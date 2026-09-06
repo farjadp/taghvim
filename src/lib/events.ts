@@ -153,16 +153,28 @@ const LUNAR_HOLIDAYS: Record<string, string> = {
   '12-18': 'عید سعید غدیر خم',
 };
 
+const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
+  1405: {
+    '6-8': 'میلاد پیامبر اکرم (ص) و امام جعفر صادق (ع)',
+    '10-2': 'میلاد امام علی (ع) — روز پدر',
+    '10-16': 'مبعث پیامبر اکرم (ص)',
+  },
+};
+
 export function eventsForDate(date: Date): CalendarEvent[] {
   const persian = toCalendar(date);
   const gregorian = toCalendar(date, 'gregorian');
   const islamic = toCalendar(date, 'islamic');
   const iran = PERSIAN_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const world = GREGORIAN_EVENTS[`${gregorian.month}-${gregorian.day}`] ?? [];
+  const officialOverrides = OFFICIAL_LUNAR_OVERRIDES[persian.year] ?? {};
+  const officialLunarTitle = officialOverrides[`${persian.month}-${persian.day}`];
   const lunarTitle = LUNAR_HOLIDAYS[`${islamic.month}-${islamic.day}`];
+  const overriddenTitles = new Set(Object.values(officialOverrides));
+  const religiousTitle = officialLunarTitle ?? (lunarTitle && !overriddenTitles.has(lunarTitle) ? lunarTitle : undefined);
   return [
     ...iran.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'iran' })),
-    ...(lunarTitle ? [{ title: lunarTitle, holiday: true, category: 'religious' as const }] : []),
+    ...(religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
     ...world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })),
   ];
 }

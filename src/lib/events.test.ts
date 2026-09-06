@@ -68,19 +68,23 @@ describe('selected calendar events', () => {
     expect(() => eventsForDate(new Date(NaN))).toThrow(RangeError);
   });
 
-  it('includes lunar religious holidays computed from the Islamic calendar', () => {
-    // 9 Shahrivar 1405 = 17 Rabi al-Awwal (Mawlud of Prophet and Imam Sadiq) — a holiday
-    // Note: islamic-civil may differ from Iranian observational calendar by ±1 day
-    const shahrivar9 = fromCalendar({ year: 1405, month: 6, day: 9 });
-    const events9 = eventsForDate(shahrivar9);
-    expect(events9.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
-    // 2 Dey 1405 = 13 Rajab (Birth of Imam Ali) — a holiday
-    const dey2 = fromCalendar({ year: 1405, month: 10, day: 2 });
-    const events2 = eventsForDate(dey2);
-    expect(events2.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
-    // 16 Dey 1405 = 27 Rajab (Mab'ath of Prophet) — a holiday
-    const dey16 = fromCalendar({ year: 1405, month: 10, day: 16 });
-    const events16 = eventsForDate(dey16);
-    expect(events16.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
+  it('prioritizes official 1405 dates over computational lunar dates', () => {
+    const shahrivar8 = eventsForDate(fromCalendar({ year: 1405, month: 6, day: 8 }));
+    expect(shahrivar8).toContainEqual(expect.objectContaining({
+      title: expect.stringContaining('میلاد پیامبر'), holiday: true, category: 'religious',
+    }));
+
+    const shahrivar9 = eventsForDate(fromCalendar({ year: 1405, month: 6, day: 9 }));
+    expect(shahrivar9.some((event) => event.title.includes('میلاد پیامبر') && event.holiday)).toBe(false);
+
+    const dey2 = eventsForDate(fromCalendar({ year: 1405, month: 10, day: 2 }));
+    expect(dey2).toContainEqual(expect.objectContaining({
+      title: expect.stringContaining('میلاد امام علی'), holiday: true, category: 'religious',
+    }));
+
+    const dey16 = eventsForDate(fromCalendar({ year: 1405, month: 10, day: 16 }));
+    expect(dey16).toContainEqual(expect.objectContaining({
+      title: expect.stringContaining('مبعث'), holiday: true, category: 'religious',
+    }));
   });
 });
