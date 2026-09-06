@@ -51,15 +51,17 @@ export function CalendarPanel({ year, month, today, selected, onSelect, onNaviga
             const active = supported && dayKey(date) === dayKey(selected);
             const isToday = supported && dayKey(date) === dayKey(today);
             const holiday = isFriday || events.some((event) => event.holiday);
-            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${MONTHS[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest text-white shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-transparent bg-[#fbf3ef] text-clay hover:bg-[#f4e7df]" : "border-transparent text-ink hover:bg-leaf"}`}>
-              <span className="text-lg leading-6 font-medium tabular-nums sm:text-[22px]">{fa(persian.day)}</span>
+            const nonFridayHoliday = holiday && !isFriday;
+            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${MONTHS[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest text-white shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-[#fce8e3] text-clay hover:bg-[#f9ded7]" : "border-transparent text-ink hover:bg-leaf"}`}>
+              <span className={`text-lg leading-6 tabular-nums sm:text-[22px] ${holiday && !active ? "font-bold" : "font-medium"}`}>{fa(persian.day)}</span>
               <span className={`text-[9px] tabular-nums sm:text-[10px] ${active ? "text-[#d9e3cf]" : "text-muted"}`} dir="ltr">{date.getUTCDate()}</span>
-              {events.length > 0 && <span className={`absolute bottom-1.5 size-1 rounded-full ${active ? "bg-[#d9e3cf]" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
+              {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-[#d9e3cf]" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
+              {nonFridayHoliday && !active && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-clay" />}
             </button>;
           })}
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-5 py-4 text-[10px] text-muted sm:px-7"><div className="flex gap-4"><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />جمعه و تعطیلی ثابت</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span></div><span>عدد کوچک: روز میلادی</span></div>
+      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-5 py-4 text-[10px] text-muted sm:px-7"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-[#fce8e3] border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span></div><span>عدد کوچک: روز میلادی</span></div>
       <p className="sr-only">روز انتخاب‌شده: {formatDate(selected)}</p>
     </section>
   );

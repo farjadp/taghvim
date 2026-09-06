@@ -117,3 +117,17 @@ test("page has no horizontal overflow or client errors", async ({ page }) => {
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(errors).toEqual([]);
 });
+
+test("non-Friday holidays are highlighted in red on the calendar grid", async ({ page }) => {
+  await page.getByLabel("انتخاب ماه تقویم").selectOption("1");
+  await page.getByLabel("انتخاب سال تقویم").selectOption("1405");
+  // 1 Farvardin (Nowruz) is a holiday — not a Friday in 1405
+  const nowruzCell = page.getByRole("button", { name: "۱ فروردین ۱۴۰۵", exact: true });
+  await expect(nowruzCell).toBeVisible();
+  // The holiday cell should have clay-colored text (red-ish), not the default ink color
+  const textColor = await nowruzCell.evaluate((el) => getComputedStyle(el).color);
+  expect(textColor).toContain("169, 80, 59"); // rgb for #a9503b (clay)
+  // The background should be a light red/pink, not white
+  const bgColor = await nowruzCell.evaluate((el) => getComputedStyle(el).backgroundColor);
+  expect(bgColor).toContain("252, 232, 227"); // rgb for #fce8e3
+});
