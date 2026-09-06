@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@import "@fontsource/vazirmatn/400.css";
+@import "@fontsource/vazirmatn/500.css";
+@import "@fontsource/vazirmatn/600.css";
+@import "@fontsource/vazirmatn/700.css";
+@import "@fontsource/vazirmatn/800.css";
+
+@theme {
+  --font-sans: "Vazirmatn", sans-serif;
+  --color-paper: #f7f8f4;
+  --color-surface: #ffffff;
+  --color-ink: #243e34;
+  --color-muted: #5c6a61;
+  --color-line: #e6eae3;
+  --color-forest: #214f40;
+  --color-leaf: #eaf0e6;
+  --color-clay: #a9503b;
+  --color-sand: #f5eee1;
+}
+
+@layer base {
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body { @apply bg-paper font-sans text-ink antialiased; }
+  button, a, input, select { -webkit-tap-highlight-color: transparent; }
+  button:not(:disabled), select { cursor: pointer; }
+  button, a, input, select { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest; }
+  button:disabled { @apply cursor-not-allowed opacity-40; }
+  input, select { @apply accent-forest; }
+  ::selection { @apply bg-forest text-white; }
+  * { scrollbar-width: thin; scrollbar-color: #bcc8bb #f7f8f4; }
+}
+
+@utility field {
+  @apply h-12 w-full min-w-0 rounded-xl border border-line bg-white px-3 text-sm text-ink transition-colors focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15;
+}
+
+@utility icon-button {
+  @apply inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-line bg-white text-ink transition-colors hover:bg-leaf;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { scroll-behavior: auto !important; }
+}

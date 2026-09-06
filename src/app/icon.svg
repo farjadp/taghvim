@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none" role="img" aria-labelledby="title">
+  <title id="title">نشان تقویم؛ طلوع یک روز تازه</title>
+  <path fill="#214f40" fill-rule="evenodd" clip-rule="evenodd" d="M20 8h24c7 0 12 5 12 12v19L39 56H20C13 56 8 51 8 44V20C8 13 13 8 20 8Zm1 25a11 11 0 0 1 22 0H21Zm-1 4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4H20Zm23 7v6l7-7h-6a1 1 0 0 0-1 1Z"/>
+  <path d="M32 14v2m-14 7 2 1m24 0 2-1" stroke="#f7f8f4" stroke-width="3" stroke-linecap="round"/>
+</svg>
