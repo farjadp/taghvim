@@ -38,6 +38,11 @@
   @apply inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-line bg-white text-ink transition-colors hover:bg-leaf;
 }
 
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { scroll-behavior: auto !important; }

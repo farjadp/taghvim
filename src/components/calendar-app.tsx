@@ -69,7 +69,7 @@ export function CalendarApp({ initialNow }: { initialNow: string }) {
       <header className="border-b border-line bg-white/80">
         <div className="mx-auto flex min-h-23 max-w-[1240px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
           <a href="#" aria-label="تقویم، صفحهٔ اصلی" className="flex items-center gap-2.5 text-forest"><BrandMark /><span className="text-[27px] leading-none font-extrabold">تقویم<span className="mr-1 text-clay">.</span></span><span className="mr-4 hidden border-r border-line pr-5 text-xs font-normal text-muted xl:block">روزها را بهتر ببین</span></a>
-          <nav aria-label="ناوبری اصلی" className="order-3 flex w-full items-center justify-between gap-3 overflow-x-auto text-[11px] font-medium sm:order-none sm:w-auto sm:justify-start sm:gap-7 sm:text-xs">
+          <nav aria-label="ناوبری اصلی" className="scrollbar-hidden order-3 flex w-full items-center justify-between gap-3 overflow-x-auto text-[11px] font-medium sm:order-none sm:w-auto sm:justify-start sm:gap-7 sm:text-xs">
             <a href="#calendar" className="flex shrink-0 items-center gap-1.5 text-forest"><CalendarDays size={16} />تقویم</a>
             <button onClick={() => openTool("convert")} className="flex shrink-0 items-center gap-1.5 text-muted hover:text-forest"><ArrowLeftRight size={16} />تبدیل تاریخ</button>
             <button onClick={() => openTool("distance")} className="flex shrink-0 items-center gap-1.5 text-muted hover:text-forest"><Hourglass size={16} />فاصلهٔ تاریخ‌ها</button>
