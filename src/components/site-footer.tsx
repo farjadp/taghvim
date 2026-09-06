@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpLeft, Mail, Phone, Building2 } from "lucide-react";
+import { ArrowUpLeft, Mail, Phone, Building2, GitBranch } from "lucide-react";
 
 export function SiteFooter() {
   return (
@@ -53,6 +53,16 @@ export function SiteFooter() {
               className="flex items-center gap-1.5 text-xs text-muted hover:text-forest"
             >
               فرجاد پورمحمد
+              <ArrowUpLeft size={12} className="opacity-60" />
+            </a>
+            <a
+              href="https://github.com/farjadp/taghvim"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 text-xs text-muted hover:text-forest"
+            >
+              <GitBranch size={14} />
+              کد پروژه در گیت‌هاب
               <ArrowUpLeft size={12} className="opacity-60" />
             </a>
             <a href="mailto:farjad@ashavid.ca" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
