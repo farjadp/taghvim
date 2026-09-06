@@ -9,6 +9,7 @@ import { CalendarPanel } from "./calendar-panel";
 import { EventsPanel } from "./events-panel";
 import { ToolsPanel, type ToolTab } from "./tools-panel";
 import { PrayerPanel } from "./prayer-panel";
+import { SiteFooter } from "./site-footer";
 
 function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
@@ -88,7 +89,7 @@ export function CalendarApp({ initialNow }: { initialNow: string }) {
         <PrayerPanel now={now} />
         <section className="mt-7 flex flex-col justify-between gap-4 rounded-2xl bg-sand px-6 py-5 sm:flex-row sm:items-center"><div><h2 className="text-sm font-semibold">یک تقویم، بدون حواس‌پرتی.</h2><p className="mt-1.5 text-xs leading-6 text-muted">بدون ثبت‌نام. بدون تبلیغات. برای پیدا کردن روزها و برنامه‌ریزی لحظه‌ها.</p></div><a href="#calendar" className="flex shrink-0 items-center gap-2 text-xs font-medium text-forest">برگردیم به روزها<ArrowUpLeft size={16} /></a></section>
       </main>
-      <footer className="mx-auto flex max-w-[1240px] flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-7 text-[10px] text-muted sm:px-8"><div className="flex items-center gap-2"><span className="text-base font-bold text-forest">تقویم.</span><span>همراهِ روزهای تو</span></div><p>تقویم قمری و اوقات شرعی محاسباتی‌اند؛ مناسبت‌ها گزیده‌اند.</p><span dir="ltr">MADE FOR EVERY DAY</span></footer>
+      <SiteFooter />
     </>
   );
 }
