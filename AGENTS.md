@@ -29,7 +29,7 @@ Run unit tests, typecheck, build, and relevant browser tests before completing a
 - Civil-date conversions return UTC noon. Supported range: Persian years 1200–1600 inclusive.
 - Month grids start on Saturday and include adjacent-month padding. Out-of-range boundary padding is disabled in the UI and must not be passed to range-validated helpers.
 - Lunar dates use `islamic-civil`, not Iranian observational dates. Preserve the visible computational-calendar notice.
-- Events are a curated selection of recurring fixed Persian/Gregorian events, not the full official calendar. Unverified lunar religious holidays are deliberately excluded. Preserve coverage warnings and never present this dataset as complete.
+- Events are a curated selection of recurring fixed Persian/Gregorian events plus lunar religious holidays computed via `islamic-civil`, not the full official calendar. Lunar holidays may differ from Iranian observational sightings by ±1 day. Preserve coverage warnings and never present this dataset as complete.
 - Prayer times use Adhan's Tehran method with city coordinates. Jafari midnight is the midpoint between sunset and the next day's fajr. Preserve approximation/method notices.
 - The live clock uses the device clock in Tehran time, not NTP synchronization.
 - Only the selected city is persisted in browser localStorage. Access is guarded for restricted-storage environments.

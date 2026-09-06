@@ -28,10 +28,9 @@ describe('selected calendar events', () => {
     [5, 'داروساز'], [5, 'رازی'], [8, 'تروریسم'], [11, 'چاپ'], [12, 'بهورز'],
     [13, 'تعاون'], [13, 'ابوریحان'], [17, 'شهریور'], [21, 'سینما'],
     [27, 'شهریار'], [27, 'شعر'], [31, 'دفاع مقدس'],
-  ])('includes Shahrivar %i: %s without inventing public holidays', (day, title) => {
+  ])('includes Shahrivar %i: %s as Iranian event (lunar holidays may overlap)', (day, title) => {
     const events = eventsForDate(persian(6, day));
     expect(events.some((event) => event.category === 'iran' && event.title.includes(title))).toBe(true);
-    expect(events.some((event) => event.holiday)).toBe(false);
   });
 
   it.each([
@@ -61,16 +60,27 @@ describe('selected calendar events', () => {
     expect(eventsForDate(date)).toEqual(expected);
   });
 
-  it('discloses limited coverage and never generates unverified lunar holidays', () => {
+  it('discloses limited coverage and computational lunar calendar notice', () => {
     expect(EVENTS_NOTICE).toContain('گزیده');
     expect(EVENTS_NOTICE).toContain('رسمی');
-    expect(EVENTS_NOTICE).toContain('مذهبی');
-    expect(EVENTS_NOTICE).toContain('تأیید');
-    for (let month = 1; month <= 12; month += 1) {
-      for (let day = 1; day <= 28; day += 1) {
-        expect(eventsForDate(persian(month, day)).some((event) => event.category === 'religious')).toBe(false);
-      }
-    }
+    expect(EVENTS_NOTICE).toContain('قمری');
+    expect(EVENTS_NOTICE).toContain('islamic-civil');
     expect(() => eventsForDate(new Date(NaN))).toThrow(RangeError);
+  });
+
+  it('includes lunar religious holidays computed from the Islamic calendar', () => {
+    // 9 Shahrivar 1405 = 17 Rabi al-Awwal (Mawlud of Prophet and Imam Sadiq) — a holiday
+    // Note: islamic-civil may differ from Iranian observational calendar by ±1 day
+    const shahrivar9 = fromCalendar({ year: 1405, month: 6, day: 9 });
+    const events9 = eventsForDate(shahrivar9);
+    expect(events9.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
+    // 2 Dey 1405 = 13 Rajab (Birth of Imam Ali) — a holiday
+    const dey2 = fromCalendar({ year: 1405, month: 10, day: 2 });
+    const events2 = eventsForDate(dey2);
+    expect(events2.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
+    // 16 Dey 1405 = 27 Rajab (Mab'ath of Prophet) — a holiday
+    const dey16 = fromCalendar({ year: 1405, month: 10, day: 16 });
+    const events16 = eventsForDate(dey16);
+    expect(events16.some((event) => event.category === 'religious' && event.holiday)).toBe(true);
   });
 });

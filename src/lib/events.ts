@@ -6,7 +6,7 @@ export type CalendarEvent = {
   category: 'iran' | 'world' | 'religious';
 };
 
-export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری به دلیل تأیید نشدن با تقویم رسمی سالانه درج نشده‌اند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای چند تعطیلی ثابت ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
+export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری با تقویم محاسباتی islamic-civil درج شده‌اند و ممکن است با تقویم رسمی ایران (مبتنی بر رؤیت هلال) تا یک روز تفاوت داشته باشند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
 
 export const EVENT_SOURCES = [
   { title: 'روز همدان و بزرگداشت ابوعلی سینا، یکم شهریور — خبرگزاری آنا', url: 'https://ana.ir/fa/news/205369' },
@@ -131,13 +131,38 @@ const GREGORIAN_EVENTS: FixedEvents = {
   '12-25': [['کریسمس']],
 };
 
+// Lunar religious holidays — computed via islamic-civil, may differ from Iranian sightings by ±1 day.
+// Key format: `${islamicMonth}-${islamicDay}`
+const LUNAR_HOLIDAYS: Record<string, string> = {
+  '1-9': 'تاسوعا',
+  '1-10': 'عاشورا',
+  '2-20': 'اربعین حسینی',
+  '2-28': 'رحلت پیامبر اکرم (ص) و شهادت امام حسن مجتبی (ع)',
+  '2-30': 'شهادت امام رضا (ع)',
+  '3-8': 'شهادت امام حسن عسکری (ع)',
+  '3-17': 'میلاد پیامبر اکرم (ص) و امام جعفر صادق (ع)',
+  '6-3': 'شهادت حضرت فاطمه (س)',
+  '7-13': 'میلاد امام علی (ع) — روز پدر',
+  '7-27': 'مبعث پیامبر اکرم (ص)',
+  '8-15': 'میلاد امام مهدی (عج)',
+  '9-21': 'شهادت امام علی (ع)',
+  '10-1': 'عید سعید فطر',
+  '10-2': 'تعطیلی عید فطر',
+  '10-3': 'تعطیلی عید فطر',
+  '12-10': 'عید سعید قربان',
+  '12-18': 'عید سعید غدیر خم',
+};
+
 export function eventsForDate(date: Date): CalendarEvent[] {
   const persian = toCalendar(date);
   const gregorian = toCalendar(date, 'gregorian');
+  const islamic = toCalendar(date, 'islamic');
   const iran = PERSIAN_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const world = GREGORIAN_EVENTS[`${gregorian.month}-${gregorian.day}`] ?? [];
+  const lunarTitle = LUNAR_HOLIDAYS[`${islamic.month}-${islamic.day}`];
   return [
     ...iran.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'iran' })),
+    ...(lunarTitle ? [{ title: lunarTitle, holiday: true, category: 'religious' as const }] : []),
     ...world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })),
   ];
 }
