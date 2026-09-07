@@ -239,7 +239,8 @@ test("changelog is reachable from the footer and lists releases with dates", asy
   const releases = page.getByRole("main").getByRole("listitem").filter({ has: page.locator("time[datetime]") });
   expect(await releases.count()).toBeGreaterThan(1);
   await expect(releases.first()).toContainText("ساعت");
-  await expect(page.getByRole("heading", { name: "در راه" })).toBeVisible();
+  // exact: a release is titled «آنچه در راه است», which also contains this text
+  await expect(page.getByRole("heading", { name: "در راه", exact: true })).toBeVisible();
 });
 
 test("changelog passes accessibility checks in both themes", async ({ page }) => {

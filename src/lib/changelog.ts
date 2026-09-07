@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.8.0 — 2026-09-07
+// Version: 0.8.1 — 2026-09-07
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.8.1',
+    at: '2026-09-07T02:30:48-04:00',
+    status: 'ready',
+    title: 'آنچه در راه است',
+    changes: [
+      { kind: 'changed', text: 'فهرست «در راه» کامل شد: نصب روی صفحهٔ اصلی، ربات تلگرام، افزونهٔ کروم، تصویر زمینهٔ ماهانه، اشتراک تعطیلات در تقویم گوگل و اپل، و برنامهٔ اندروید با ویجت.' },
+    ],
+  },
   {
     version: '0.8.0',
     at: '2026-09-07T02:09:58-04:00',
@@ -95,7 +104,7 @@ export const RELEASES: Release[] = [
     version: '0.2.0',
     at: '2026-09-07T00:23:52-04:00',
     status: 'live',
-    title: 'پیش‌فرض سکولار',
+    title: 'پیش‌فرض ایران عزیز',
     changes: [
       { kind: 'changed', text: 'مناسبت‌های مذهبی و دولتی به‌صورت پیش‌فرض نمایش داده نمی‌شوند. یک کلید در نوار بالا آن‌ها را برمی‌گرداند و انتخاب تو ذخیره می‌شود.' },
       { kind: 'fixed', text: 'تاریخ قمری به هر خانهٔ تقویم اضافه شد و عدد میلادی کمی بزرگ‌تر شد.' },
@@ -117,10 +126,16 @@ export const RELEASES: Release[] = [
 ];
 
 // Under consideration — deliberately without dates or promises.
+// Written for visitors, not as internal strategy: what is being considered,
+// in plain terms, with the honest caveats attached. Order carries no meaning.
 export const UPCOMING: string[] = [
-  'ویجت صفحهٔ اصلی برای موبایل، تا تاریخ بدون باز کردن سایت دیده شود.',
-  'افزونهٔ کروم، با همین طراحی.',
+  'نصب روی صفحهٔ اصلی موبایل، بدون فروشگاه و بدون نصب برنامه. همین سایت، با آیکن خودش، و بدون نیاز به اینترنت برای دیدن تقویم.',
+  'ربات تلگرام که هر روز صبح تاریخ و مناسبت‌های آن روز را بفرستد.',
+  'افزونهٔ کروم، تا تقویم در تب جدید باز شود.',
+  'تصویر زمینهٔ ماهانه برای موبایل، تا تقویم روی صفحهٔ قفل باشد.',
+  'اشتراک تعطیلات در تقویم گوگل و اپل، تا تعطیلات ایران داخل همان تقویمی بیاید که هر روز باز می‌کنی. این یکی تا وقتی تعطیلات قمری بر پایهٔ تقویم رسمی درنیامده، ساخته نمی‌شود.',
   'تعطیلات قمری بر پایهٔ تقویم رسمی، نه محاسباتی — امروز فقط سه تاریخ از سال ۱۴۰۵ تثبیت شده است.',
+  'برنامهٔ اندروید و ویجت صفحهٔ اصلی. ویجت بدون برنامهٔ نصبی ممکن نیست، و چون اپ‌استور اپل در ایران در دسترس نیست، اگر ساخته شود اول اندروید خواهد بود.',
 ];
 
 export const UPCOMING_NOTICE = 'این فهرست، کارهایی است که در دست بررسی‌اند؛ نه قول، نه زمان‌بندی. ترتیب هم معنایی ندارد.';
