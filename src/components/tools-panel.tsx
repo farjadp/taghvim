@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: src/components/tools-panel.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Date tools: conversion between calendars, date distance, age.
+// Env / Deps: Input parsing accepts Persian, Arabic-Indic and Latin digits.
+// ============================================================================
+
 "use client";
 
 import { useState } from "react";
@@ -12,10 +19,12 @@ const GREGORIAN_MONTHS = ["ژانویه", "فوریه", "مارس", "آوریل"
 const ISLAMIC_MONTHS = ["محرم", "صفر", "ربیع‌الاول", "ربیع‌الثانی", "جمادی‌الاول", "جمادی‌الثانی", "رجب", "شعبان", "رمضان", "شوال", "ذی‌القعده", "ذی‌الحجه"];
 const INVALID_DATE = "تاریخ معتبر نیست. روز، ماه و سال را بررسی کنید؛ بازهٔ پشتیبانی‌شده ۱۲۰۰ تا ۱۶۰۰ خورشیدی است.";
 
+// Date → three input strings in Persian digits, for pre-filling a form
 function inputDate(date: Date, kind: CalendarKind = "persian"): DateInput {
   const parts = toCalendar(date, kind);
   return { year: String(parts.year), month: String(parts.month), day: String(parts.day) };
 }
+// Three input strings → Date, throwing a Persian RangeError on bad input
 function parseDate(value: DateInput, kind: CalendarKind = "persian") {
   return fromCalendar({ year: parseNumericInput(value.year), month: parseNumericInput(value.month), day: parseNumericInput(value.day) }, kind);
 }
@@ -33,6 +42,7 @@ function SubmitButton({ children }: { children: React.ReactNode }) {
   return <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">{children}<ArrowLeft size={16} /></button>;
 }
 
+// Tab 1: convert a date from one calendar into the other two
 function Converter({ now }: { now: Date }) {
   const [kind, setKind] = useState<CalendarKind>("persian");
   const [value, setValue] = useState(inputDate(now));
@@ -57,6 +67,7 @@ function Converter({ now }: { now: Date }) {
   </div>;
 }
 
+// Tab 2: whole days between two Persian dates (sign-aware)
 function Distance({ now }: { now: Date }) {
   const [start, setStart] = useState(inputDate(now));
   const [end, setEnd] = useState(inputDate(now));
@@ -74,6 +85,7 @@ function Distance({ now }: { now: Date }) {
   </form>;
 }
 
+// Tab 3: elapsed age from a Persian birthday to today
 function Age({ now }: { now: Date }) {
   const [value, setValue] = useState(inputDate(now));
   const [result, setResult] = useState<ReturnType<typeof elapsedAge> | null>(null);
@@ -94,6 +106,7 @@ function Age({ now }: { now: Date }) {
   </form>;
 }
 
+// Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
 export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void }) {
   const tabs = [{ key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
   return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-white">

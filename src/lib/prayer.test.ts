@@ -1,6 +1,14 @@
+// ============================================================================
+// Source: src/lib/prayer.test.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Unit tests for prayer-time ordering, city coverage and midnight rule.
+// Env / Deps: Vitest.
+// ============================================================================
+
 import { describe, expect, it } from "vitest";
 import { CITIES, prayerTimes, type PrayerTime } from "./prayer";
 
+// Fixed reference day so the expected ordering does not drift with the wall clock
 const referenceDate = new Date("2026-09-06T12:00:00+03:30");
 const keys = ["fajr", "sunrise", "dhuhr", "sunset", "maghrib", "midnight"];
 

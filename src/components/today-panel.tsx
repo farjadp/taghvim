@@ -1,9 +1,18 @@
+// ============================================================================
+// Source: src/components/today-panel.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Hero: today in Persian with a live Tehran clock, plus Gregorian and
+//      Hijri equivalents and a copy-to-clipboard button.
+// Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
+// ============================================================================
+
 "use client";
 
 import { useEffect, useState } from "react";
 import { ArrowDownLeft, Copy, Check, Clock3 } from "lucide-react";
 import { dateNumbers, fa, formatDate, MONTHS, toCalendar } from "@/lib/calendar";
 
+// Ticks every second on the client; the server-rendered value avoids a hydration flash
 function LiveClock({ initialNow }: { initialNow: string }) {
   const [now, setNow] = useState(new Date(initialNow));
   useEffect(() => {
@@ -14,6 +23,7 @@ function LiveClock({ initialNow }: { initialNow: string }) {
   return <time className="text-[2.4rem] leading-none font-medium tracking-wide tabular-nums sm:text-5xl" dir="ltr">{new Intl.DateTimeFormat("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(now)}</time>;
 }
 
+// Decorative line-art sunrise; aria-hidden, purely visual
 function SunDrawing() {
   return (
     <svg viewBox="0 0 250 240" fill="none" aria-hidden="true" className="pointer-events-none absolute -bottom-10 left-2 h-64 w-64 text-[#b7c7a6] opacity-35 sm:left-8">
@@ -35,6 +45,7 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
     const timer = setTimeout(() => setCopied(false), 2500);
     return () => clearTimeout(timer);
   }, [copied]);
+  // Clipboard may be unavailable (insecure context, permissions) — surface that, do not crash
   async function copyDate() {
     try {
       await navigator.clipboard.writeText(dateNumbers(now));

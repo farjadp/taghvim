@@ -1,9 +1,17 @@
+// ============================================================================
+// Source: src/lib/date-tools.test.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Unit tests for digit parsing and elapsed-age calculation.
+// Env / Deps: Vitest.
+// ============================================================================
+
 import { describe, expect, it } from "vitest";
 import { elapsedAge, parseNumericInput } from "./date-tools";
 import { fromCalendar } from "./calendar";
 
 const date = (year: number, month: number, day: number) => fromCalendar({ year, month, day });
 
+// Digit normalisation must accept all three digit sets and reject everything else
 describe("numeric input", () => {
   it("accepts Persian, Arabic and Latin digits", () => {
     expect(parseNumericInput("۱۴۰۳")).toBe(1403);

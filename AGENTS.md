@@ -4,7 +4,9 @@
 
 Persian-language, RTL calendar web app inspired by `time.ir`, with a modern Iranian visual identity.
 
+- Live at `https://taghv.im`. Repository: `https://github.com/farjadp/taghvim`.
 - No accounts, authentication, advertising, or backend database.
+- **Secular by default.** State occasions (`category: 'state'`), lunar religious holidays and the prayer-times panel are hidden until the visitor turns on the «مناسبت‌های مذهبی و دولتی» switch in the header. The choice persists in `localStorage` as `taghvim-scope`. Never move an event between `iran` and `state` without a reason in the commit message.
 - Approved design: warm light surfaces, deep green, restrained clay accents, locally hosted Vazirmatn typography.
 - Logo source: `src/app/icon.svg`, a sunrise/calendar-page mark. The header references `/icon.svg`, and Next.js uses the same asset as the browser icon. Do not duplicate its geometry.
 - Stack: Next.js App Router, TypeScript, React 19 functional components, Tailwind CSS v4. No inline styling.
@@ -30,12 +32,25 @@ Run unit tests, typecheck, build, and relevant browser tests before completing a
 - Month grids start on Saturday and include adjacent-month padding. Out-of-range boundary padding is disabled in the UI and must not be passed to range-validated helpers.
 - Lunar dates use `islamic-civil`, not Iranian observational dates. Preserve the visible computational-calendar notice.
 - Events are a curated selection of recurring fixed Persian/Gregorian events plus lunar religious holidays computed via `islamic-civil`, not the full official calendar. Lunar holidays may differ from Iranian observational sightings by ±1 day. Preserve coverage warnings and never present this dataset as complete.
+- `eventsForDate(date, scope)` is the single source of truth for both the grid shading and the event list. In `'secular'` scope, state and religious rows are removed entirely — including their holiday flag — so the grid never shades a day it cannot explain.
+- `OFFICIAL_LUNAR_OVERRIDES` pins lunar holidays to official Persian dates per year. It currently covers three dates in 1405 only.
 - Prayer times use Adhan's Tehran method with city coordinates. Jafari midnight is the midpoint between sunset and the next day's fajr. Preserve approximation/method notices.
 - The live clock uses the device clock in Tehran time, not NTP synchronization.
-- Only the selected city is persisted in browser localStorage. Access is guarded for restricted-storage environments.
+- Only two keys are persisted in browser localStorage: `taghvim-city` and `taghvim-scope`. Every access is guarded for restricted-storage environments.
 - Calendar cells and tool tabs support RTL arrow-key navigation. Preserve keyboard behavior and midnight rollover regression tests.
 
 ## Code style
+
+- Every code file (`.ts`, `.tsx`, `.mjs`, `.css`) starts with the header block below and carries inline comments on non-obvious logic. Bump `Version` in the header when the file's behaviour changes.
+
+  ```ts
+  // ============================================================================
+  // Source: src/lib/events.ts
+  // Version: 0.2.0 — 2026-09-07
+  // Why: One or two lines on what this file is for.
+  // Env / Deps: What it depends on or persists.
+  // ============================================================================
+  ```
 
 - TypeScript over JavaScript.
 - Functional React components only.
@@ -55,3 +70,13 @@ src/
 tests/
 └── calendar.spec.ts     # Playwright E2E
 ```
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+# This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

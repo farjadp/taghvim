@@ -1,7 +1,15 @@
+// ============================================================================
+// Source: src/components/site-footer.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers.
+// Env / Deps: Server component used by every page.
+// ============================================================================
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpLeft, Mail, Phone, Building2, GitBranch } from "lucide-react";
 
+// Four columns on desktop: brand, pages, tools, contact; disclaimers underneath
 export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-white">

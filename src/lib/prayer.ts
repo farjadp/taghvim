@@ -1,5 +1,14 @@
+// ============================================================================
+// Source: src/lib/prayer.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Prayer times for 12 Iranian cities using Adhan's Tehran method.
+//      Jafari midnight is the midpoint of sunset and next-day fajr.
+// Env / Deps: adhan; coordinates are hard-coded per city.
+// ============================================================================
+
 import { CalculationMethod, Coordinates, PrayerTimes } from "adhan";
 
+// Twelve cities with coordinates. Adding one here is the only step needed.
 export const CITIES: readonly {
   id: string;
   name: string;
@@ -47,6 +56,7 @@ const timeFormatter = new Intl.DateTimeFormat("fa-IR", {
   hourCycle: "h23",
 });
 
+// Six daily times for a city on the Tehran civil day of `date`, in ascending order.
 export function prayerTimes(date: Date, cityId: string): PrayerTime[] {
   if (!(date instanceof Date) || !Number.isFinite(date.getTime())) {
     throw new RangeError("Invalid date");
@@ -66,6 +76,7 @@ export function prayerTimes(date: Date, cityId: string): PrayerTime[] {
   const parameters = CalculationMethod.Tehran();
   const today = new PrayerTimes(coordinates, localDate, parameters);
   const tomorrow = new PrayerTimes(coordinates, nextDate, parameters);
+  // Jafari (Shia) midnight: midpoint of tonight's sunset and tomorrow's fajr, not clock midnight.
   const midnight = new Date((today.sunset.getTime() + tomorrow.fajr.getTime()) / 2);
   const entries: [string, string, Date][] = [
     ["fajr", "اذان صبح", today.fajr],

@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: src/app/contact/page.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Static contact page: AshaVid and personal links.
+// Env / Deps: Server component; no form, no backend.
+// ============================================================================
+
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,6 +15,7 @@ export const metadata: Metadata = {
   description: "راه‌های ارتباطی با تیم تقویم و مشخصات برنامه‌نویس.",
 };
 
+// Sections: company contact, social links, related sites
 export default function ContactPage() {
   return (
     <>
@@ -91,6 +99,7 @@ export default function ContactPage() {
   );
 }
 
+// Contact row with an optional LTR value (phone, email) and external-link handling
 function ContactCard({ icon, title, label, href, ltr, external }: {
   icon: React.ReactNode;
   title: string;
@@ -118,6 +127,7 @@ function ContactCard({ icon, title, label, href, ltr, external }: {
   );
 }
 
+// Compact social-profile link tile
 function SocialCard({ icon, title, label, href }: {
   icon: React.ReactNode;
   title: string;

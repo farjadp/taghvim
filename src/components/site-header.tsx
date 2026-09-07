@@ -1,7 +1,15 @@
+// ============================================================================
+// Source: src/components/site-header.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Minimal header for secondary pages (about, contact) with a back link.
+// Env / Deps: Server component; the home page has its own richer header.
+// ============================================================================
+
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
 
+// `active` highlights the current secondary page in the nav
 export function SiteHeader({ active }: { active?: "about" | "contact" }) {
   return (
     <header className="border-b border-line bg-white/80">

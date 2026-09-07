@@ -1,3 +1,11 @@
+// ============================================================================
+// Source: src/lib/events.test.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Unit tests for the events dataset, categories, scope filtering and
+//      official 1405 lunar overrides.
+// Env / Deps: Vitest.
+// ============================================================================
+
 import { describe, expect, it } from 'vitest';
 import { fromCalendar } from './calendar';
 import { EVENTS_NOTICE, eventsForDate } from './events';
@@ -11,26 +19,49 @@ describe('selected calendar events', () => {
     }));
   });
 
-  it.each([[1, 12], [1, 13], [3, 14], [3, 15], [11, 22], [12, 29]])('includes fixed Iranian holidays %i/%i', (month, day) => {
+  it.each([[1, 13], [12, 29]])('includes fixed national holidays %i/%i', (month, day) => {
     expect(eventsForDate(persian(month, day)).some((event) => event.holiday && event.category === 'iran')).toBe(true);
+  });
+
+  it.each([[1, 12], [3, 14], [3, 15], [11, 22]])('files state holidays %i/%i under the state category', (month, day) => {
+    expect(eventsForDate(persian(month, day)).some((event) => event.holiday && event.category === 'state')).toBe(true);
+  });
+
+  // Default scope is the caller's choice; 'secular' must strip state and religious rows entirely,
+  // including their holiday flag, so the grid does not shade a day it cannot explain.
+  it('hides state and religious events in secular scope but keeps national and world ones', () => {
+    const bahman22 = eventsForDate(persian(11, 22), 'secular');
+    expect(bahman22.some((event) => event.category === 'state')).toBe(false);
+    expect(bahman22.some((event) => event.holiday)).toBe(false);
+    const ashura = fromCalendar({ year: 1405, month: 6, day: 8 });
+    expect(eventsForDate(ashura, 'all').some((event) => event.category === 'religious')).toBe(true);
+    expect(eventsForDate(ashura, 'secular').some((event) => event.category === 'religious')).toBe(false);
+    expect(eventsForDate(persian(1, 1), 'secular')).toContainEqual(expect.objectContaining({ title: expect.stringContaining('نوروز'), holiday: true }));
+    expect(eventsForDate(persian(9, 30), 'secular').some((event) => event.title.includes('یلدا'))).toBe(true);
+    expect(eventsForDate(fromCalendar({ year: 2025, month: 12, day: 25 }, 'gregorian'), 'secular').some((event) => event.category === 'world')).toBe(true);
   });
 
   it.each([
     [1, 25, 'عطار'], [2, 25, 'فردوسی'], [3, 1, 'ملاصدرا'], [4, 10, 'صنعت'],
     [4, 14, 'قلم'], [5, 17, 'خبرنگار'], [6, 27, 'شعر'], [7, 20, 'حافظ'],
-    [8, 24, 'کتاب'], [9, 30, 'یلدا'], [10, 5, 'زلزله'], [11, 12, 'امام خمینی'], [12, 5, 'مهندس'],
+    [8, 24, 'کتاب'], [9, 30, 'یلدا'], [10, 5, 'زلزله'], [12, 5, 'مهندس'],
   ])('includes selected event %i/%i: %s', (month, day, title) => {
     expect(eventsForDate(persian(month, day)).some((event) => event.title.includes(title))).toBe(true);
   });
 
   it.each([
-    [1, 'پزشک'], [1, 'ابوعلی سینا'], [2, 'دولت'], [1, 'همدان'], [4, 'کارمند'],
-    [5, 'داروساز'], [5, 'رازی'], [8, 'تروریسم'], [11, 'چاپ'], [12, 'بهورز'],
-    [13, 'تعاون'], [13, 'ابوریحان'], [17, 'شهریور'], [21, 'سینما'],
-    [27, 'شهریار'], [27, 'شعر'], [31, 'دفاع مقدس'],
-  ])('includes Shahrivar %i: %s as Iranian event (lunar holidays may overlap)', (day, title) => {
+    [1, 'پزشک'], [1, 'ابوعلی سینا'], [1, 'همدان'], [4, 'کارمند'],
+    [5, 'داروساز'], [5, 'رازی'], [11, 'چاپ'], [12, 'بهورز'],
+    [13, 'تعاون'], [13, 'ابوریحان'], [21, 'سینما'], [27, 'شهریار'], [27, 'شعر'],
+  ])('includes Shahrivar %i: %s as a national event (lunar holidays may overlap)', (day, title) => {
     const events = eventsForDate(persian(6, day));
     expect(events.some((event) => event.category === 'iran' && event.title.includes(title))).toBe(true);
+  });
+
+  it.each([[2, 'دولت'], [8, 'تروریسم'], [17, 'شهریور'], [31, 'دفاع مقدس'], [19, 'طالقانی']])('files Shahrivar %i: %s under the state category', (day, title) => {
+    const events = eventsForDate(persian(6, day));
+    expect(events.some((event) => event.category === 'state' && event.title.includes(title))).toBe(true);
+    expect(events.some((event) => event.category === 'iran' && event.title.includes(title))).toBe(false);
   });
 
   it.each([

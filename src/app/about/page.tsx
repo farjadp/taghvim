@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: src/app/about/page.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Static about page: what the app does, what it deliberately leaves out.
+// Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
+// ============================================================================
+
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -8,6 +15,7 @@ export const metadata: Metadata = {
   description: "معرفی تقویم ایرانی، اهداف و امکانات پروژهٔ تقویم.",
 };
 
+// Sections: intro, features, limitations (disclaimers), credits
 export default function AboutPage() {
   return (
     <>
@@ -85,6 +93,7 @@ export default function AboutPage() {
   );
 }
 
+// One feature tile: icon, title, one-sentence description
 function FeatureCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-line bg-white p-5">

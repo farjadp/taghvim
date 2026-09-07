@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: playwright.config.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Playwright configuration: two device projects and the dev-server hook.
+// Env / Deps: Starts `npm run dev -- --port 3100`; port 3000 is reserved on this machine.
+// ============================================================================
+
 import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({

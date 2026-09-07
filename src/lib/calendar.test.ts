@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: src/lib/calendar.test.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Unit tests for calendar conversion, formatting, grids and range limits.
+// Env / Deps: Vitest.
+// ============================================================================
+
 import { describe, expect, it } from 'vitest';
 import {
   MONTHS, WEEKDAYS, ISLAMIC_NOTICE, addDays, dateNumbers, dayKey, daysBetween,
@@ -7,6 +14,7 @@ import {
 
 const civil = (year: number, month: number, day: number): CalendarDate => ({ year, month, day });
 
+// Round-trips and known reference dates across the three calendars
 describe('calendar conversion', () => {
   it.each([
     [1399, 1, 1, '2020-03-20'],

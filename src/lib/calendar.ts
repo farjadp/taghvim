@@ -1,3 +1,11 @@
+// ============================================================================
+// Source: src/lib/calendar.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Calendar core: Jalali/Gregorian/Hijri conversion, formatting, month grids.
+//      Every instant is read as a civil day in Asia/Tehran and returned at UTC noon.
+// Env / Deps: jalaali-js for Jalali; Intl islamic-civil for Hijri. Range 1200–1600 SH.
+// ============================================================================
+
 import { jalaaliMonthLength, toGregorian, toJalaali } from 'jalaali-js';
 
 export type CalendarKind = 'persian' | 'gregorian' | 'islamic';
@@ -22,13 +30,16 @@ const GREGORIAN_MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
   'July', 'August', 'September', 'October', 'November', 'December',
 ];
+// Internally every date is an integer day count; `noon()` turns it back into a UTC-noon Date.
 const DAY_MS = 86_400_000;
 const MIN_YEAR = 1200;
 const MAX_YEAR = 1600;
+// Reads the civil date in Tehran regardless of the host machine's timezone.
 const tehranFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Asia/Tehran', calendar: 'gregory', numberingSystem: 'latn',
   year: 'numeric', month: 'numeric', day: 'numeric',
 });
+// islamic-civil is arithmetic, not observational — see ISLAMIC_NOTICE.
 const islamicFormatter = new Intl.DateTimeFormat('en-US', {
   timeZone: 'Asia/Tehran', calendar: 'islamic-civil', numberingSystem: 'latn',
   year: 'numeric', month: 'numeric', day: 'numeric',
@@ -69,6 +80,7 @@ const MAX_DAY = persianDay(MAX_YEAR, 12, jalaaliMonthLength(MAX_YEAR, 12));
 const MIN_GREGORIAN_YEAR = toGregorian(MIN_YEAR, 1, 1).gy;
 const MAX_GREGORIAN_YEAR = toGregorian(MAX_YEAR, 12, jalaaliMonthLength(MAX_YEAR, 12)).gy;
 
+// Guards the 1200–1600 SH window; callers must not pass padding cells outside it.
 function supported(day: number): number {
   integer(day);
   if (day < MIN_DAY || day > MAX_DAY) throw new RangeError('Date is outside Persian years 1200–1600.');
@@ -131,11 +143,13 @@ function islamicDay(value: CalendarDate): number {
   throw new RangeError('Invalid or unsupported Islamic civil date.');
 }
 
+// Persian digits for display. Input numbers stay Latin everywhere else.
 export function fa(value: number | string): string {
   if (typeof value === 'number' && !Number.isFinite(value)) throw new RangeError('Invalid number.');
   return String(value).replace(/[0-9]/g, (digit) => '۰۱۲۳۴۵۶۷۸۹'[Number(digit)]);
 }
 
+// Instant → civil date in the requested calendar, interpreted in Asia/Tehran.
 export function toCalendar(date: Date, kind: CalendarKind = 'persian'): CalendarDate {
   validateKind(kind);
   const day = tehranDay(date);
@@ -145,6 +159,7 @@ export function toCalendar(date: Date, kind: CalendarKind = 'persian'): Calendar
   return { year: normalized.getUTCFullYear(), month: normalized.getUTCMonth() + 1, day: normalized.getUTCDate() };
 }
 
+// Civil date → UTC-noon instant. Validates range and month/day for the calendar kind.
 export function fromCalendar(value: CalendarDate, kind: CalendarKind = 'persian'): Date {
   validateKind(kind);
   if (!value || typeof value !== 'object') throw new RangeError('Invalid calendar date.');
@@ -189,6 +204,7 @@ export function monthLength(year: number, month: number, kind: CalendarKind = 'p
   return next - first;
 }
 
+// Saturday-first grid, padded with adjacent-month days to whole weeks (minimum 5 rows).
 export function monthGrid(year: number, month: number): {
   date: Date; persian: CalendarDate; inMonth: boolean; isFriday: boolean;
 }[] {

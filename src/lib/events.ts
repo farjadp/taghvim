@@ -1,25 +1,47 @@
+// ============================================================================
+// Source: src/lib/events.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Curated occasions: national, state, lunar religious, and world.
+//      Not the official calendar. Scope filtering lives here so grid and list agree.
+// Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
+// ============================================================================
+
 import { toCalendar } from './calendar';
+
+// 'iran'      — national and cultural occasions (Nowruz, poets, Yalda, professions)
+// 'state'     — occasions of the Islamic Republic and its institutions
+// 'religious' — lunar religious holidays, computed via islamic-civil
+// 'world'     — international observances on the Gregorian calendar
+export type EventCategory = 'iran' | 'state' | 'religious' | 'world';
 
 export type CalendarEvent = {
   title: string;
   holiday: boolean;
-  category: 'iran' | 'world' | 'religious';
+  category: EventCategory;
 };
 
+// 'secular' hides 'state' and 'religious' — this is the app's default scope.
+// 'all' returns every category; the UI opts into it with a persisted toggle.
+export type EventScope = 'secular' | 'all';
+
+// Shown verbatim in the UI. Preserve it: the dataset is curated, not the official calendar.
 export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری با تقویم محاسباتی islamic-civil درج شده‌اند و ممکن است با تقویم رسمی ایران (مبتنی بر رؤیت هلال) تا یک روز تفاوت داشته باشند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
 
+// Citations for entries that were verified against a named source.
 export const EVENT_SOURCES = [
   { title: 'روز همدان و بزرگداشت ابوعلی سینا، یکم شهریور — خبرگزاری آنا', url: 'https://ana.ir/fa/news/205369' },
 ] as const;
 
+// Month-day → list of [title, isHoliday?] tuples.
 type FixedEvents = Record<string, ReadonlyArray<readonly [title: string, holiday?: boolean]>>;
 
+// National and cultural occasions keyed on the Persian calendar.
+// Key format: `${persianMonth}-${persianDay}`; second tuple slot marks an official holiday.
 const PERSIAN_EVENTS: FixedEvents = {
   '1-1': [['آغاز سال نو و عید نوروز', true]],
   '1-2': [['عید نوروز', true]],
   '1-3': [['عید نوروز', true]],
   '1-4': [['عید نوروز', true]],
-  '1-12': [['روز جمهوری اسلامی ایران', true]],
   '1-13': [['روز طبیعت (سیزده‌به‌در)', true]],
   '1-25': [['روز بزرگداشت عطار نیشابوری']],
   '2-1': [['روز بزرگداشت سعدی']],
@@ -30,12 +52,8 @@ const PERSIAN_EVENTS: FixedEvents = {
   '2-25': [['روز پاسداشت زبان فارسی و بزرگداشت فردوسی']],
   '2-28': [['روز بزرگداشت حکیم عمر خیام']],
   '3-1': [['روز بزرگداشت ملاصدرا']],
-  '3-3': [['سالروز آزادسازی خرمشهر؛ روز مقاومت، ایثار و پیروزی']],
-  '3-14': [['رحلت امام خمینی', true]],
-  '3-15': [['قیام پانزده خرداد', true]],
   '3-20': [['روز صنایع دستی']],
   '4-1': [['روز اصناف']],
-  '4-7': [['روز قوه قضائیه']],
   '4-10': [['روز صنعت و معدن']],
   '4-13': [['جشن تیرگان']],
   '4-14': [['روز قلم']],
@@ -46,19 +64,13 @@ const PERSIAN_EVENTS: FixedEvents = {
   '5-17': [['روز خبرنگار']],
   '5-28': [['سالروز کودتای ۲۸ مرداد']],
   '6-1': [['روز پزشک و بزرگداشت ابوعلی سینا'], ['روز همدان']],
-  '6-2': [['آغاز هفته دولت']],
   '6-4': [['روز کارمند']],
   '6-5': [['روز داروساز و بزرگداشت محمد بن زکریای رازی']],
-  '6-8': [['روز مبارزه با تروریسم؛ سالروز شهادت رجایی و باهنر']],
-  '6-10': [['روز پدافند هوایی']],
   '6-11': [['روز صنعت چاپ']],
   '6-12': [['روز بهورز']],
   '6-13': [['روز تعاون'], ['روز بزرگداشت ابوریحان بیرونی']],
-  '6-17': [['سالروز قیام هفدهم شهریور']],
-  '6-19': [['سالروز درگذشت آیت‌الله طالقانی']],
   '6-21': [['روز ملی سینما']],
   '6-27': [['روز شعر و ادب فارسی و بزرگداشت استاد شهریار']],
-  '6-31': [['آغاز هفته دفاع مقدس']],
   '7-1': [['آغاز سال تحصیلی']],
   '7-7': [['روز آتش‌نشانی و ایمنی']],
   '7-8': [['روز بزرگداشت مولوی']],
@@ -69,18 +81,12 @@ const PERSIAN_EVENTS: FixedEvents = {
   '8-13': [['روز دانش‌آموز']],
   '8-14': [['روز فرهنگ عمومی']],
   '8-24': [['روز کتاب، کتاب‌خوانی و کتابدار']],
-  '9-5': [['روز بسیج مستضعفین']],
-  '9-7': [['روز نیروی دریایی']],
   '9-16': [['روز دانشجو']],
   '9-25': [['روز پژوهش']],
   '9-30': [['شب یلدا']],
   '10-5': [['روز ایمنی در برابر زلزله و کاهش اثرات بلایای طبیعی']],
-  '10-7': [['روز نهضت سوادآموزی']],
   '10-20': [['سالروز شهادت امیرکبیر']],
   '10-29': [['روز هوای پاک']],
-  '11-12': [['بازگشت امام خمینی به ایران؛ آغاز دهه فجر']],
-  '11-19': [['روز نیروی هوایی']],
-  '11-22': [['پیروزی انقلاب اسلامی ایران', true]],
   '12-5': [['روز مهندس و بزرگداشت خواجه نصیرالدین طوسی']],
   '12-14': [['روز احسان و نیکوکاری']],
   '12-15': [['روز درختکاری']],
@@ -88,6 +94,30 @@ const PERSIAN_EVENTS: FixedEvents = {
   '12-29': [['روز ملی شدن صنعت نفت ایران', true]],
 };
 
+// Occasions tied to the Islamic Republic and its institutions. Hidden in 'secular' scope.
+// Key format: `${persianMonth}-${persianDay}`
+const STATE_EVENTS: FixedEvents = {
+  '1-12': [['روز جمهوری اسلامی ایران', true]],
+  '3-3': [['سالروز آزادسازی خرمشهر؛ روز مقاومت، ایثار و پیروزی']],
+  '3-14': [['رحلت امام خمینی', true]],
+  '3-15': [['قیام پانزده خرداد', true]],
+  '4-7': [['روز قوه قضائیه']],
+  '6-2': [['آغاز هفته دولت']],
+  '6-8': [['روز مبارزه با تروریسم؛ سالروز شهادت رجایی و باهنر']],
+  '6-10': [['روز پدافند هوایی']],
+  '6-17': [['سالروز قیام هفدهم شهریور']],
+  '6-19': [['سالروز درگذشت آیت‌الله طالقانی']],
+  '6-31': [['آغاز هفته دفاع مقدس']],
+  '9-5': [['روز بسیج مستضعفین']],
+  '9-7': [['روز نیروی دریایی']],
+  '10-7': [['روز نهضت سوادآموزی']],
+  '11-12': [['بازگشت امام خمینی به ایران؛ آغاز دهه فجر']],
+  '11-19': [['روز نیروی هوایی']],
+  '11-22': [['پیروزی انقلاب اسلامی ایران', true]],
+};
+
+// International observances keyed on the Gregorian calendar. Never holidays in Iran.
+// Key format: `${gregorianMonth}-${gregorianDay}`
 const GREGORIAN_EVENTS: FixedEvents = {
   '1-1': [['سال نو میلادی']],
   '1-24': [['روز جهانی آموزش']],
@@ -153,6 +183,8 @@ const LUNAR_HOLIDAYS: Record<string, string> = {
   '12-18': 'عید سعید غدیر خم',
 };
 
+// Official Iranian dates that pin a lunar holiday to a Persian month-day for one year.
+// Only 1405 is covered, and only three dates — every other lunar holiday is computed.
 const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
   1405: {
     '6-8': 'میلاد پیامبر اکرم (ص) و امام جعفر صادق (ع)',
@@ -161,20 +193,28 @@ const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
   },
 };
 
-export function eventsForDate(date: Date): CalendarEvent[] {
+// Returns the curated events for one civil day in Asia/Tehran.
+// `scope` defaults to 'all' so the library stays neutral; the UI passes its own setting.
+export function eventsForDate(date: Date, scope: EventScope = 'all'): CalendarEvent[] {
   const persian = toCalendar(date);
   const gregorian = toCalendar(date, 'gregorian');
   const islamic = toCalendar(date, 'islamic');
   const iran = PERSIAN_EVENTS[`${persian.month}-${persian.day}`] ?? [];
+  const state = STATE_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const world = GREGORIAN_EVENTS[`${gregorian.month}-${gregorian.day}`] ?? [];
+  // An official override for this Persian year wins over the computed lunar date,
+  // and the computed copy of the same title is suppressed so it cannot appear twice.
   const officialOverrides = OFFICIAL_LUNAR_OVERRIDES[persian.year] ?? {};
   const officialLunarTitle = officialOverrides[`${persian.month}-${persian.day}`];
   const lunarTitle = LUNAR_HOLIDAYS[`${islamic.month}-${islamic.day}`];
   const overriddenTitles = new Set(Object.values(officialOverrides));
   const religiousTitle = officialLunarTitle ?? (lunarTitle && !overriddenTitles.has(lunarTitle) ? lunarTitle : undefined);
+  const showAll = scope === 'all';
+  // Order matters for display: national first, then state, then religious, then world.
   return [
     ...iran.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'iran' })),
-    ...(religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
+    ...(showAll ? state.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'state' })) : []),
+    ...(showAll && religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
     ...world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })),
   ];
 }

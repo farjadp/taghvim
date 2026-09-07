@@ -1,3 +1,10 @@
+// ============================================================================
+// Source: src/components/prayer-panel.tsx
+// Version: 0.2.0 — 2026-09-07
+// Why: Prayer times for the chosen city with the next-prayer countdown.
+// Env / Deps: Persists `taghvim-city` in localStorage (guarded); Adhan Tehran method.
+// ============================================================================
+
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -5,6 +12,7 @@ import { MapPin, Moon, MoonStar, Sun, Sunrise, Sunset, SunMoon } from "lucide-re
 import { addDays, dayKey, fa } from "@/lib/calendar";
 import { CITIES, prayerTimes, PRAYER_NOTICE } from "@/lib/prayer";
 
+// One icon per prayer time, in the order lib/prayer returns them
 const ICONS = [MoonStar, Sunrise, Sun, Sunset, SunMoon, Moon];
 
 export function PrayerPanel({ now }: { now: Date }) {
@@ -18,6 +26,7 @@ export function PrayerPanel({ now }: { now: Date }) {
   }, []);
   const key = dayKey(now);
   const times = useMemo(() => prayerTimes(new Date(`${key}T12:00:00Z`), city), [key, city]);
+  // After the last time of the day, the next prayer is tomorrow's first
   const next = times.find((time) => time.timestamp > now.getTime()) ?? prayerTimes(addDays(now, 1), city)[0];
   const remaining = Math.max(0, Math.ceil((next.timestamp - now.getTime()) / 60_000));
   function changeCity(value: string) {

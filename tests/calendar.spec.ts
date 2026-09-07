@@ -1,6 +1,15 @@
+// ============================================================================
+// Source: tests/calendar.spec.ts
+// Version: 0.2.0 — 2026-09-07
+// Why: Browser tests: navigation, tools, scope toggle, prayer city, keyboard
+//      RTL navigation, midnight rollover, accessibility, overflow.
+// Env / Deps: Playwright on port 3100 with a frozen clock; desktop + iPhone 13.
+// ============================================================================
+
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+// Every test starts at a fixed instant (6 Sep 2026, 14:00 Tehran) so dates are deterministic.
 test.beforeEach(async ({ page }) => {
   await page.clock.install({ time: new Date("2026-09-06T10:30:00Z") });
   await page.goto("/");
@@ -42,7 +51,26 @@ test("date conversion validates and converts actual dates", async ({ page }) => 
   await expect(page.locator("#tools").getByRole("alert")).toContainText("تاریخ معتبر نیست");
 });
 
+test("religious and state occasions are hidden by default and the toggle persists", async ({ page }) => {
+  const toggle = page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" });
+  await expect(toggle).toHaveAttribute("aria-checked", "false");
+  await expect(page.getByTestId("prayer-times")).toHaveCount(0);
+  // 22 Bahman is a state holiday: unshaded in secular scope, shaded once the scope is on
+  await page.getByLabel("انتخاب ماه تقویم").selectOption("11");
+  const bahman22 = page.getByRole("button", { name: "۲۲ بهمن ۱۴۰۵", exact: true });
+  await expect(bahman22).toBeVisible();
+  expect(await bahman22.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toContain("252, 232, 227");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+  await expect(page.getByTestId("prayer-times")).toBeVisible();
+  expect(await bahman22.evaluate((el) => getComputedStyle(el).backgroundColor)).toContain("252, 232, 227");
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" })).toHaveAttribute("aria-checked", "true");
+});
+
 test("city choice changes prayer times and survives refresh", async ({ page }) => {
+  // Prayer times only render inside the religious scope
+  await page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" }).click();
   const prayers = page.getByTestId("prayer-times");
   const before = await prayers.innerText();
   await page.getByLabel("انتخاب شهر").selectOption("mashhad");
