@@ -180,6 +180,30 @@ test("secondary pages carry the same settings menu", async ({ page }) => {
   await expect(page.getByRole("button", { name: "تنظیمات نمایش" })).toBeVisible();
 });
 
+test("changelog is reachable from the footer and lists releases with dates", async ({ page }) => {
+  await page.getByRole("contentinfo").getByRole("link", { name: "تغییرات و نسخه‌ها" }).click();
+  await expect(page).toHaveURL(/\/changelog$/);
+  await expect(page.getByRole("heading", { name: "تغییرات", level: 1 })).toBeVisible();
+  // Newest release first, each with a Persian date and a Tehran clock time
+  const releases = page.getByRole("main").getByRole("listitem").filter({ has: page.locator("time[datetime]") });
+  expect(await releases.count()).toBeGreaterThan(1);
+  await expect(releases.first()).toContainText("ساعت");
+  await expect(page.getByRole("heading", { name: "در راه" })).toBeVisible();
+});
+
+test("changelog passes accessibility checks in both themes", async ({ page }) => {
+  await page.goto("/changelog");
+  const audit = async () => (await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze())
+    .violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }));
+  expect(await audit()).toEqual([]);
+  // The release chips introduce colour pairs the home page does not use
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "پوسته" }).getByRole("button", { name: "تیره" }).click();
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(400);
+  expect(await audit()).toEqual([]);
+});
+
 test("page has no horizontal overflow or client errors", async ({ page }) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));

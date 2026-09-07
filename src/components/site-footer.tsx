@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.5.0 — 2026-09-07
 // Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers.
 // Env / Deps: Server component used by every page.
 // ============================================================================
@@ -29,6 +29,9 @@ export function SiteFooter() {
             <h3 className="text-xs font-semibold text-ink">صفحات</h3>
             <Link href="/about" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
               درباره ما
+            </Link>
+            <Link href="/changelog" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
+              تغییرات و نسخه‌ها
             </Link>
             <Link href="/contact" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
               تماس با ما
