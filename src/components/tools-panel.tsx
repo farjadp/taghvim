@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/tools-panel.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Date tools: conversion between calendars, date distance, age.
 // Env / Deps: Input parsing accepts Persian, Arabic-Indic and Latin digits.
 // ============================================================================
@@ -55,13 +55,13 @@ function Converter({ now }: { now: Date }) {
       try { setResult(parseDate(value, kind)); setError(""); }
       catch { setError(INVALID_DATE); setResult(null); }
     }}>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm font-medium">تاریخت رو به زبان دیگری ببین.</p><select aria-label="تقویم مبدأ" value={kind} onChange={(event) => { const next = event.target.value as CalendarKind; setKind(next); change(inputDate(now, next)); }} className="rounded-lg border border-line bg-paper px-3 py-2 text-xs">{KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
+      <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm font-medium">تاریخ را در کدام تقویم وارد می‌کنی؟</p><select aria-label="تقویم مبدأ" value={kind} onChange={(event) => { const next = event.target.value as CalendarKind; setKind(next); change(inputDate(now, next)); }} className="rounded-lg border border-line bg-paper px-3 py-2 text-xs">{KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
       <DateFields value={value} kind={kind} onChange={change} />
       <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><p className="text-[0.625rem] text-muted">تبدیل هم‌زمان به هر سه تقویم</p><SubmitButton>تبدیل کن</SubmitButton></div>
       {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
     </form>
     <div data-testid="conversion-result" aria-live="polite" className="rounded-xl bg-paper px-5 py-3">
-      {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[0.6875rem] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[0.625rem] text-muted">{formatDate(result, item.value)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-sm font-medium">از یک تاریخ، سه نشانی</p><p className="text-xs leading-6 text-muted">تاریخ را وارد کن؛ معادلش را اینجا می‌بینی.</p></div>}
+      {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[0.6875rem] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[0.625rem] text-muted">{formatDate(result, item.value)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-xs leading-6 text-muted">تاریخ را وارد کن و «تبدیل کن» را بزن.<br />معادل شمسی، میلادی و قمری اینجا می‌آید.</p></div>}
     </div>
     <p className="text-[0.625rem] leading-6 text-muted lg:col-span-2">تقویم قمری بر اساس روش محاسباتی است، نه رؤیت هلال؛ ممکن است با تقویم رسمی ایران متفاوت باشد.</p>
   </div>;
@@ -110,7 +110,7 @@ function Age({ now }: { now: Date }) {
 export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void }) {
   const tabs = [{ key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
   return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
-    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-7"><h2 className="text-lg font-semibold">ابزارهای روزمره</h2><div role="tablist" aria-label="انتخاب ابزار" className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-paper p-1">{tabs.map(({ key, label, icon: Icon }) => <button id={`tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls="tool-content" onClick={() => onTabChange(key)} onKeyDown={(event) => {
+    <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-7"><h2 className="text-lg font-semibold">ابزارهای تاریخ</h2><div role="tablist" aria-label="انتخاب ابزار" className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-paper p-1">{tabs.map(({ key, label, icon: Icon }) => <button id={`tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls="tool-content" onClick={() => onTabChange(key)} onKeyDown={(event) => {
       const index = tabs.findIndex((item) => item.key === key);
       const next = event.key === "ArrowLeft" ? (index + 1) % tabs.length : event.key === "ArrowRight" ? (index + tabs.length - 1) % tabs.length : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
       if (next < 0) return;

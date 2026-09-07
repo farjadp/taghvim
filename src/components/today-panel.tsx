@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Hero: today in Persian with a live Tehran clock, plus Gregorian and
 //      Hijri equivalents and a copy-to-clipboard button.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
@@ -63,7 +63,6 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
           <div>
             <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
             <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
-            <p className="mt-2 text-sm text-[#d9e3cf]">یک روز تازه، یک فرصت تازه.</p>
           </div>
           <button onClick={copyDate} aria-label="کپی تاریخ امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10">{copied ? <Check size={17} /> : <Copy size={17} />}</button>
         </div>

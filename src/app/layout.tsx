@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/layout.tsx
-// Version: 0.4.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Root layout: RTL Persian document, global styles, site metadata.
 // Env / Deps: Next.js Metadata API; globals.css (Vazirmatn is imported there).
 // ============================================================================
@@ -13,7 +13,7 @@ import { PREFERENCES_BOOT_SCRIPT } from "@/lib/preferences";
 export const metadata: Metadata = {
   metadataBase: new URL("https://taghv.im"),
   title: "تقویم | روزها را بهتر ببین",
-  description: "تقویم ایرانی، تاریخ امروز، تبدیل تاریخ شمسی و میلادی، مناسبت‌ها و اوقات شرعی شهرهای ایران. بدون ثبت‌نام.",
+  description: "تاریخ امروز به شمسی، میلادی و قمری. تقویم ماهانه، مناسبت‌ها، تبدیل تاریخ و محاسبهٔ سن. بدون ثبت‌نام و بدون تبلیغات.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

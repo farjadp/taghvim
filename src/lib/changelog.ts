@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.5.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.6.0',
+    at: '2026-09-07T01:17:44-04:00',
+    status: 'ready',
+    title: 'پاک‌سازی متن‌ها',
+    changes: [
+      { kind: 'changed', text: 'متن‌های تزئینی صفحهٔ اصلی برداشته شدند: خوشامد بالای صفحه، جملهٔ انگیزشی زیر تاریخ، و نوار پایانی. صفحه با تاریخ امروز شروع می‌شود.' },
+      { kind: 'changed', text: 'توضیح ابزار تبدیل تاریخ و صفحهٔ «درباره» بازنویسی شدند تا به‌جای تعریف از خود، بگویند چه کاری انجام می‌شود.' },
+      { kind: 'fixed', text: 'صفحهٔ «درباره» می‌گفت فقط شهر در مرورگر ذخیره می‌شود؛ از نسخهٔ ۰.۴.۰ پنج تنظیم ذخیره می‌شود. همچنین فقط وزیرمتن را نام می‌برد.' },
+    ],
+  },
   {
     version: '0.5.0',
     at: '2026-09-07T00:59:07-04:00',

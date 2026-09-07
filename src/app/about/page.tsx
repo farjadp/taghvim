@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -8,7 +8,7 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck } from "lucide-react";
+import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "درباره ما | تقویم",
@@ -24,8 +24,9 @@ export default function AboutPage() {
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">درباره تقویم</h1>
           <p className="mt-3 text-sm leading-7 text-muted">
-            تقویم، یک تقویم ایرانیِ ساده و تمیز است. ساخته شده برای اینکه روزها را بهتر ببینی؛
-            بدون حواس‌پرتی، بدون ثبت‌نام، و بدون تبلیغات.
+            تقویم ایرانی برای وب. تاریخ شمسی، میلادی و قمری را کنار هم نشان می‌دهد،
+            مناسبت‌ها را فهرست می‌کند و چند ابزار تاریخ دارد. حساب کاربری، تبلیغات و
+            پایگاه داده ندارد.
           </p>
         </div>
 
@@ -33,14 +34,12 @@ export default function AboutPage() {
           <h2 className="mb-4 text-lg font-semibold text-ink">چرا ساخته شد؟</h2>
           <div className="space-y-4 text-sm leading-7 text-muted">
             <p>
-              تقویم‌های موجود پر از عناصر اضافی، تبلیغات و چیدمان‌های شلوغ بودند. خواستیم تقویمی
-              بسازیم که فقط کارش را خوب انجام بدهد: نمایش روز، تاریخ و مناسبت‌ها — با هویت بصری
-              مدرن و ایرانی.
+              تقویم‌های فارسیِ موجود شلوغ‌اند: تبلیغات، پاپ‌آپ، و بخش‌هایی که کسی دنبالشان
+              نیامده. اینجا فقط تاریخ، مناسبت و چند ابزار هست.
             </p>
             <p>
-              تقویم فارسی، میلادی و قمری را کنار هم می‌بیند، اوقات شرعی شهرهای ایران را نشان
-              می‌دهد، و ابزارهای ساده‌ای برای تبدیل تاریخ و محاسبهٔ فاصله و سن در اختیارت
-              می‌گذارد.
+              داده‌ای از تو ذخیره نمی‌شود، جز چند تنظیم در مرورگر خودت. هرجا هم که عدد قطعی
+              نیست، مثل تعطیلات قمری، همان‌جا نوشته شده است.
             </p>
           </div>
         </section>
@@ -61,10 +60,19 @@ export default function AboutPage() {
               محاسبهٔ فاصلهٔ بین دو تاریخ و محاسبهٔ سن.
             </FeatureCard>
             <FeatureCard icon={<MapPin size={20} />} title="اوقات شرعی">
-              اوقات شرعی ۱۲ شهر ایران با روش محاسبهٔ تهران.
+              اوقات شرعی ۱۲ شهر ایران با روش محاسبهٔ تهران. با کلید «مناسبت‌های مذهبی و
+              دولتی» روشن می‌شود.
+            </FeatureCard>
+            <FeatureCard icon={<Flame size={20} />} title="یادبود جاویدنامان">
+              در هر بار باز شدن صفحه، نام و عکس یکی از جان‌باختگان شناسایی‌شدهٔ ۱۸ و ۱۹ دی،
+              با پیوند به صفحهٔ او در فهرست منبع.
+            </FeatureCard>
+            <FeatureCard icon={<Palette size={20} />} title="پوسته و قلم">
+              حالت تیره، سه اندازهٔ قلم و سه قلم فارسی، از منوی تنظیمات در نوار بالا.
             </FeatureCard>
             <FeatureCard icon={<ShieldCheck size={20} />} title="حریم خصوصی">
-              بدون حساب کاربری، بدون پایگاه داده. فقط شهر انتخاب‌شده در مرورگرت ذخیره می‌شود.
+              بدون حساب کاربری، بدون پایگاه داده. فقط شهر، پوسته، قلم، اندازهٔ قلم و وضعیت
+              کلید مناسبت‌ها در مرورگر خودت می‌ماند.
             </FeatureCard>
           </div>
         </section>
@@ -84,7 +92,7 @@ export default function AboutPage() {
           <p className="text-sm leading-6 text-muted">
             ساخته‌شده با Next.js، React، TypeScript و Tailwind CSS. تقویم شمسی با
             <span dir="ltr"> jalaali-js </span> و اوقات شرعی با
-            <span dir="ltr"> adhan </span> محاسبه می‌شوند. تایپوگرافی فارسی با فونت وزیرمتن.
+            <span dir="ltr"> adhan </span> محاسبه می‌شوند. قلم‌های وزیرمتن، شبنم و ساحل روی همین سرور میزبانی می‌شوند.
           </p>
         </section>
       </main>

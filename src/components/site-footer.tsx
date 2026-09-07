@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.5.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers.
 // Env / Deps: Server component used by every page.
 // ============================================================================
@@ -88,12 +88,8 @@ export function SiteFooter() {
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[0.625rem] text-muted">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-bold text-forest">تقویم.</span>
-            <span>همراهِ روزهای تو</span>
-          </div>
+          <span className="text-sm font-bold text-forest">تقویم.</span>
           <p>تقویم قمری و اوقات شرعی محاسباتی‌اند؛ مناسبت‌ها گزیده‌اند.</p>
-          <span dir="ltr">MADE FOR EVERY DAY</span>
         </div>
       </div>
     </footer>

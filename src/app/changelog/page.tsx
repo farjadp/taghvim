@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/changelog/page.tsx
-// Version: 0.5.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Public release history — what changed, when, and what is being looked
 //      at next. Linked from the footer and the header of secondary pages.
 // Env / Deps: Data from lib/changelog; dates rendered as Tehran civil time
@@ -37,7 +37,7 @@ export default function ChangelogPage() {
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">تغییرات</h1>
           <p className="mt-3 text-sm leading-7 text-muted">
-            هر چیزی که در تقویم عوض شده، با تاریخ و ساعتش — و پایین‌تر، کارهایی که در دست بررسی‌اند.
+            فهرست تغییرهای تقویم، تازه‌ترین بالا. پایین‌تر هم کارهایی که در دست بررسی‌اند.
             ساعت‌ها به وقت ایران است.
           </p>
         </div>

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.4.0 — 2026-09-07
+// Version: 0.6.0 — 2026-09-07
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and the event-scope toggle.
 // Env / Deps: Persists only `taghvim-scope` in localStorage (guarded).
@@ -10,7 +10,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { ArrowLeftRight, CalendarDays, Hourglass, MapPin, ArrowUpLeft } from "lucide-react";
+import { ArrowLeftRight, CalendarDays, Hourglass, MapPin } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import type { EventScope } from "@/lib/events";
 import type { Person } from "@/lib/javidnaman";
@@ -109,7 +109,6 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
         </div>
       </header>
       <main id="main" className="mx-auto max-w-[1240px] px-4 pt-8 pb-10 sm:px-8 sm:pt-10">
-        <div className="mb-6 flex items-end justify-between"><div><h2 className="text-xl font-semibold sm:text-2xl">امروزت به‌خیر.</h2><p className="mt-1.5 text-xs text-muted">زمان، تاریخ و روزهایی که پیش رو داریم.</p></div><span className="hidden items-center gap-2 text-[0.6875rem] text-muted sm:flex"><span className="size-1.5 rounded-full bg-forest-deep" />به وقت ایران</span></div>
         <TodayPanel now={now} initialNow={initialNow} />
         <div className="mt-7 grid items-stretch gap-5 lg:grid-cols-[1.7fr_1fr]">
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} scope={scope} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} />
@@ -119,7 +118,6 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
         {/* The memorial took the prayer panel's slot; prayer times return below it when the scope is on */}
         <MemorialPanel person={person} />
         {scope === "all" && <PrayerPanel now={now} />}
-        <section className="mt-7 flex flex-col justify-between gap-4 rounded-2xl bg-sand px-6 py-5 sm:flex-row sm:items-center"><div><h2 className="text-sm font-semibold">یک تقویم، بدون حواس‌پرتی.</h2><p className="mt-1.5 text-xs leading-6 text-muted">بدون ثبت‌نام. بدون تبلیغات. برای پیدا کردن روزها و برنامه‌ریزی لحظه‌ها.</p></div><a href="#calendar" className="flex shrink-0 items-center gap-2 text-xs font-medium text-forest">برگردیم به روزها<ArrowUpLeft size={16} /></a></section>
       </main>
       <SiteFooter />
     </>
