@@ -4,6 +4,7 @@
 // Why: The zodiac sign for a Persian date. The Solar Hijri months map one to
 //      one onto the signs, which is why the Afghan calendar names its months
 //      حمل، ثور، جوزا. So this is a lookup, not an astronomical calculation.
+//      Glyphs are SVG (lucide's Zodiac* icons), never emoji or font characters.
 // Env / Deps: lib/calendar for the Persian month. SANDBOX: only /sandbox/hero
 //      uses it. Delete this file and its test to drop the idea.
 // ============================================================================
@@ -16,26 +17,26 @@ export type Sign = {
   // 1 = فروردین / حمل
   month: number;
   name: string;
+  // Also the icon key: components/zodiac-icon maps it to the lucide glyph.
   latin: string;
-  symbol: string;
   element: Element;
 };
 
 // Order is fixed and matches the Persian months. The four elements repeat in
 // the standard آتش، خاک، باد، آب cycle, three signs each.
 export const SIGNS: Sign[] = [
-  { month: 1, name: 'حمل', latin: 'Aries', symbol: '♈', element: 'آتش' },
-  { month: 2, name: 'ثور', latin: 'Taurus', symbol: '♉', element: 'خاک' },
-  { month: 3, name: 'جوزا', latin: 'Gemini', symbol: '♊', element: 'باد' },
-  { month: 4, name: 'سرطان', latin: 'Cancer', symbol: '♋', element: 'آب' },
-  { month: 5, name: 'اسد', latin: 'Leo', symbol: '♌', element: 'آتش' },
-  { month: 6, name: 'سنبله', latin: 'Virgo', symbol: '♍', element: 'خاک' },
-  { month: 7, name: 'میزان', latin: 'Libra', symbol: '♎', element: 'باد' },
-  { month: 8, name: 'عقرب', latin: 'Scorpio', symbol: '♏', element: 'آب' },
-  { month: 9, name: 'قوس', latin: 'Sagittarius', symbol: '♐', element: 'آتش' },
-  { month: 10, name: 'جدی', latin: 'Capricorn', symbol: '♑', element: 'خاک' },
-  { month: 11, name: 'دلو', latin: 'Aquarius', symbol: '♒', element: 'باد' },
-  { month: 12, name: 'حوت', latin: 'Pisces', symbol: '♓', element: 'آب' },
+  { month: 1, name: 'حمل', latin: 'Aries', element: 'آتش' },
+  { month: 2, name: 'ثور', latin: 'Taurus', element: 'خاک' },
+  { month: 3, name: 'جوزا', latin: 'Gemini', element: 'باد' },
+  { month: 4, name: 'سرطان', latin: 'Cancer', element: 'آب' },
+  { month: 5, name: 'اسد', latin: 'Leo', element: 'آتش' },
+  { month: 6, name: 'سنبله', latin: 'Virgo', element: 'خاک' },
+  { month: 7, name: 'میزان', latin: 'Libra', element: 'باد' },
+  { month: 8, name: 'عقرب', latin: 'Scorpio', element: 'آب' },
+  { month: 9, name: 'قوس', latin: 'Sagittarius', element: 'آتش' },
+  { month: 10, name: 'جدی', latin: 'Capricorn', element: 'خاک' },
+  { month: 11, name: 'دلو', latin: 'Aquarius', element: 'باد' },
+  { month: 12, name: 'حوت', latin: 'Pisces', element: 'آب' },
 ];
 
 // Shown with the sign. The mapping is calendrical, not a measured transit.

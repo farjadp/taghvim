@@ -1,11 +1,12 @@
 // ============================================================================
 // Source: src/components/sandbox-hero.tsx
 // Version: 0.8.0-sandbox — 2026-09-07
-// Why: SANDBOX. Four renderings of the same top row, so the empty space under
-//      the Tehran clock can be judged by eye and by measured height:
-//      the current build, then three fixes. Measurements are live.
-// Env / Deps: lib/calendar, lib/clocks, components/world-clocks (reused as-is
-//      so the side card is the real one). Not imported by any live page.
+// Why: SANDBOX for the chosen layout (J): world clocks in the hero, and the
+//      zodiac appended to the side card under the other two calendars. What
+//      is still open is how the sign is drawn, so three treatments are shown
+//      plus every glyph at once. Heights are measured live.
+// Env / Deps: lib/calendar, lib/clocks, lib/zodiac, components/zodiac-icon,
+//      components/world-clocks (the real one). No live page imports this.
 // ============================================================================
 
 "use client";
@@ -14,8 +15,8 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDownLeft, Clock3, Copy } from "lucide-react";
 import { MONTHS, dateNumbers, fa, formatDate, toCalendar } from "@/lib/calendar";
 import { TEHRAN, dayShift, deviceZone, matchesTehran, offsetFromTehran, timeIn, zoneLabel } from "@/lib/clocks";
-import { ZODIAC_NOTICE, signFor, signProgress, signRange } from "@/lib/zodiac";
-import { WorldClocks } from "./world-clocks";
+import { SIGNS, ZODIAC_NOTICE, signFor, signRange } from "@/lib/zodiac";
+import { ZodiacIcon } from "./zodiac-icon";
 
 function useNow(initialNow: string) {
   const [now, setNow] = useState(() => new Date(initialNow));
@@ -41,44 +42,6 @@ function SunDrawing() {
   );
 }
 
-// `bottomAligned` turns the hero into a column that pushes the clock row to the
-// floor, so extra height lands above the clock instead of under it.
-function Hero({ now, bottomAligned, children }: { now: Date; bottomAligned?: boolean; children?: React.ReactNode }) {
-  const persian = toCalendar(now);
-  const clock = new Intl.DateTimeFormat("fa-IR", { timeZone: TEHRAN, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(now);
-  return (
-    <div className={`relative isolate overflow-hidden rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9 ${bottomAligned ? "flex flex-col" : ""}`}>
-      <SunDrawing />
-      <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
-        <div>
-          <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: TEHRAN }).format(now)}</div>
-          <h3 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h3>
-        </div>
-        <span className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb]"><Copy size={17} /></span>
-      </div>
-      <div className={`relative z-10 flex flex-wrap items-end justify-between gap-4 ${bottomAligned ? "mt-auto pt-8" : "mt-8"}`}>
-        <div className="flex items-center gap-3"><Clock3 size={19} className="text-[#d9e3cf]" /><span className="text-xs leading-6 text-[#d9e3cf]">ساعت ایران<br />تهران · UTC +۳:۳۰</span></div>
-        <time className="text-[2.4rem] leading-none font-medium tracking-wide tabular-nums sm:text-5xl" dir="ltr">{clock}</time>
-      </div>
-      {children}
-      <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]">بر پایهٔ ساعت دستگاه شما</p>
-    </div>
-  );
-}
-
-// The real side card, minus the clocks unless `withClocks` is set.
-function SideCard({ now, withClocks }: { now: Date; withClocks: boolean }) {
-  return (
-    <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
-      <div className="flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
-      <div className="mt-5 border-b border-line pb-5"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-3 text-xl font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p><p className="mt-1 text-xs text-muted" dir="ltr">{formatDate(now, "gregorian", true)}</p></div>
-      <div className={withClocks ? "py-4" : "pt-4"}><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[0.625rem] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
-      {withClocks && <WorldClocks now={now} />}
-    </div>
-  );
-}
-
-// A quiet clock line for inside the hero, in the hero's own colours.
 function HeroClock({ now, timeZone, label }: { now: Date; timeZone: string; label: string }) {
   const shift = dayShift(now, timeZone);
   return (
@@ -95,51 +58,79 @@ function HeroClock({ now, timeZone, label }: { now: Date; timeZone: string; labe
   );
 }
 
-
-// The other two calendars as one compact row, for when they move into the hero.
-function CalendarsInHero({ now }: { now: Date }) {
+// Layout J's hero: unchanged, plus the visitor's own clock in the space that
+// would otherwise be empty.
+function Hero({ now }: { now: Date }) {
+  const persian = toCalendar(now);
+  const [device, setDevice] = useState<string | null>(null);
+  useEffect(() => { setDevice(deviceZone()); }, []);
+  const showDevice = device !== null && !matchesTehran(now, device);
+  const clock = new Intl.DateTimeFormat("fa-IR", { timeZone: TEHRAN, hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(now);
   return (
-    <div className="relative z-10 mt-5 grid grid-cols-2 gap-4 border-t border-white/15 pt-4 text-[#d9e3cf]">
-      <div>
-        <p className="text-[0.625rem] opacity-75">میلادی</p>
-        <p className="mt-1 text-base font-medium tabular-nums text-white" dir="ltr">{dateNumbers(now, "gregorian")}</p>
-      </div>
-      <div>
-        <p className="text-[0.625rem] opacity-75">هجری قمری</p>
-        <p className="mt-1 text-base font-medium text-white">{formatDate(now, "islamic")}</p>
-      </div>
-    </div>
-  );
-}
-
-// The zodiac card: sign, element, the month it covers, and how far into it we
-// are. Deliberately astronomical only, no horoscope.
-function ZodiacCard({ now, children }: { now: Date; children?: React.ReactNode }) {
-  const sign = signFor(now);
-  const progress = Math.round(signProgress(now) * 100);
-  return (
-    <div className="flex flex-col rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
-      <div className="flex items-center justify-between"><h3 className="text-base font-semibold">برج فلکی امروز</h3><span dir="ltr" className="text-xs text-muted">ZODIAC</span></div>
-      <div className="mt-5 flex items-center gap-4">
-        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-leaf text-3xl leading-none text-forest">{sign.symbol}</span>
-        <div className="min-w-0">
-          <p className="text-2xl font-semibold text-ink">{sign.name}</p>
-          <p className="mt-0.5 text-xs text-muted"><span dir="ltr">{sign.latin}</span> · عنصر {sign.element}</p>
+    <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
+      <SunDrawing />
+      <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
+        <div>
+          <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: TEHRAN }).format(now)}</div>
+          <h3 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h3>
         </div>
+        <span className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb]"><Copy size={17} /></span>
       </div>
-      <div className="mt-5">
-        <div className="flex items-center justify-between text-[0.6875rem] text-muted"><span>{signRange(now)}</span><span className="tabular-nums">{fa(progress)}٪</span></div>
-        {/* SANDBOX ONLY: an inline width. A shipped version would use a transform or a fixed set of steps, since the project bans inline styles. */}
-        <div className="mt-2 h-1 overflow-hidden rounded-full bg-paper"><div className="h-full rounded-full bg-forest" style={{ width: `${progress}%` }} /></div>
+      <div className="relative z-10 mt-8 flex flex-wrap items-end justify-between gap-4">
+        <div className="flex items-center gap-3"><Clock3 size={19} className="text-[#d9e3cf]" /><span className="text-xs leading-6 text-[#d9e3cf]">ساعت ایران<br />تهران · UTC +۳:۳۰</span></div>
+        <time className="text-[2.4rem] leading-none font-medium tracking-wide tabular-nums sm:text-5xl" dir="ltr">{clock}</time>
       </div>
-      {children}
-      <details className="mt-4 text-[0.625rem] leading-6 text-muted"><summary className="cursor-pointer">دربارهٔ برج‌ها</summary><p className="pt-2">{ZODIAC_NOTICE}</p></details>
+      {showDevice && (
+        <div className="relative z-10 mt-5 border-t border-white/15 pt-4">
+          <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
+        </div>
+      )}
+      <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]">بر پایهٔ ساعت دستگاه شما</p>
     </div>
   );
 }
 
-// Measures the two cards of a row and reports the gap the hero has to absorb.
-function Measured({ title, note, verdict, tone, children }: { title: string; note: string; verdict: string; tone: "bad" | "good"; children: React.ReactNode }) {
+// Layout J's side card. `treatment` only changes how the sign is drawn.
+function SideCard({ now, treatment }: { now: Date; treatment: 1 | 2 | 3 }) {
+  const sign = signFor(now);
+  return (
+    <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
+      <div className="flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
+      <div className="mt-5 border-b border-line pb-4"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-2 text-lg font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p></div>
+      <div className="border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p></div>
+
+      <div className="relative pt-4">
+        {/* 3: an oversized glyph behind the row, the way SunDrawing sits behind the hero */}
+        {treatment === 3 && <ZodiacIcon sign={sign} className="pointer-events-none absolute -top-1 left-0 size-24 text-forest opacity-10" strokeWidth={1} />}
+        <div className="relative flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div>
+        {treatment === 1 && (
+          <p className="relative mt-2 flex items-center gap-2 text-lg font-medium">
+            <ZodiacIcon sign={sign} className="size-5 text-forest" />
+            {sign.name}
+            <span className="text-xs font-normal text-muted">عنصر {sign.element}</span>
+          </p>
+        )}
+        {treatment === 2 && (
+          <div className="relative mt-2.5 flex items-center gap-3">
+            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-leaf text-forest"><ZodiacIcon sign={sign} className="size-5" /></span>
+            <span className="min-w-0">
+              <span className="block text-lg leading-tight font-medium">{sign.name}</span>
+              <span className="block text-[0.625rem] text-muted"><span dir="ltr">{sign.latin}</span> · عنصر {sign.element} · {signRange(now)}</span>
+            </span>
+          </div>
+        )}
+        {treatment === 3 && (
+          <p className="relative mt-2 flex items-baseline gap-2 text-lg font-medium">
+            {sign.name}
+            <span className="text-xs font-normal text-muted">عنصر {sign.element}</span>
+          </p>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function Measured({ title, note, children }: { title: string; note: string; children: React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState<{ hero: number; card: number } | null>(null);
   useEffect(() => {
@@ -158,136 +149,47 @@ function Measured({ title, note, verdict, tone, children }: { title: string; not
       <h2 className="text-base font-semibold text-ink">{title}</h2>
       <p className="mt-1.5 text-xs leading-6 text-muted">{note}</p>
       <div ref={box} className="mt-5">{children}</div>
-      <p className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-1 border-t border-line pt-4 text-[0.6875rem] text-muted">
-        <span>کارت سبز <span className="tabular-nums text-ink">{size ? fa(size.hero) : "…"}</span> پیکسل</span>
-        <span>کارت سفید <span className="tabular-nums text-ink">{size ? fa(size.card) : "…"}</span> پیکسل</span>
+      <p className="mt-4 border-t border-line pt-4 text-[0.6875rem] text-muted">
+        کارت سبز <span className="tabular-nums text-ink">{size ? fa(size.hero) : "…"}</span> پیکسل ·
+        کارت سفید <span className="tabular-nums text-ink">{size ? fa(size.card) : "…"}</span> پیکسل
       </p>
-      <p className={`mt-2 text-xs leading-6 ${tone === "bad" ? "text-clay" : "text-forest"}`}>{verdict}</p>
     </section>
   );
 }
 
 export function HeroSandbox({ initialNow }: { initialNow: string }) {
   const now = useNow(initialNow);
-  const [device, setDevice] = useState<string | null>(null);
-  useEffect(() => { setDevice(deviceZone()); }, []);
-  const showDevice = device !== null && !matchesTehran(now, device);
-
+  const today = signFor(now);
   return (
     <div className="space-y-6">
-      <Measured
-        title="امروز · ساخت فعلی"
-        note="ساعت‌ها در کارت سفید. کارت سفید بلندتر می‌شود و گرید کارت سبز را تا همان قد می‌کشد؛ ارتفاع اضافه زیر ساعت جمع می‌شود."
-        tone="bad"
-        verdict="همان چیزی که به آن ایراد گرفتی."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now} />
-          <SideCard now={now} withClocks />
-        </div>
+      <section className="rounded-2xl border border-line bg-surface p-5 sm:p-6">
+        <h2 className="text-base font-semibold text-ink">هر دوازده برج</h2>
+        <p className="mt-1.5 text-xs leading-6 text-muted">
+          نشان‌ها SVG هستند، از همان مجموعه‌ای که بقیهٔ آیکن‌های سایت از آن می‌آیند. رنگ را از متن می‌گیرند،
+          پس در پوستهٔ تیره هم درست‌اند. هیچ ایموجی و هیچ نویسهٔ فونتی در کار نیست.
+        </p>
+        <ul className="mt-5 grid grid-cols-3 gap-3 sm:grid-cols-4 lg:grid-cols-6">
+          {SIGNS.map((sign) => (
+            <li key={sign.month} className={`flex flex-col items-center gap-2 rounded-xl border p-3 ${sign.month === today.month ? "border-forest bg-leaf" : "border-line"}`}>
+              <ZodiacIcon sign={sign} className={`size-7 ${sign.month === today.month ? "text-forest" : "text-ink"}`} />
+              <span className="text-xs font-medium">{sign.name}</span>
+              <span className="text-[0.625rem] text-muted">{MONTHS[sign.month - 1]}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="mt-4 border-t border-line pt-4 text-[0.625rem] leading-6 text-muted">{ZODIAC_NOTICE}</p>
+      </section>
+
+      <Measured title="۱ · نشان در همان خط" note="کوچک‌ترین حالت. نشان پیش از نام، هم‌اندازهٔ متن. دقیقاً مثل دو ردیف بالای خودش رفتار می‌کند.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={1} /></div>
       </Measured>
 
-      <Measured
-        title="الف · ساعت بچسبد به کف کارت"
-        note="کارت سبز ستون می‌شود و ردیف ساعت به کف می‌چسبد. قدها عوض نمی‌شوند، ولی فضای اضافه می‌رود بالای ساعت، جایی که تاریخ و ساعت را از هم باز می‌کند، نه زیر ساعت."
-        tone="good"
-        verdict="کم‌ترین تغییر. فضای خالی از بین نمی‌رود، فقط جایش عوض می‌شود و دیگر شبیه دنبالهٔ رهاشده نیست."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now} bottomAligned />
-          <SideCard now={now} withClocks />
-        </div>
+      <Measured title="۲ · نشان در کادر، با نام لاتین و بازهٔ ماه" note="نشان در یک مربع سبز کم‌رنگ، و یک خط اطلاعات بیشتر: نام لاتین، عنصر، و بازهٔ ماه.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={2} /></div>
       </Measured>
 
-      <Measured
-        title="ب · ساعت‌ها بروند داخل همان فضای خالی"
-        note="ساعت‌ها از کارت سفید درمی‌آیند و می‌روند پایین کارت سبز، دقیقاً در فضایی که الان خالی است. کارت سفید به قد قبلی‌اش برمی‌گردد."
-        tone="good"
-        verdict="فضای خالی نه جابه‌جا، بلکه پر می‌شود؛ و کارت سفید دست‌نخورده می‌ماند. در عوض ساعت‌ها می‌روند روی کارت اصلی."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now}>
-            {showDevice && (
-              <div className="relative z-10 mt-5 space-y-2.5 border-t border-white/15 pt-4">
-                <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
-              </div>
-            )}
-          </Hero>
-          <SideCard now={now} withClocks={false} />
-        </div>
-      </Measured>
-
-      <Measured
-        title="ت · پیشنهاد تو، کامل"
-        note="کارت سفید کلاً می‌شود برج فلکی به‌علاوهٔ ساعت شهرها. میلادی و قمری می‌روند داخل کارت سبز، زیر ساعت ایران، در دو ستون."
-        tone="good"
-        verdict="فضای خالی پر می‌شود و هر کارت یک موضوع دارد: سبز «امروز و زمان»، سفید «آسمان امروز». شلوغ‌ترین گزینه هم همین است."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now}>
-            <CalendarsInHero now={now} />
-          </Hero>
-          <ZodiacCard now={now}>
-            <div className="mt-4 border-t border-line pt-4"><WorldClocks now={now} /></div>
-          </ZodiacCard>
-        </div>
-      </Measured>
-
-      <Measured
-        title="ث · همان، ولی ساعت‌ها هم داخل کارت سبز"
-        note="مثل «ت»، با این فرق که ساعت شهرها هم می‌روند کنار ساعت ایران. کارت سفید فقط و فقط برج فلکی می‌ماند."
-        tone="good"
-        verdict="تمیزترین تقسیم: هرچه به زمان مربوط است یک‌جا، آسمان جای دیگر. کارت سبز پرتر می‌شود."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now}>
-            {showDevice && (
-              <div className="relative z-10 mt-5 space-y-2.5 border-t border-white/15 pt-4">
-                <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
-              </div>
-            )}
-            <CalendarsInHero now={now} />
-          </Hero>
-          <ZodiacCard now={now} />
-        </div>
-      </Measured>
-
-      <Measured
-        title="ج · برج فلکی بدون جابه‌جایی چیز دیگر"
-        note="میلادی و قمری سر جایشان می‌مانند و برج فلکی زیرشان در همان کارت سفید اضافه می‌شود. ساعت‌ها هم در کارت سبز، مثل «ب»."
-        tone="bad"
-        verdict="کم‌ترین ریسک، ولی کارت سفید سه موضوع پیدا می‌کند و بلندتر از همه می‌شود."
-      >
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now}>
-            {showDevice && (
-              <div className="relative z-10 mt-5 space-y-2.5 border-t border-white/15 pt-4">
-                <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
-              </div>
-            )}
-          </Hero>
-          <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
-            <div className="flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
-            <div className="mt-5 border-b border-line pb-4"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-2 text-lg font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p></div>
-            <div className="border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p></div>
-            <div className="pt-4">
-              <div className="flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div>
-              <p className="mt-2 flex items-center gap-2 text-lg font-medium"><span aria-hidden="true" className="text-forest">{signFor(now).symbol}</span>{signFor(now).name}<span className="text-xs font-normal text-muted">عنصر {signFor(now).element}</span></p>
-            </div>
-          </div>
-        </div>
-      </Measured>
-
-      <Measured
-        title="پ · دو کارت هم‌قد نباشند"
-        note="یک کلمه در گرید عوض می‌شود و هر کارت به قد طبیعی خودش درمی‌آید. کارت سبز هیچ فضای خالی ندارد."
-        tone="bad"
-        verdict="فضای خالی صفر می‌شود، ولی کف دو کارت هم‌تراز نیست. به نظر من این از فضای خالی بدتر است."
-      >
-        <div className="grid items-start gap-5 lg:grid-cols-[1.7fr_1fr]">
-          <Hero now={now} />
-          <SideCard now={now} withClocks />
-        </div>
+      <Measured title="۳ · نشان بزرگ و کم‌رنگ در پس‌زمینه" note="نشان می‌رود پشت ردیف، بزرگ و کم‌رنگ، شبیه کاری که طرح خورشید در کارت سبز می‌کند. متن دست‌نخورده می‌ماند.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={3} /></div>
       </Measured>
     </div>
   );

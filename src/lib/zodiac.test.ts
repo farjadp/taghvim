@@ -17,7 +17,7 @@ describe('zodiac signs', () => {
     expect(SIGNS).toHaveLength(12);
     expect(SIGNS.map((sign) => sign.month)).toEqual([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
     expect(new Set(SIGNS.map((sign) => sign.name)).size).toBe(12);
-    expect(new Set(SIGNS.map((sign) => sign.symbol)).size).toBe(12);
+    expect(new Set(SIGNS.map((sign) => sign.latin)).size).toBe(12);
   });
 
   it('repeats the four elements three times each', () => {
