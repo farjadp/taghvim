@@ -56,7 +56,7 @@ export default function ContactPage() {
 
         <section className="mb-12">
           <h2 className="mb-5 text-lg font-semibold text-ink">برنامه‌نویس</h2>
-          <div className="rounded-2xl border border-line bg-white p-6 sm:p-8">
+          <div className="rounded-2xl border border-line bg-surface p-6 sm:p-8">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
               <div>
                 <h3 className="text-base font-semibold text-forest">فرجاد پورمحمد</h3>
@@ -83,11 +83,11 @@ export default function ContactPage() {
         <section className="rounded-2xl bg-sand px-6 py-7">
           <h2 className="mb-2 text-base font-semibold text-forest">پروژه‌های مرتبط</h2>
           <div className="grid gap-3 sm:grid-cols-2">
-            <a href="https://www.ashavid.ca" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-xs text-ink hover:bg-leaf">
+            <a href="https://www.ashavid.ca" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-xs text-ink hover:bg-leaf">
               <span>اشاویید — تحول دیجیتال و فناوری</span>
               <ArrowUpLeft size={14} className="text-muted" />
             </a>
-            <a href="https://farjadp.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between rounded-xl bg-white px-4 py-3 text-xs text-ink hover:bg-leaf">
+            <a href="https://farjadp.com" target="_blank" rel="noopener noreferrer" className="flex items-center justify-between rounded-xl bg-surface px-4 py-3 text-xs text-ink hover:bg-leaf">
               <span>فرجاد پورمحمد — وب‌سایت شخصی</span>
               <ArrowUpLeft size={14} className="text-muted" />
             </a>
@@ -115,12 +115,12 @@ function ContactCard({ icon, title, label, href, ltr, external }: {
       <p className={`text-xs text-muted ${ltr ? "" : ""}`} dir={ltr ? "ltr" : undefined}>{label}</p>
     </>
   );
-  if (!href) return <div className="rounded-xl border border-line bg-white p-5">{content}</div>;
+  if (!href) return <div className="rounded-xl border border-line bg-surface p-5">{content}</div>;
   return (
     <a
       href={href}
       {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-      className="rounded-xl border border-line bg-white p-5 transition-colors hover:border-forest/30 hover:bg-leaf/40"
+      className="rounded-xl border border-line bg-surface p-5 transition-colors hover:border-forest/30 hover:bg-leaf/40"
     >
       {content}
     </a>
@@ -139,7 +139,7 @@ function SocialCard({ icon, title, label, href }: {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="flex items-center gap-3 rounded-xl border border-line bg-white p-4 transition-colors hover:border-forest/30 hover:bg-leaf/40"
+      className="flex items-center gap-3 rounded-xl border border-line bg-surface p-4 transition-colors hover:border-forest/30 hover:bg-leaf/40"
     >
       <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-leaf text-forest">{icon}</div>
       <div className="min-w-0">

@@ -39,7 +39,7 @@ function DateFields({ value, onChange, kind = "persian", prefix = "" }: { value:
 }
 
 function SubmitButton({ children }: { children: React.ReactNode }) {
-  return <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">{children}<ArrowLeft size={16} /></button>;
+  return <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest-deep px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">{children}<ArrowLeft size={16} /></button>;
 }
 
 // Tab 1: convert a date from one calendar into the other two
@@ -57,13 +57,13 @@ function Converter({ now }: { now: Date }) {
     }}>
       <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm font-medium">تاریخت رو به زبان دیگری ببین.</p><select aria-label="تقویم مبدأ" value={kind} onChange={(event) => { const next = event.target.value as CalendarKind; setKind(next); change(inputDate(now, next)); }} className="rounded-lg border border-line bg-paper px-3 py-2 text-xs">{KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
       <DateFields value={value} kind={kind} onChange={change} />
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><p className="text-[10px] text-muted">تبدیل هم‌زمان به هر سه تقویم</p><SubmitButton>تبدیل کن</SubmitButton></div>
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><p className="text-[0.625rem] text-muted">تبدیل هم‌زمان به هر سه تقویم</p><SubmitButton>تبدیل کن</SubmitButton></div>
       {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
     </form>
     <div data-testid="conversion-result" aria-live="polite" className="rounded-xl bg-paper px-5 py-3">
-      {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[11px] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[10px] text-muted">{formatDate(result, item.value)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-sm font-medium">از یک تاریخ، سه نشانی</p><p className="text-xs leading-6 text-muted">تاریخ را وارد کن؛ معادلش را اینجا می‌بینی.</p></div>}
+      {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[0.6875rem] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[0.625rem] text-muted">{formatDate(result, item.value)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-sm font-medium">از یک تاریخ، سه نشانی</p><p className="text-xs leading-6 text-muted">تاریخ را وارد کن؛ معادلش را اینجا می‌بینی.</p></div>}
     </div>
-    <p className="text-[10px] leading-6 text-muted lg:col-span-2">تقویم قمری بر اساس روش محاسباتی است، نه رؤیت هلال؛ ممکن است با تقویم رسمی ایران متفاوت باشد.</p>
+    <p className="text-[0.625rem] leading-6 text-muted lg:col-span-2">تقویم قمری بر اساس روش محاسباتی است، نه رؤیت هلال؛ ممکن است با تقویم رسمی ایران متفاوت باشد.</p>
   </div>;
 }
 
@@ -79,7 +79,7 @@ function Distance({ now }: { now: Date }) {
     catch { setError(INVALID_DATE); setResult(null); }
   }}>
     <div className="grid gap-6 sm:grid-cols-2"><fieldset><legend className="mb-4 text-sm font-medium">از تاریخ خورشیدی</legend><DateFields prefix="مبدأ " value={start} onChange={(value) => { setStart(value); setResult(null); setError(""); }} /></fieldset><fieldset><legend className="mb-4 text-sm font-medium">تا تاریخ خورشیدی</legend><DateFields prefix="مقصد " value={end} onChange={(value) => { setEnd(value); setResult(null); setError(""); }} /></fieldset></div>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><p className="text-[10px] text-muted">روز شروع در فاصله شمرده نمی‌شود.</p><SubmitButton>محاسبهٔ فاصله</SubmitButton></div>
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><p className="text-[0.625rem] text-muted">روز شروع در فاصله شمرده نمی‌شود.</p><SubmitButton>محاسبهٔ فاصله</SubmitButton></div>
     {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
     {result !== null && <div role="status" className="mt-5 rounded-xl bg-leaf px-5 py-4 text-sm text-forest"><strong className="text-2xl tabular-nums">{fa(Math.abs(result))}</strong> روز {result < 0 ? "به عقب" : "فاصله"}<span className="mr-4 text-xs">{fa(Math.floor(Math.abs(result) / 7))} هفته و {fa(Math.abs(result) % 7)} روز</span></div>}
   </form>;
@@ -100,7 +100,7 @@ function Age({ now }: { now: Date }) {
   }}>
     <p className="mb-5 text-sm font-medium">تاریخ تولدت را به خورشیدی وارد کن.</p>
     <div className="max-w-xl"><DateFields prefix="تولد " value={value} onChange={(next) => { setValue(next); setResult(null); setError(""); }} /></div>
-    <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><p className="text-[10px] text-muted">سن تقویمی تا امروز، به وقت ایران</p><SubmitButton>محاسبهٔ سن</SubmitButton></div>
+    <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><p className="text-[0.625rem] text-muted">سن تقویمی تا امروز، به وقت ایران</p><SubmitButton>محاسبهٔ سن</SubmitButton></div>
     {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
     {result && <p role="status" className="mt-5 rounded-xl bg-leaf px-5 py-5 text-lg font-medium text-forest">{fa(result.years)} سال و {fa(result.months)} ماه و {fa(result.days)} روز</p>}
   </form>;
@@ -109,7 +109,7 @@ function Age({ now }: { now: Date }) {
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
 export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void }) {
   const tabs = [{ key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
-  return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-white">
+  return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-7"><h2 className="text-lg font-semibold">ابزارهای روزمره</h2><div role="tablist" aria-label="انتخاب ابزار" className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-paper p-1">{tabs.map(({ key, label, icon: Icon }) => <button id={`tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls="tool-content" onClick={() => onTabChange(key)} onKeyDown={(event) => {
       const index = tabs.findIndex((item) => item.key === key);
       const next = event.key === "ArrowLeft" ? (index + 1) % tabs.length : event.key === "ArrowRight" ? (index + tabs.length - 1) % tabs.length : event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1 : -1;
@@ -117,7 +117,7 @@ export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab;
       event.preventDefault();
       onTabChange(tabs[next].key);
       document.getElementById(`tab-${tabs[next].key}`)?.focus();
-    }} className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2.5 text-[10px] transition-colors sm:px-4 sm:text-xs ${tab === key ? "bg-white font-medium text-forest shadow-xs" : "text-muted hover:text-forest"}`}><Icon size={14} />{label}</button>)}</div></div>
+    }} className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2.5 text-[0.625rem] transition-colors sm:px-4 sm:text-xs ${tab === key ? "bg-surface font-medium text-forest shadow-xs" : "text-muted hover:text-forest"}`}><Icon size={14} />{label}</button>)}</div></div>
     <div id="tool-content" role="tabpanel" aria-labelledby={`tab-${tab}`} className="p-5 sm:p-7">{tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
   </section>;
 }

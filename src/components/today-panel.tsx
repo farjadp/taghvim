@@ -57,7 +57,7 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
   }
   return (
     <section aria-label="تاریخ و ساعت امروز" className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
-      <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-forest px-7 py-7 text-white sm:px-9">
+      <div className="relative isolate overflow-hidden rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
         <SunDrawing />
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
           <div>
@@ -71,12 +71,12 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
           <div className="flex items-center gap-3"><Clock3 size={19} className="text-[#d9e3cf]" /><span className="text-xs leading-6 text-[#d9e3cf]">ساعت ایران<br />تهران · UTC +۳:۳۰</span></div>
           <LiveClock initialNow={initialNow} />
         </div>
-        <p className="relative z-10 mt-3 min-h-4 text-[10px] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : "بر پایهٔ ساعت دستگاه شما"}</p>
+        <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : "بر پایهٔ ساعت دستگاه شما"}</p>
       </div>
-      <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-white p-6 sm:p-7">
+      <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
         <div className="flex items-center justify-between"><h2 className="text-base font-semibold">امروز در تقویم‌های دیگر</h2><ArrowDownLeft size={19} className="text-muted" /></div>
         <div className="mt-5 border-b border-line pb-5"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-3 text-xl font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p><p className="mt-1 text-xs text-muted" dir="ltr">{formatDate(now, "gregorian", true)}</p></div>
-        <div className="pt-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[10px] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
+        <div className="pt-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[0.625rem] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
       </div>
     </section>
   );

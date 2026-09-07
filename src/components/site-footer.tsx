@@ -12,7 +12,7 @@ import { ArrowUpLeft, Mail, Phone, Building2, GitBranch } from "lucide-react";
 // Four columns on desktop: brand, pages, tools, contact; disclaimers underneath
 export function SiteFooter() {
   return (
-    <footer className="border-t border-line bg-white">
+    <footer className="border-t border-line bg-surface">
       <div className="mx-auto max-w-[1240px] px-5 py-10 sm:px-8 sm:py-12">
         <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
           <div className="lg:col-span-1">
@@ -84,7 +84,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[10px] text-muted">
+        <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[0.625rem] text-muted">
           <div className="flex items-center gap-2">
             <span className="text-sm font-bold text-forest">تقویم.</span>
             <span>همراهِ روزهای تو</span>

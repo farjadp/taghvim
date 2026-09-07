@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.4.0 — 2026-09-07
 // Why: Browser tests: navigation, tools, scope toggle, prayer city, keyboard
 //      RTL navigation, midnight rollover, accessibility, overflow.
 // Env / Deps: Playwright on port 3100 with a frozen clock; desktop + iPhone 13.
@@ -139,9 +139,45 @@ test("today rolls over at Tehran midnight without waiting a full minute", async 
   await expect(page.getByTestId("selected-date")).toContainText("۱۶ شهریور");
 });
 
-test("main workflows pass automated accessibility checks", async ({ page }) => {
-  const result = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
-  expect(result.violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }))).toEqual([]);
+test("main workflows pass automated accessibility checks in both themes", async ({ page }) => {
+  const audit = async () => {
+    const result = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    return result.violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }));
+  };
+  expect(await audit()).toEqual([]);
+  // Same page, dark palette: every token has a dark counterpart and must still pass contrast
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "پوسته" }).getByRole("button", { name: "تیره" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  // Colours animate for 150ms (transition-colors); auditing mid-transition reads blended values
+  await page.waitForTimeout(400);
+  expect(await audit()).toEqual([]);
+});
+
+test("display settings apply immediately and survive reload", async ({ page }) => {
+  const html = page.locator("html");
+  await expect(html).not.toHaveAttribute("data-theme", /.+/);
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "پوسته" }).getByRole("button", { name: "تیره" }).click();
+  await page.getByRole("group", { name: "اندازهٔ قلم" }).getByRole("button", { name: "بزرگ" }).click();
+  await page.getByRole("group", { name: "قلم" }).getByRole("button", { name: "شبنم" }).click();
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await expect(html).toHaveAttribute("data-size", "lg");
+  await expect(html).toHaveAttribute("data-font", "shabnam");
+  expect(await html.evaluate((el) => getComputedStyle(el).fontSize)).toBe("18px");
+  expect(await page.locator("body").evaluate((el) => getComputedStyle(el).fontFamily)).toContain("Shabnam");
+  expect(await page.locator("body").evaluate((el) => getComputedStyle(el).backgroundColor)).toBe("rgb(18, 26, 22)");
+  await page.reload();
+  // The boot script must restore all three before React hydrates
+  await expect(html).toHaveAttribute("data-theme", "dark");
+  await expect(html).toHaveAttribute("data-size", "lg");
+  await expect(html).toHaveAttribute("data-font", "shabnam");
+});
+
+test("secondary pages carry the same settings menu", async ({ page }) => {
+  await page.goto("/about");
+  await expect(page.getByRole("button", { name: "تنظیمات نمایش" })).toBeVisible();
 });
 
 test("page has no horizontal overflow or client errors", async ({ page }) => {

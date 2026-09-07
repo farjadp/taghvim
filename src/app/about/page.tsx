@@ -96,7 +96,7 @@ export default function AboutPage() {
 // One feature tile: icon, title, one-sentence description
 function FeatureCard({ icon, title, children }: { icon: React.ReactNode; title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-xl border border-line bg-white p-5">
+    <div className="rounded-xl border border-line bg-surface p-5">
       <div className="mb-3 flex size-10 items-center justify-center rounded-lg bg-leaf text-forest">{icon}</div>
       <h3 className="mb-1.5 text-sm font-semibold text-ink">{title}</h3>
       <p className="text-xs leading-6 text-muted">{children}</p>

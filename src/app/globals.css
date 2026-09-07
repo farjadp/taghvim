@@ -1,6 +1,6 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.2.0 — 2026-09-07
+   Version: 0.4.0 — 2026-09-07
    Why: Visual system: colour tokens, Vazirmatn faces, base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
    ============================================================================ */
@@ -11,7 +11,13 @@
 @import "@fontsource/vazirmatn/600.css";
 @import "@fontsource/vazirmatn/700.css";
 @import "@fontsource/vazirmatn/800.css";
+/* Optional faces; a browser only downloads the one the visitor selects */
+@import "shabnam-font/dist/font-face.css";
+@import "sahel-font/dist/font-face.css";
 
+/* Light palette. `forest` is the green used for text and accents, `forest-deep`
+   the green used as a background under white text — identical in light mode,
+   split in dark mode so both stay readable. */
 @theme {
   --font-sans: "Vazirmatn", sans-serif;
   --color-paper: #f7f8f4;
@@ -20,9 +26,73 @@
   --color-muted: #5c6a61;
   --color-line: #e6eae3;
   --color-forest: #214f40;
+  --color-forest-deep: #214f40;
   --color-leaf: #eaf0e6;
   --color-clay: #a9503b;
   --color-sand: #f5eee1;
+  --color-holiday: #fce8e3;
+  --color-holiday-hover: #f9ded7;
+  --color-memorial: #1e2f28;
+  --color-memorial-ink: #eef2ee;
+  --color-memorial-muted: #b7c7bd;
+  --color-memorial-line: #35493f;
+  --color-scrollbar: #bcc8bb;
+}
+
+/* Dark palette: applied by explicit choice (data-theme="dark") or by the OS
+   when no choice is stored. Every token above has a counterpart here. */
+@layer base {
+  html { color-scheme: light; }
+  html[data-theme="dark"] { color-scheme: dark; }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) { color-scheme: dark; }
+  }
+  html[data-theme="dark"] {
+    --color-paper: #121a16;
+    --color-surface: #1a2420;
+    --color-ink: #e6ece8;
+    --color-muted: #9fb0a6;
+    --color-line: #2c3a33;
+    --color-forest: #8cc7ad;
+    --color-forest-deep: #1f4a3b;
+    --color-leaf: #1f2e28;
+    --color-clay: #e39a85;
+    --color-sand: #2a271f;
+    --color-holiday: #3a2622;
+    --color-holiday-hover: #4a2e29;
+    --color-memorial: #0f1613;
+    --color-memorial-ink: #e6ece8;
+    --color-memorial-muted: #9fb0a6;
+    --color-memorial-line: #2c3a33;
+    --color-scrollbar: #3a4a42;
+  }
+  @media (prefers-color-scheme: dark) {
+    html:not([data-theme="light"]) {
+      --color-paper: #121a16;
+      --color-surface: #1a2420;
+      --color-ink: #e6ece8;
+      --color-muted: #9fb0a6;
+      --color-line: #2c3a33;
+      --color-forest: #8cc7ad;
+      --color-forest-deep: #1f4a3b;
+      --color-leaf: #1f2e28;
+      --color-clay: #e39a85;
+      --color-sand: #2a271f;
+      --color-holiday: #3a2622;
+      --color-holiday-hover: #4a2e29;
+      --color-memorial: #0f1613;
+      --color-memorial-ink: #e6ece8;
+      --color-memorial-muted: #9fb0a6;
+      --color-memorial-line: #2c3a33;
+      --color-scrollbar: #3a4a42;
+    }
+  }
+  /* Font size: everything is in rem, so the root size scales the whole page */
+  html[data-size="sm"] { font-size: 14px; }
+  html[data-size="lg"] { font-size: 18px; }
+  /* Font family: the Tailwind font-sans utility reads this variable */
+  html[data-font="shabnam"] { --font-sans: "Shabnam", "Vazirmatn", sans-serif; }
+  html[data-font="sahel"] { --font-sans: "Sahel", "Vazirmatn", sans-serif; }
 }
 
 @layer base {
@@ -33,16 +103,16 @@
   button, a, input, select { @apply focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest; }
   button:disabled { @apply cursor-not-allowed opacity-40; }
   input, select { @apply accent-forest; }
-  ::selection { @apply bg-forest text-white; }
-  * { scrollbar-width: thin; scrollbar-color: #bcc8bb #f7f8f4; }
+  ::selection { @apply bg-forest-deep text-white; }
+  * { scrollbar-width: thin; scrollbar-color: var(--color-scrollbar) var(--color-paper); }
 }
 
 @utility field {
-  @apply h-12 w-full min-w-0 rounded-xl border border-line bg-white px-3 text-sm text-ink transition-colors focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15;
+  @apply h-12 w-full min-w-0 rounded-xl border border-line bg-surface px-3 text-sm text-ink transition-colors focus:border-forest focus:outline-none focus:ring-2 focus:ring-forest/15;
 }
 
 @utility icon-button {
-  @apply inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-line bg-white text-ink transition-colors hover:bg-leaf;
+  @apply inline-flex size-11 shrink-0 items-center justify-center rounded-xl border border-line bg-surface text-ink transition-colors hover:bg-leaf;
 }
 
 @utility scrollbar-hidden {

@@ -7,8 +7,9 @@ Persian-language, RTL calendar web app inspired by `time.ir`, with a modern Iran
 - Live at `https://taghv.im`. Repository: `https://github.com/farjadp/taghvim`.
 - No accounts, authentication, advertising, or backend database.
 - **Memorial panel.** The slot under the tools that used to hold prayer times shows one random person from the javidnaman list (`src/data/javidnaman.json`, ~3,200 identified names from javidnaman.iranintl.com). The pick happens on the server per request in `app/page.tsx`. Photos are hot-linked from the source CDN with `referrerPolicy="no-referrer"`; nothing is stored locally. Refresh the snapshot with `npm run sync:javidnaman` and commit the JSON. The line «اینجا پیش‌تر اوقات شرعی را اعلام می‌کردیم.» is deliberate — keep it.
+- **Display settings.** A gear in both headers opens theme (auto/light/dark), font size (14/16/18px root) and font family (Vazirmatn, Shabnam, Sahel — all self-hosted, OFL). Stored as `taghvim-theme`, `taghvim-size`, `taghvim-font`; applied as `data-theme` / `data-size` / `data-font` on `<html>` by an inline boot script in `app/layout.tsx` before first paint. Every colour must be a token from `globals.css` — never `bg-white`, never a hex literal in a component — because each token has a dark counterpart and axe runs in both themes. Text sizes are rem, never px, so the size setting scales them.
 - **Secular by default.** State occasions (`category: 'state'`), lunar religious holidays and the prayer-times panel are hidden until the visitor turns on the «مناسبت‌های مذهبی و دولتی» switch in the header. The choice persists in `localStorage` as `taghvim-scope`. Never move an event between `iran` and `state` without a reason in the commit message.
-- Approved design: warm light surfaces, deep green, restrained clay accents, locally hosted Vazirmatn typography.
+- Approved design: warm light surfaces, deep green, restrained clay accents, locally hosted Vazirmatn typography; a matching dark palette; the memorial box is the one deliberately dark surface in light mode.
 - Logo source: `src/app/icon.svg`, a sunrise/calendar-page mark. The header references `/icon.svg`, and Next.js uses the same asset as the browser icon. Do not duplicate its geometry.
 - Stack: Next.js App Router, TypeScript, React 19 functional components, Tailwind CSS v4. No inline styling.
 
@@ -39,7 +40,7 @@ Run unit tests, typecheck, build, and relevant browser tests before completing a
 - Prayer times use Adhan's Tehran method with city coordinates. Jafari midnight is the midpoint between sunset and the next day's fajr. Preserve approximation/method notices.
 - The live clock uses the device clock in Tehran time, not NTP synchronization.
 - `src/data/javidnaman.json` is a committed snapshot, not a database: the app never fetches the source at build or request time. The snapshot's `count` and `fetchedAt` are shown in the UI, so a stale snapshot is visible, not hidden.
-- Only two keys are persisted in browser localStorage: `taghvim-city` and `taghvim-scope`. Every access is guarded for restricted-storage environments.
+- Persisted localStorage keys: `taghvim-city`, `taghvim-scope`, `taghvim-theme`, `taghvim-size`, `taghvim-font`. Every access is guarded for restricted-storage environments.
 - Calendar cells and tool tabs support RTL arrow-key navigation. Preserve keyboard behavior and midnight rollover regression tests.
 
 ## Code style
@@ -57,7 +58,7 @@ Run unit tests, typecheck, build, and relevant browser tests before completing a
 
 - TypeScript over JavaScript.
 - Functional React components only.
-- Tailwind classes only — no inline styles.
+- Tailwind classes only — no inline styles. Colours only via the tokens in `globals.css` (`surface`, `paper`, `ink`, `muted`, `line`, `forest` for text, `forest-deep` for backgrounds, `leaf`, `clay`, `sand`, `holiday`, `memorial-*`).
 - Keep the app Persian and RTL.
 - Do not add account/auth/database functionality.
 - Preserve all date and data disclaimers.

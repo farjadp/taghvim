@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/site-header.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.4.0 — 2026-09-07
 // Why: Minimal header for secondary pages (about, contact) with a back link.
 // Env / Deps: Server component; the home page has its own richer header.
 // ============================================================================
@@ -8,11 +8,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight } from "lucide-react";
+import { SettingsMenu } from "./settings-menu";
 
 // `active` highlights the current secondary page in the nav
 export function SiteHeader({ active }: { active?: "about" | "contact" }) {
   return (
-    <header className="border-b border-line bg-white/80">
+    <header className="border-b border-line bg-surface/80">
       <div className="mx-auto flex min-h-20 max-w-[1240px] items-center justify-between gap-4 px-5 py-4 sm:px-8">
         <Link href="/" aria-label="تقویم، صفحهٔ اصلی" className="flex items-center gap-2.5 text-forest">
           <Image src="/icon.svg" width={36} height={36} alt="" unoptimized className="size-9 shrink-0" />
@@ -39,6 +40,7 @@ export function SiteHeader({ active }: { active?: "about" | "contact" }) {
           >
             اشاویید
           </a>
+          <SettingsMenu />
         </nav>
       </div>
     </header>
