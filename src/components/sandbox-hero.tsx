@@ -1,10 +1,11 @@
 // ============================================================================
 // Source: src/components/sandbox-hero.tsx
-// Version: 0.8.0-sandbox — 2026-09-07
+// Version: 0.8.1-sandbox — 2026-09-07
 // Why: SANDBOX for the chosen layout (J): world clocks in the hero, and the
 //      zodiac appended to the side card under the other two calendars. What
-//      is still open is how the sign is drawn, so three treatments are shown
-//      plus every glyph at once. Heights are measured live.
+//      is still open is the ghosted glyph behind the side card: the inline
+//      sign is settled (treatment 1). Three strengths are shown, plus every
+//      glyph at once. Heights are measured live.
 // Env / Deps: lib/calendar, lib/clocks, lib/zodiac, components/zodiac-icon,
 //      components/world-clocks (the real one). No live page imports this.
 // ============================================================================
@@ -90,41 +91,30 @@ function Hero({ now }: { now: Date }) {
   );
 }
 
-// Layout J's side card. `treatment` only changes how the sign is drawn.
-function SideCard({ now, treatment }: { now: Date; treatment: 1 | 2 | 3 }) {
+// Layout J's side card: the settled inline sign, plus a ghosted glyph behind
+// the whole card. `ghost` only changes that background layer.
+//
+// The card mirrors the hero's pattern for this: `relative isolate
+// overflow-hidden` on the container, the decoration absolutely placed, and
+// every real row lifted with `relative z-10`. Without overflow-hidden the
+// glyph would escape the rounded corner.
+type Ghost = { size: string; opacity: string; position: string };
+
+function SideCard({ now, ghost }: { now: Date; ghost: Ghost | null }) {
   const sign = signFor(now);
   return (
-    <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
-      <div className="flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
-      <div className="mt-5 border-b border-line pb-4"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-2 text-lg font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p></div>
-      <div className="border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p></div>
-
-      <div className="relative pt-4">
-        {/* 3: an oversized glyph behind the row, the way SunDrawing sits behind the hero */}
-        {treatment === 3 && <ZodiacIcon sign={sign} className="pointer-events-none absolute -top-1 left-0 size-24 text-forest opacity-10" strokeWidth={1} />}
-        <div className="relative flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div>
-        {treatment === 1 && (
-          <p className="relative mt-2 flex items-center gap-2 text-lg font-medium">
-            <ZodiacIcon sign={sign} className="size-5 text-forest" />
-            {sign.name}
-            <span className="text-xs font-normal text-muted">عنصر {sign.element}</span>
-          </p>
-        )}
-        {treatment === 2 && (
-          <div className="relative mt-2.5 flex items-center gap-3">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-leaf text-forest"><ZodiacIcon sign={sign} className="size-5" /></span>
-            <span className="min-w-0">
-              <span className="block text-lg leading-tight font-medium">{sign.name}</span>
-              <span className="block text-[0.625rem] text-muted"><span dir="ltr">{sign.latin}</span> · عنصر {sign.element} · {signRange(now)}</span>
-            </span>
-          </div>
-        )}
-        {treatment === 3 && (
-          <p className="relative mt-2 flex items-baseline gap-2 text-lg font-medium">
-            {sign.name}
-            <span className="text-xs font-normal text-muted">عنصر {sign.element}</span>
-          </p>
-        )}
+    <div className="relative isolate flex flex-col justify-between overflow-hidden rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
+      {ghost && <ZodiacIcon sign={sign} className={`pointer-events-none absolute text-forest ${ghost.size} ${ghost.opacity} ${ghost.position}`} strokeWidth={1} />}
+      <div className="relative z-10 flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
+      <div className="relative z-10 mt-5 border-b border-line pb-4"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-2 text-lg font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p></div>
+      <div className="relative z-10 border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p></div>
+      <div className="relative z-10 pt-4">
+        <div className="flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div>
+        <p className="mt-2 flex items-center gap-2 text-lg font-medium">
+          <ZodiacIcon sign={sign} className="size-5 text-forest" />
+          {sign.name}
+          <span className="text-xs font-normal text-muted">عنصر {sign.element}</span>
+        </p>
       </div>
     </div>
   );
@@ -180,16 +170,20 @@ export function HeroSandbox({ initialNow }: { initialNow: string }) {
         <p className="mt-4 border-t border-line pt-4 text-[0.625rem] leading-6 text-muted">{ZODIAC_NOTICE}</p>
       </section>
 
-      <Measured title="۱ · نشان در همان خط" note="کوچک‌ترین حالت. نشان پیش از نام، هم‌اندازهٔ متن. دقیقاً مثل دو ردیف بالای خودش رفتار می‌کند.">
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={1} /></div>
+      <Measured title="۱ · محو ملایم، گوشهٔ پایین چپ" note="نشان بزرگ در گوشهٔ پایین چپ، هم‌جهت با طرح خورشید در کارت سبز. حدود نیمی از ارتفاع کارت، با کدری ۷ درصد.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} ghost={{ size: "size-44", opacity: "opacity-[0.07]", position: "-bottom-6 -left-6" }} /></div>
       </Measured>
 
-      <Measured title="۲ · نشان در کادر، با نام لاتین و بازهٔ ماه" note="نشان در یک مربع سبز کم‌رنگ، و یک خط اطلاعات بیشتر: نام لاتین، عنصر، و بازهٔ ماه.">
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={2} /></div>
+      <Measured title="۲ · همان، کمی پررنگ‌تر" note="همان جا و همان اندازه، با کدری ۱۲ درصد. اگر «۱» را روی نمایشگر خودت نمی‌بینی، این را ببین.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} ghost={{ size: "size-44", opacity: "opacity-[0.12]", position: "-bottom-6 -left-6" }} /></div>
       </Measured>
 
-      <Measured title="۳ · نشان بزرگ و کم‌رنگ در پس‌زمینه" note="نشان می‌رود پشت ردیف، بزرگ و کم‌رنگ، شبیه کاری که طرح خورشید در کارت سبز می‌کند. متن دست‌نخورده می‌ماند.">
-        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} treatment={3} /></div>
+      <Measured title="۳ · بزرگ‌تر و بریده از لبه" note="نشان بزرگ‌تر که از لبهٔ چپ بیرون می‌زند و کارت آن را می‌بُرد. کدری ۸ درصد.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} ghost={{ size: "size-60", opacity: "opacity-[0.08]", position: "-bottom-12 -left-16" }} /></div>
+      </Measured>
+
+      <Measured title="بدون نشان پس‌زمینه" note="برای مقایسه: همان کارت، فقط با نشان کوچک کنار نام برج.">
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]"><Hero now={now} /><SideCard now={now} ghost={null} /></div>
       </Measured>
     </div>
   );

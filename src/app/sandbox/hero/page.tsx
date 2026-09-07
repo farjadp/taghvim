@@ -28,8 +28,8 @@ export default function HeroSandboxPage() {
         <div className="mb-8 rounded-2xl border border-clay/40 bg-holiday px-6 py-5">
           <h1 className="text-xl font-bold text-clay">آزمایشگاه · برج فلکی</h1>
           <p className="mt-2 text-sm leading-7 text-ink">
-            چیدمان «ج» انتخاب شد: ساعت شهرها داخل کارت سبز، برج فلکی زیر میلادی و قمری در کارت سفید.
-            آنچه هنوز باز است، شکل کشیدن نشان برج است. سه حالت اینجاست؛ زیر هرکدام قد واقعی همان لحظه نوشته شده.
+            چیدمان «ج» و نشان کوچک کنار نام برج تصویب شد. آنچه اینجا مقایسه می‌شود، فقط نشان محوِ
+            پس‌زمینهٔ کارت سفید است: سه شدت، و یک نمونه بدون آن برای مقایسه. زیر هرکدام قد واقعی همان لحظه نوشته شده.
           </p>
         </div>
         <HeroSandbox initialNow={new Date().toISOString()} />
