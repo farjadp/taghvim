@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.5.0',
     at: '2026-09-07T00:59:07-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'همین صفحه',
     changes: [
       { kind: 'added', text: 'صفحهٔ «تغییرات»: فهرست نسخه‌ها با تاریخ و ساعت، و کارهایی که در دست بررسی‌اند.' },
@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.4.0',
     at: '2026-09-07T00:52:46-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'پوسته و قلم به انتخاب تو',
     changes: [
       { kind: 'added', text: 'حالت تیره، با سه گزینهٔ خودکار، روشن و تیره. «خودکار» از تنظیمات دستگاه پیروی می‌کند.' },
@@ -52,7 +52,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.3.0',
     at: '2026-09-07T00:36:41-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'یادبود جاویدنامان',
     changes: [
       { kind: 'added', text: 'باکس یادبود جاویدنامان انقلاب ملی ایرانیان: در هر بار باز کردن صفحه، نام و عکس یک نفر، با پیوند به صفحهٔ او در فهرست منبع.' },
@@ -62,7 +62,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.2.0',
     at: '2026-09-07T00:23:52-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'پیش‌فرض سکولار',
     changes: [
       { kind: 'changed', text: 'مناسبت‌های مذهبی و دولتی به‌صورت پیش‌فرض نمایش داده نمی‌شوند. یک کلید در نوار بالا آن‌ها را برمی‌گرداند و انتخاب تو ذخیره می‌شود.' },
