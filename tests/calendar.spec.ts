@@ -180,6 +180,45 @@ test("secondary pages carry the same settings menu", async ({ page }) => {
   await expect(page.getByRole("button", { name: "تنظیمات نمایش" })).toBeVisible();
 });
 
+test.describe("second clock", () => {
+  // The device zone is the only input; Playwright can set it per context
+  test.use({ timezoneId: "America/Toronto" });
+
+  test("adds the visitor's own clock and lets them pin up to two cities", async ({ page }) => {
+    const clocks = page.getByTestId("world-clocks");
+    await expect(clocks).toBeVisible();
+    await expect(clocks).toContainText("تورنتو (شما)");
+    await expect(clocks).toContainText("۷:۳۰ ساعت عقب‌تر");
+    // The hero's Tehran clock stays the main one
+    await expect(page.getByText("ساعت ایران")).toBeVisible();
+
+    await clocks.getByRole("button", { name: "افزودن شهر" }).click();
+    await clocks.getByRole("button", { name: "لندن", exact: true }).click();
+    await expect(clocks).toContainText("لندن");
+
+    await clocks.getByRole("button", { name: "افزودن شهر" }).click();
+    await clocks.getByRole("button", { name: "توکیو", exact: true }).click();
+    // Two is the cap, so the add control goes away
+    await expect(clocks.getByRole("button", { name: "افزودن شهر" })).toHaveCount(0);
+
+    await page.reload();
+    await expect(page.getByTestId("world-clocks")).toContainText("لندن");
+    await expect(page.getByTestId("world-clocks")).toContainText("توکیو");
+
+    await page.getByTestId("world-clocks").getByRole("button", { name: "حذف لندن" }).click();
+    await expect(page.getByTestId("world-clocks")).not.toContainText("لندن");
+  });
+});
+
+test.describe("inside Iran", () => {
+  test.use({ timezoneId: "Asia/Tehran" });
+
+  test("shows no second clock, only a quiet way to add one", async ({ page }) => {
+    await expect(page.getByTestId("world-clocks")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "افزودن ساعت شهر دیگر" })).toBeVisible();
+  });
+});
+
 test("changelog is reachable from the footer and lists releases with dates", async ({ page }) => {
   await page.getByRole("contentinfo").getByRole("link", { name: "تغییرات و نسخه‌ها" }).click();
   await expect(page).toHaveURL(/\/changelog$/);

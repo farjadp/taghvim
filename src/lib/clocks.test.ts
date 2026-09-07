@@ -1,13 +1,14 @@
 // ============================================================================
 // Source: src/lib/clocks.test.ts
-// Version: 0.7.0-sandbox — 2026-09-07
+// Version: 0.7.0 — 2026-09-07
 // Why: Guards the offset maths, which is the part most likely to be wrong,
-//      and the Tehran-match rule that decides whether a clock is shown at all.
+//      the Tehran-match rule that decides whether a clock is shown at all,
+//      and the parser that reads the saved city list.
 // Env / Deps: Vitest.
 // ============================================================================
 
 import { describe, expect, it } from "vitest";
-import { TEHRAN, ZONES, dayShift, matchesTehran, offsetFromTehran, offsetMinutes, timeIn, zoneLabel } from "./clocks";
+import { MAX_CLOCKS, TEHRAN, ZONES, dayShift, matchesTehran, offsetFromTehran, offsetMinutes, parseClocks, timeIn, zoneLabel } from "./clocks";
 
 // 7 Sep 2026, 12:00 UTC. Tehran is +03:30 year round (no DST since 1401).
 const noonUtc = new Date("2026-09-07T12:00:00Z");
@@ -53,5 +54,20 @@ describe("world clocks", () => {
     expect(zoneLabel("America/Argentina/Buenos_Aires")).toBe("Buenos Aires");
     expect(new Set(ZONES.map((zone) => zone.id)).size).toBe(ZONES.length);
     for (const zone of ZONES) expect(() => timeIn(noonUtc, zone.timeZone)).not.toThrow();
+  });
+});
+
+describe("saved city list", () => {
+  it("keeps known ids in order and drops the rest", () => {
+    expect(parseClocks("toronto,london")).toEqual(["toronto", "london"]);
+    expect(parseClocks(" toronto , london ")).toEqual(["toronto", "london"]);
+    expect(parseClocks("toronto,mars,london")).toEqual(["toronto", "london"]);
+  });
+
+  it("ignores empty, duplicate and over-long values instead of throwing", () => {
+    expect(parseClocks(null)).toEqual([]);
+    expect(parseClocks("")).toEqual([]);
+    expect(parseClocks("toronto,toronto")).toEqual(["toronto"]);
+    expect(parseClocks("toronto,london,paris,berlin")).toHaveLength(MAX_CLOCKS);
   });
 });

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.6.0 — 2026-09-07
+// Version: 0.7.0 — 2026-09-07
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.7.0',
+    at: '2026-09-07T01:37:02-04:00',
+    status: 'ready',
+    title: 'ساعت شهرهای دیگر',
+    changes: [
+      { kind: 'added', text: 'اگر منطقهٔ زمانی مرورگرت با تهران فرق داشته باشد، ساعت خودت در کارت «امروز در تقویم‌های دیگر» می‌آید. ساعت تهران همچنان ساعت اصلی و بزرگ صفحه است.' },
+      { kind: 'added', text: 'می‌توانی تا دو شهر دلخواه از میان دوازده شهر اضافه کنی. انتخاب در مرورگر ذخیره می‌شود و هر ردیف اختلافش با تهران را نشان می‌دهد.' },
+    ],
+  },
   {
     version: '0.6.0',
     at: '2026-09-07T01:17:44-04:00',
@@ -99,7 +109,6 @@ export const RELEASES: Release[] = [
 export const UPCOMING: string[] = [
   'ویجت صفحهٔ اصلی برای موبایل، تا تاریخ بدون باز کردن سایت دیده شود.',
   'افزونهٔ کروم، با همین طراحی.',
-  'گزینه‌ای برای اینکه ساعت دستگاه خودت اصل باشد و ساعت ایران کنارش.',
   'تعطیلات قمری بر پایهٔ تقویم رسمی، نه محاسباتی — امروز فقط سه تاریخ از سال ۱۴۰۵ تثبیت شده است.',
 ];
 

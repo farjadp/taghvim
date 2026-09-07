@@ -1,8 +1,9 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.6.0 — 2026-09-07
-// Why: Hero: today in Persian with a live Tehran clock, plus Gregorian and
-//      Hijri equivalents and a copy-to-clipboard button.
+// Version: 0.7.0 — 2026-09-07
+// Why: Hero: today in Persian with a live Tehran clock, plus a side card with
+//      the Gregorian and Hijri equivalents, optional second clocks, and a
+//      copy-to-clipboard button.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
 // ============================================================================
 
@@ -11,6 +12,7 @@
 import { useEffect, useState } from "react";
 import { ArrowDownLeft, Copy, Check, Clock3 } from "lucide-react";
 import { dateNumbers, fa, formatDate, MONTHS, toCalendar } from "@/lib/calendar";
+import { WorldClocks } from "./world-clocks";
 
 // Ticks every second on the client; the server-rendered value avoids a hydration flash
 function LiveClock({ initialNow }: { initialNow: string }) {
@@ -75,7 +77,8 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
       <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
         <div className="flex items-center justify-between"><h2 className="text-base font-semibold">امروز در تقویم‌های دیگر</h2><ArrowDownLeft size={19} className="text-muted" /></div>
         <div className="mt-5 border-b border-line pb-5"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-3 text-xl font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p><p className="mt-1 text-xs text-muted" dir="ltr">{formatDate(now, "gregorian", true)}</p></div>
-        <div className="pt-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[0.625rem] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
+        <div className="py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[0.625rem] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
+        <WorldClocks now={now} />
       </div>
     </section>
   );

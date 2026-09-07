@@ -1,10 +1,10 @@
 // ============================================================================
 // Source: src/lib/clocks.ts
-// Version: 0.7.0-sandbox — 2026-09-07
-// Why: Secondary world clocks. Tehran stays the primary clock everywhere;
-//      this only formats other zones and detects the visitor's own zone.
-// Env / Deps: Intl only. SANDBOX: used by /sandbox/clocks, not by the site.
-//      Delete this file and src/app/sandbox to remove the feature entirely.
+// Version: 0.7.0 — 2026-09-07
+// Why: Secondary world clocks shown in the "other calendars" card. Tehran
+//      stays the primary clock; this formats other zones, detects the
+//      visitor's own zone, and validates the saved city list.
+// Env / Deps: Intl only. The chosen cities persist as `taghvim-clocks`.
 // ============================================================================
 
 export const TEHRAN = "Asia/Tehran";
@@ -78,6 +78,23 @@ export function deviceZone(): string | null {
 export function matchesTehran(date: Date, timeZone: string | null): boolean {
   if (!timeZone) return true;
   try { return offsetMinutes(date, timeZone) === offsetMinutes(date, TEHRAN); } catch { return true; }
+}
+
+// At most two cities may be added by hand; the visitor's own clock is extra.
+export const MAX_CLOCKS = 2;
+
+// Parses the stored `taghvim-clocks` value: a comma-separated list of zone ids.
+// Unknown ids, duplicates and anything past the cap are dropped rather than
+// throwing, so a hand-edited or stale value cannot break the page.
+export function parseClocks(raw: string | null): string[] {
+  if (!raw) return [];
+  const known = new Set(ZONES.map((zone) => zone.id));
+  const out: string[] = [];
+  for (const id of raw.split(",").map((part) => part.trim())) {
+    if (known.has(id) && !out.includes(id)) out.push(id);
+    if (out.length === MAX_CLOCKS) break;
+  }
+  return out;
 }
 
 // A readable label for an arbitrary IANA zone: the matching city when we know
