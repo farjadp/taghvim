@@ -68,6 +68,14 @@ test("religious and state occasions are hidden by default and the toggle persist
   await expect(page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" })).toHaveAttribute("aria-checked", "true");
 });
 
+test("memorial shows one identified person with a link to the source page", async ({ page }) => {
+  const memorial = page.getByTestId("memorial");
+  await expect(memorial).toBeVisible();
+  await expect(page.getByTestId("memorial-name")).not.toBeEmpty();
+  await expect(memorial.getByRole("link", { name: /جاویدنامان/ })).toHaveAttribute("href", /^https:\/\/javidnaman\.iranintl\.com\/memorial\//);
+  await expect(memorial.getByText("اینجا پیش‌تر اوقات شرعی را اعلام می‌کردیم.")).toBeVisible();
+});
+
 test("city choice changes prayer times and survives refresh", async ({ page }) => {
   // Prayer times only render inside the religious scope
   await page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" }).click();

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.3.0 — 2026-09-07
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and the event-scope toggle.
 // Env / Deps: Persists only `taghvim-scope` in localStorage (guarded).
@@ -13,11 +13,13 @@ import Image from "next/image";
 import { ArrowLeftRight, CalendarDays, Hourglass, MapPin, ArrowUpLeft } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import type { EventScope } from "@/lib/events";
+import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
 import { EventsPanel } from "./events-panel";
 import { ToolsPanel, type ToolTab } from "./tools-panel";
 import { PrayerPanel } from "./prayer-panel";
+import { MemorialPanel } from "./memorial-panel";
 import { SiteFooter } from "./site-footer";
 
 // localStorage key for the event-scope toggle. Only this and the prayer city are persisted.
@@ -27,7 +29,7 @@ function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
 }
 
-export function CalendarApp({ initialNow }: { initialNow: string }) {
+export function CalendarApp({ initialNow, person }: { initialNow: string; person: Person }) {
   const [now, setNow] = useState(new Date(initialNow));
   const [selected, setSelected] = useState(new Date(initialNow));
   const [view, setView] = useState(() => toCalendar(new Date(initialNow)));
@@ -112,7 +114,8 @@ export function CalendarApp({ initialNow }: { initialNow: string }) {
           <EventsPanel year={view.year} month={view.month} selected={selected} scope={scope} onSelect={select} />
         </div>
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} />
-        {/* Prayer times are part of the religious scope and unmount entirely when it is off */}
+        {/* The memorial took the prayer panel's slot; prayer times return below it when the scope is on */}
+        <MemorialPanel person={person} />
         {scope === "all" && <PrayerPanel now={now} />}
         <section className="mt-7 flex flex-col justify-between gap-4 rounded-2xl bg-sand px-6 py-5 sm:flex-row sm:items-center"><div><h2 className="text-sm font-semibold">یک تقویم، بدون حواس‌پرتی.</h2><p className="mt-1.5 text-xs leading-6 text-muted">بدون ثبت‌نام. بدون تبلیغات. برای پیدا کردن روزها و برنامه‌ریزی لحظه‌ها.</p></div><a href="#calendar" className="flex shrink-0 items-center gap-2 text-xs font-medium text-forest">برگردیم به روزها<ArrowUpLeft size={16} /></a></section>
       </main>
