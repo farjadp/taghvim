@@ -9,6 +9,7 @@ import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette } from "lucide-react";
+import { ZODIAC_NOTICE } from "@/lib/zodiac";
 
 export const metadata: Metadata = {
   title: "درباره ما | تقویم",
@@ -51,8 +52,8 @@ export default function AboutPage() {
               نمایش گرید شمسی با شروع هفته از شنبه، ناوبری ماه/سال و بازگشت سریع به امروز.
             </FeatureCard>
             <FeatureCard icon={<Globe size={20} />} title="تاریخ‌های موازی">
-              تاریخ شمسی، میلادی و قمری به‌صورت هم‌زمان برای هر روز. اگر بیرون از ایران
-              باشی، ساعت خودت و تا دو شهر دلخواه هم کنارشان می‌آید.
+              تاریخ شمسی، میلادی و قمری به‌صورت هم‌زمان برای هر روز، به‌همراه برج فلکی همان
+              روز. اگر بیرون از ایران باشی، ساعت خودت و تا دو شهر دلخواه هم می‌آید.
             </FeatureCard>
             <FeatureCard icon={<ArrowLeftRight size={20} />} title="تبدیل تاریخ">
               تبدیل بین شمسی، میلادی و قمری با اعتبارسنجی ورودی.
@@ -85,6 +86,7 @@ export default function AboutPage() {
             <li>• تاریخ قمری از تقویم محاسباتی <span dir="ltr">islamic-civil</span> است و ممکن است با رصدیِ ایران تفاوت داشته باشد.</li>
             <li>• مناسبت‌ها مجموعه‌ای برگزیده و تکرارشونده هستند، نه تقویم رسمیِ کامل.</li>
             <li>• اوقات شرعی محاسباتی‌اند و تقریبی.</li>
+            <li>• {ZODIAC_NOTICE}</li>
           </ul>
         </section>
 

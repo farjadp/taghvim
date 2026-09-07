@@ -210,6 +210,18 @@ test.describe("second clock", () => {
   });
 });
 
+test("shows the zodiac sign of the current Persian month", async ({ page }) => {
+  const card = page.getByTestId("other-calendars");
+  // Shahrivar is Virgo; the frozen clock puts us in Shahrivar 1405
+  await expect(card).toContainText("برج فلکی");
+  await expect(card).toContainText("سنبله");
+  await expect(card).toContainText("عنصر خاک");
+  await expect(card).toContainText("طالع‌بینی");
+  // Drawn as SVG, never as a font character or emoji
+  expect(await card.locator("svg").count()).toBeGreaterThan(1);
+  await expect(page.locator("body")).not.toContainText("♍");
+});
+
 test.describe("inside Iran", () => {
   test.use({ timezoneId: "Asia/Tehran" });
 

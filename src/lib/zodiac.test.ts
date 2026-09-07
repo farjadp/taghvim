@@ -1,13 +1,13 @@
 // ============================================================================
 // Source: src/lib/zodiac.test.ts
-// Version: 0.8.0-sandbox — 2026-09-07
+// Version: 0.8.0 — 2026-09-07
 // Why: Guards the month-to-sign mapping and the element cycle, which are the
 //      whole feature, plus the honesty notice.
 // Env / Deps: Vitest.
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { SIGNS, ZODIAC_NOTICE, signFor, signProgress, signRange } from './zodiac';
+import { SIGNS, ZODIAC_NOTICE, ZODIAC_SHORT_NOTICE, signFor, signProgress, signRange } from './zodiac';
 import { fromCalendar } from './calendar';
 
 const persian = (month: number, day: number) => fromCalendar({ year: 1405, month, day });
@@ -52,5 +52,8 @@ describe('zodiac signs', () => {
   it('says what the mapping is and is not', () => {
     expect(ZODIAC_NOTICE).toContain('افغانستان');
     expect(ZODIAC_NOTICE).toContain('طالع');
+    // The inline version has to carry the same disclaimer in one line
+    expect(ZODIAC_SHORT_NOTICE).toContain('طالع');
+    expect(ZODIAC_SHORT_NOTICE.length).toBeLessThan(60);
   });
 });

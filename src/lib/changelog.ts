@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.7.0 — 2026-09-07
+// Version: 0.8.0 — 2026-09-07
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.8.0',
+    at: '2026-09-07T02:09:58-04:00',
+    status: 'ready',
+    title: 'برج فلکی',
+    changes: [
+      { kind: 'added', text: 'برج فلکی هر روز، در کارت «امروز در تقویم‌های دیگر». ماه‌های خورشیدی همان برج‌ها هستند — شهریور یعنی سنبله — و در تقویم افغانستان ماه‌ها را با همین نام‌ها می‌خوانند.' },
+      { kind: 'added', text: 'نشان هر برج به شکل SVG کشیده می‌شود، یک‌بار کوچک کنار نام و یک‌بار بزرگ و محو در پس‌زمینهٔ کارت. هیچ ایموجی‌ای در کار نیست.' },
+      { kind: 'changed', text: 'ساعت شهرهای دیگر از کارت سفید به کارت سبز منتقل شد و همان فضای خالی زیر ساعت ایران را پر کرد.' },
+    ],
+  },
   {
     version: '0.7.0',
     at: '2026-09-07T01:37:02-04:00',

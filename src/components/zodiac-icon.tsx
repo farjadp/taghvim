@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/zodiac-icon.tsx
-// Version: 0.8.0-sandbox — 2026-09-07
+// Version: 0.8.0 — 2026-09-07
 // Why: Draws a zodiac sign as an SVG glyph. Deliberately not the Unicode
 //      characters (♈♉♊): those render as colour emoji on some systems, at a
 //      size and weight nothing else on the page uses.

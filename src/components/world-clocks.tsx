@@ -1,10 +1,11 @@
 // ============================================================================
 // Source: src/components/world-clocks.tsx
-// Version: 0.7.0 — 2026-09-07
-// Why: The second-clock block inside the "other calendars" card. Shows the
-//      visitor's own time when their zone differs from Tehran, plus up to two
-//      cities they add. Renders nothing but a small add link when there is
-//      nothing to show, so a visitor in Iran sees the card unchanged.
+// Version: 0.8.0 — 2026-09-07
+// Why: The second-clock block. Shows the visitor's own time when their zone
+//      differs from Tehran, plus up to two cities they add. Renders nothing
+//      but a small add link when there is nothing to show, so a visitor in
+//      Iran sees the page unchanged. Styled for the dark hero, which is the
+//      only place it is used; the picker itself is a light popover.
 // Env / Deps: lib/clocks. Persists the chosen ids as `taghvim-clocks`.
 //      The Tehran clock in the hero is untouched and remains the main clock.
 // ============================================================================
@@ -56,15 +57,16 @@ export function WorldClocks({ now }: { now: Date }) {
   const canAdd = picked.length < MAX_CLOCKS && rest.length > 0;
 
   // The picker sits on the heading row rather than a line of its own, so the
-  // block costs one row per clock and nothing else. The card shares a grid row
-  // with the hero, and every pixel here stretches the hero too.
+  // block costs one row per clock and nothing else. It opens rightward from
+  // the button: anchored to the other edge it would hang outside the hero and
+  // paint underneath the card next to it.
   const addButton = canAdd && (
     <div ref={menu} className="relative">
       <button type="button" onClick={() => setOpen(!open)} aria-expanded={open} aria-label={rows.length ? "افزودن شهر" : "افزودن ساعت شهر دیگر"} className="flex items-center gap-1 text-[0.6875rem] font-medium text-forest hover:underline">
         <Plus size={13} />{rows.length ? "شهر" : "افزودن ساعت شهر دیگر"}
       </button>
       {open && (
-        <div className="absolute right-0 top-6 z-20 flex w-56 flex-wrap gap-1.5 rounded-xl border border-line bg-surface p-3 shadow-lg">
+        <div className="absolute left-0 top-6 z-20 flex w-56 flex-wrap gap-1.5 rounded-xl border border-line bg-surface p-3 shadow-lg">
           {rest.map((zone) => (
             <button key={zone.id} type="button" onClick={() => { save([...picked, zone.id]); setOpen(false); }} className="rounded-lg bg-paper px-2.5 py-1 text-[0.6875rem] text-ink hover:bg-leaf">{zone.city}</button>
           ))}
@@ -80,20 +82,20 @@ export function WorldClocks({ now }: { now: Date }) {
   if (!rows.length) return <div className="pt-4">{addButton}</div>;
 
   return (
-    <div data-testid="world-clocks" className="border-t border-line pt-4">
-      <div className="flex items-center justify-between gap-3 text-xs text-muted"><span>ساعت شهرهای دیگر</span>{addButton || <span dir="ltr">CLOCKS</span>}</div>
+    <div data-testid="world-clocks" className="border-t border-white/15 pt-4">
+      <div className="flex items-center justify-between gap-3 text-xs text-[#d9e3cf]"><span>ساعت شهرهای دیگر</span>{addButton || <span dir="ltr">CLOCKS</span>}</div>
       {rows.map((row) => {
         const shift = dayShift(now, row.timeZone);
         return (
           <div key={row.id} className="mt-2.5 flex items-center justify-between gap-3">
             <span className="flex min-w-0 items-baseline gap-1.5">
-              <span className="truncate text-xs text-ink">{row.label}</span>
-              <span className="shrink-0 text-[0.625rem] text-muted">{offsetFromTehran(now, row.timeZone)}</span>
+              <span className="truncate text-xs text-[#d9e3cf]">{row.label}</span>
+              <span className="shrink-0 text-[0.625rem] text-[#d9e3cf] opacity-80">{offsetFromTehran(now, row.timeZone)}</span>
             </span>
             <span className="flex shrink-0 items-center gap-2">
-              {shift && <span className="rounded bg-paper px-1.5 py-0.5 text-[0.625rem] text-muted">{shift}</span>}
-              <time className="text-base font-medium tabular-nums" dir="ltr">{timeIn(now, row.timeZone)}</time>
-              {row.removable && <button type="button" aria-label={`حذف ${row.label}`} onClick={() => save(picked.filter((id) => id !== row.id))} className="text-muted hover:text-clay"><X size={13} /></button>}
+              {shift && <span className="rounded bg-white/10 px-1.5 py-0.5 text-[0.625rem] text-[#d9e3cf]">{shift}</span>}
+              <time className="text-base font-medium tabular-nums text-white" dir="ltr">{timeIn(now, row.timeZone)}</time>
+              {row.removable && <button type="button" aria-label={`حذف ${row.label}`} onClick={() => save(picked.filter((id) => id !== row.id))} className="text-[#d9e3cf] hover:text-white"><X size={13} /></button>}
             </span>
           </div>
         );

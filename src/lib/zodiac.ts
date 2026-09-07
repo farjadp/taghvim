@@ -1,12 +1,12 @@
 // ============================================================================
 // Source: src/lib/zodiac.ts
-// Version: 0.8.0-sandbox — 2026-09-07
+// Version: 0.8.0 — 2026-09-07
 // Why: The zodiac sign for a Persian date. The Solar Hijri months map one to
 //      one onto the signs, which is why the Afghan calendar names its months
 //      حمل، ثور، جوزا. So this is a lookup, not an astronomical calculation.
 //      Glyphs are SVG (lucide's Zodiac* icons), never emoji or font characters.
-// Env / Deps: lib/calendar for the Persian month. SANDBOX: only /sandbox/hero
-//      uses it. Delete this file and its test to drop the idea.
+// Env / Deps: lib/calendar for the Persian month. Shown in the side card of
+//      the hero row; components/zodiac-icon draws the glyph.
 // ============================================================================
 
 import { MONTHS, monthLength, toCalendar } from './calendar';
@@ -40,6 +40,10 @@ export const SIGNS: Sign[] = [
 ];
 
 // Shown with the sign. The mapping is calendrical, not a measured transit.
+// One line, shown beside the sign, matching how the Hijri row states its own
+// limits. The long version lives on the about page.
+export const ZODIAC_SHORT_NOTICE = 'بر پایهٔ ماه خورشیدی؛ برج نجومی است، نه طالع‌بینی.';
+
 export const ZODIAC_NOTICE = 'نام برج‌ها همان ترتیب ماه‌های خورشیدی است؛ در تقویم افغانستان ماه‌ها را با همین نام‌ها می‌خوانند. لحظهٔ دقیق ورود خورشید به هر برج ممکن است تا یک روز با آغاز ماه فرق داشته باشد. اینجا فقط برج نجومی نوشته می‌شود، نه پیش‌بینی و طالع.';
 
 // The sign a date falls in, by its Persian month.
