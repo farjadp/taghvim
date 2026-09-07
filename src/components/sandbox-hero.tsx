@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/sandbox-hero.tsx
-// Version: 0.7.1-sandbox — 2026-09-07
+// Version: 0.8.0-sandbox — 2026-09-07
 // Why: SANDBOX. Four renderings of the same top row, so the empty space under
 //      the Tehran clock can be judged by eye and by measured height:
 //      the current build, then three fixes. Measurements are live.
@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowDownLeft, Clock3, Copy } from "lucide-react";
 import { MONTHS, dateNumbers, fa, formatDate, toCalendar } from "@/lib/calendar";
 import { TEHRAN, dayShift, deviceZone, matchesTehran, offsetFromTehran, timeIn, zoneLabel } from "@/lib/clocks";
+import { ZODIAC_NOTICE, signFor, signProgress, signRange } from "@/lib/zodiac";
 import { WorldClocks } from "./world-clocks";
 
 function useNow(initialNow: string) {
@@ -94,6 +95,49 @@ function HeroClock({ now, timeZone, label }: { now: Date; timeZone: string; labe
   );
 }
 
+
+// The other two calendars as one compact row, for when they move into the hero.
+function CalendarsInHero({ now }: { now: Date }) {
+  return (
+    <div className="relative z-10 mt-5 grid grid-cols-2 gap-4 border-t border-white/15 pt-4 text-[#d9e3cf]">
+      <div>
+        <p className="text-[0.625rem] opacity-75">میلادی</p>
+        <p className="mt-1 text-base font-medium tabular-nums text-white" dir="ltr">{dateNumbers(now, "gregorian")}</p>
+      </div>
+      <div>
+        <p className="text-[0.625rem] opacity-75">هجری قمری</p>
+        <p className="mt-1 text-base font-medium text-white">{formatDate(now, "islamic")}</p>
+      </div>
+    </div>
+  );
+}
+
+// The zodiac card: sign, element, the month it covers, and how far into it we
+// are. Deliberately astronomical only, no horoscope.
+function ZodiacCard({ now, children }: { now: Date; children?: React.ReactNode }) {
+  const sign = signFor(now);
+  const progress = Math.round(signProgress(now) * 100);
+  return (
+    <div className="flex flex-col rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
+      <div className="flex items-center justify-between"><h3 className="text-base font-semibold">برج فلکی امروز</h3><span dir="ltr" className="text-xs text-muted">ZODIAC</span></div>
+      <div className="mt-5 flex items-center gap-4">
+        <span aria-hidden="true" className="flex size-14 shrink-0 items-center justify-center rounded-2xl bg-leaf text-3xl leading-none text-forest">{sign.symbol}</span>
+        <div className="min-w-0">
+          <p className="text-2xl font-semibold text-ink">{sign.name}</p>
+          <p className="mt-0.5 text-xs text-muted"><span dir="ltr">{sign.latin}</span> · عنصر {sign.element}</p>
+        </div>
+      </div>
+      <div className="mt-5">
+        <div className="flex items-center justify-between text-[0.6875rem] text-muted"><span>{signRange(now)}</span><span className="tabular-nums">{fa(progress)}٪</span></div>
+        {/* SANDBOX ONLY: an inline width. A shipped version would use a transform or a fixed set of steps, since the project bans inline styles. */}
+        <div className="mt-2 h-1 overflow-hidden rounded-full bg-paper"><div className="h-full rounded-full bg-forest" style={{ width: `${progress}%` }} /></div>
+      </div>
+      {children}
+      <details className="mt-4 text-[0.625rem] leading-6 text-muted"><summary className="cursor-pointer">دربارهٔ برج‌ها</summary><p className="pt-2">{ZODIAC_NOTICE}</p></details>
+    </div>
+  );
+}
+
 // Measures the two cards of a row and reports the gap the hero has to absorb.
 function Measured({ title, note, verdict, tone, children }: { title: string; note: string; verdict: string; tone: "bad" | "good"; children: React.ReactNode }) {
   const box = useRef<HTMLDivElement>(null);
@@ -170,6 +214,67 @@ export function HeroSandbox({ initialNow }: { initialNow: string }) {
             )}
           </Hero>
           <SideCard now={now} withClocks={false} />
+        </div>
+      </Measured>
+
+      <Measured
+        title="ت · پیشنهاد تو، کامل"
+        note="کارت سفید کلاً می‌شود برج فلکی به‌علاوهٔ ساعت شهرها. میلادی و قمری می‌روند داخل کارت سبز، زیر ساعت ایران، در دو ستون."
+        tone="good"
+        verdict="فضای خالی پر می‌شود و هر کارت یک موضوع دارد: سبز «امروز و زمان»، سفید «آسمان امروز». شلوغ‌ترین گزینه هم همین است."
+      >
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+          <Hero now={now}>
+            <CalendarsInHero now={now} />
+          </Hero>
+          <ZodiacCard now={now}>
+            <div className="mt-4 border-t border-line pt-4"><WorldClocks now={now} /></div>
+          </ZodiacCard>
+        </div>
+      </Measured>
+
+      <Measured
+        title="ث · همان، ولی ساعت‌ها هم داخل کارت سبز"
+        note="مثل «ت»، با این فرق که ساعت شهرها هم می‌روند کنار ساعت ایران. کارت سفید فقط و فقط برج فلکی می‌ماند."
+        tone="good"
+        verdict="تمیزترین تقسیم: هرچه به زمان مربوط است یک‌جا، آسمان جای دیگر. کارت سبز پرتر می‌شود."
+      >
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+          <Hero now={now}>
+            {showDevice && (
+              <div className="relative z-10 mt-5 space-y-2.5 border-t border-white/15 pt-4">
+                <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
+              </div>
+            )}
+            <CalendarsInHero now={now} />
+          </Hero>
+          <ZodiacCard now={now} />
+        </div>
+      </Measured>
+
+      <Measured
+        title="ج · برج فلکی بدون جابه‌جایی چیز دیگر"
+        note="میلادی و قمری سر جایشان می‌مانند و برج فلکی زیرشان در همان کارت سفید اضافه می‌شود. ساعت‌ها هم در کارت سبز، مثل «ب»."
+        tone="bad"
+        verdict="کم‌ترین ریسک، ولی کارت سفید سه موضوع پیدا می‌کند و بلندتر از همه می‌شود."
+      >
+        <div className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+          <Hero now={now}>
+            {showDevice && (
+              <div className="relative z-10 mt-5 space-y-2.5 border-t border-white/15 pt-4">
+                <HeroClock now={now} timeZone={device!} label={`${zoneLabel(device!)} (شما)`} />
+              </div>
+            )}
+          </Hero>
+          <div className="flex flex-col justify-between rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
+            <div className="flex items-center justify-between"><h3 className="text-base font-semibold">امروز در تقویم‌های دیگر</h3><ArrowDownLeft size={19} className="text-muted" /></div>
+            <div className="mt-5 border-b border-line pb-4"><div className="flex items-center justify-between text-xs text-muted"><span>میلادی</span><span dir="ltr">GREGORIAN</span></div><p className="mt-2 text-lg font-medium tabular-nums" dir="ltr">{dateNumbers(now, "gregorian")}</p></div>
+            <div className="border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p></div>
+            <div className="pt-4">
+              <div className="flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div>
+              <p className="mt-2 flex items-center gap-2 text-lg font-medium"><span aria-hidden="true" className="text-forest">{signFor(now).symbol}</span>{signFor(now).name}<span className="text-xs font-normal text-muted">عنصر {signFor(now).element}</span></p>
+            </div>
+          </div>
         </div>
       </Measured>
 
