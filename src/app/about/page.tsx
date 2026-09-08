@@ -1,14 +1,15 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.4 — 2026-09-08
+// Version: 0.9.5 — 2026-09-08
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette, CalendarPlus } from "lucide-react";
+import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette, CalendarPlus, ArrowUpLeft } from "lucide-react";
 import { ZODIAC_NOTICE } from "@/lib/zodiac";
 import { FEED_NAME } from "@/lib/ics";
 
@@ -86,8 +87,9 @@ export default function AboutPage() {
           </div>
         </section>
 
-        {/* The subscription URL has to be readable and copyable, so it gets its
-            own section rather than a card in the features grid. */}
+        {/* The how-to lives on /help; duplicating it here would be two copies
+            of the same instructions drifting apart. This keeps the caveat, which
+            is a fact about the data, and points at the steps. */}
         <section id="subscribe" className="mb-12 scroll-mt-24">
           <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-ink">
             <CalendarPlus size={20} className="text-forest" />
@@ -95,16 +97,9 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-4 text-sm leading-7 text-muted">
             <p>
-              این نشانی را یک بار به تقویم گوشی یا رایانه‌ات اضافه کن تا {FEED_NAME} داخل
-              همان تقویمی بیاید که هر روز باز می‌کنی. بعد از آن، خودِ تقویم هر چند وقت
-              یک‌بار فهرست را تازه می‌کند و اگر تاریخی اصلاح شود، خودبه‌خود اصلاح می‌شود.
-            </p>
-            <p className="rounded-xl border border-line bg-paper px-4 py-3 font-medium break-all text-ink">
-              <bdi dir="ltr">https://taghv.im/calendar.ics</bdi>
-            </p>
-            <p>
-              در آی‌فون: تنظیمات ← برنامه‌ها ← تقویم ← حساب‌ها ← افزودن حساب ← دیگر ←
-              افزودن تقویم اشتراکی. در تقویم گوگل: تقویم‌های دیگر ← از طریق نشانی وب.
+              می‌توانی {FEED_NAME} را به تقویم گوشی یا رایانه‌ات اضافه کنی تا داخل همان
+              تقویمی بیاید که هر روز باز می‌کنی.{" "}
+              <Link href="/help#subscribe" className="font-medium text-forest underline">مراحلش در راهنما</Link> نوشته شده است.
             </p>
             <p>
               <strong className="font-medium text-ink">تعطیلات مذهبی قمری در این فهرست نیست.</strong>{" "}
@@ -115,15 +110,23 @@ export default function AboutPage() {
           </div>
         </section>
 
-        <section className="mb-12">
-          <h2 className="mb-4 text-lg font-semibold text-ink">ملاحظات داده</h2>
-          <ul className="space-y-2.5 text-sm leading-6 text-muted">
-            <li>• تاریخ‌ها بر اساس روز مدنی در <span dir="ltr">Asia/Tehran</span> تفسیر می‌شوند.</li>
-            <li>• تاریخ قمری از تقویم محاسباتی <span dir="ltr">islamic-civil</span> است و ممکن است با رصدیِ ایران تفاوت داشته باشد.</li>
-            <li>• مناسبت‌ها مجموعه‌ای برگزیده و تکرارشونده هستند، نه تقویم رسمیِ کامل.</li>
-            <li>• اوقات شرعی محاسباتی‌اند و تقریبی.</li>
-            <li>• {ZODIAC_NOTICE}</li>
-          </ul>
+        {/* Everything that used to crowd the footer: who built it, the company,
+            the repository and the way to reach us, in one place. */}
+        <section id="links" className="mb-12 scroll-mt-24">
+          <h2 className="mb-4 text-lg font-semibold text-ink">پیوندها و تماس</h2>
+          <div className="grid gap-3 sm:grid-cols-2">
+            <Link href="/contact" className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink hover:border-forest">
+              تماس با ما
+              <span className="text-xs text-muted">ایمیل، تلفن و شبکه‌های اجتماعی</span>
+            </Link>
+            <Link href="/help" className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink hover:border-forest">
+              راهنمای استفاده
+              <span className="text-xs text-muted">چطور هر کاری را انجام بدهی</span>
+            </Link>
+            <ExternalLink href="https://github.com/farjadp/taghvim" title="کد پروژه در گیت‌هاب" note="متن‌باز، برای دیدن و بررسی" />
+            <ExternalLink href="https://farjadp.com" title="فرجاد پورمحمد" note="سازندهٔ این پروژه" />
+            <ExternalLink href="https://www.ashavid.ca" title="اشاویید" note="شرکتی که این پروژه زیر آن ساخته شد" />
+          </div>
         </section>
 
         <section className="rounded-2xl bg-leaf px-6 py-7">
@@ -131,12 +134,22 @@ export default function AboutPage() {
           <p className="text-sm leading-6 text-muted">
             ساخته‌شده با Next.js، React، TypeScript و Tailwind CSS. تقویم شمسی با
             <span dir="ltr"> jalaali-js </span> و اوقات شرعی با
-            <span dir="ltr"> adhan </span> محاسبه می‌شوند. قلم‌های وزیرمتن، شبنم و ساحل روی همین سرور میزبانی می‌شوند.
+            <span dir="ltr"> adhan </span> محاسبه می‌شوند. هر پنج قلم روی همین سرور میزبانی می‌شوند و هیچ درخواستی به سرور دیگری نمی‌رود.
           </p>
         </section>
       </main>
       <SiteFooter />
     </>
+  );
+}
+
+// One outbound row in the links section
+function ExternalLink({ href, title, note }: { href: string; title: string; note: string }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="flex items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm text-ink hover:border-forest">
+      <span className="flex items-center gap-1.5">{title}<ArrowUpLeft size={12} className="text-muted" /></span>
+      <span className="text-xs text-muted">{note}</span>
+    </a>
   );
 }
 

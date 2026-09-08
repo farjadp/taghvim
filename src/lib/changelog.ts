@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.7 — 2026-09-08
+// Version: 0.9.8 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -29,9 +29,19 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.5',
+    at: '2026-09-08T14:10:00-04:00',
+    status: 'ready',
+    title: 'صفحهٔ راهنما، و پاورقی کوتاه‌تر',
+    changes: [
+      { kind: 'added', text: 'صفحهٔ «راهنما» با نُه بخش: گشتن در تقویم، کم و زیاد کردن مناسبت‌ها، اوقات شرعی، ابزارهای تاریخ، ساعت شهرها، پوسته و قلم، نصب روی گوشی، افزودن به تقویم گوگل و اپل، و یادبود.' },
+      { kind: 'changed', text: 'پاورقی از دوازده پیوند به هفت‌تا رسید. سازنده، شرکت، گیت‌هاب و راه‌های تماس همه در صفحهٔ «درباره ما» جمع شدند.' },
+    ],
+  },
+  {
     version: '0.9.4',
     at: '2026-09-08T13:45:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'افزودن به تقویم گوگل و اپل',
     changes: [
       { kind: 'added', text: 'یک نشانی اشتراکی که مناسبت‌های ملی و فرهنگی ایران را داخل تقویم گوگل یا اپل خودت می‌آورد. یک بار اضافه‌اش می‌کنی و بعد خودِ تقویم تازه‌اش می‌کند. راهنمای افزودن در صفحهٔ «درباره» است.' },

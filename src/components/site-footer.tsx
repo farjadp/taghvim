@@ -1,22 +1,37 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.9.4 — 2026-09-08
-// Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers,
-//      and the link to why the calendar is built this way.
+// Version: 0.9.5 — 2026-09-08
+// Why: Shared footer. Deliberately short: the brand line with the link to why
+//      the calendar is built this way, the three pages, and four things a
+//      visitor might actually be looking for. Who built it, the company, the
+//      repository and the contact details all live on /about — a footer that
+//      lists every link is a sitemap, not navigation.
 // Env / Deps: Server component used by every page.
 // ============================================================================
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowUpLeft, Mail, Phone, Building2, GitBranch } from "lucide-react";
+import { ArrowUpLeft } from "lucide-react";
 
-// Four columns on desktop: brand, pages, tools, contact; disclaimers underneath
+const PAGES = [
+  { href: "/help", label: "راهنما" },
+  { href: "/about", label: "درباره ما" },
+  { href: "/changelog", label: "تغییرات و نسخه‌ها" },
+];
+
+const SHORTCUTS = [
+  { href: "/#calendar", label: "تقویم ماهانه" },
+  { href: "/#tools", label: "تبدیل تاریخ" },
+  { href: "/#prayer", label: "اوقات شرعی" },
+  { href: "/help#subscribe", label: "افزودن به تقویم گوگل و اپل" },
+];
+
 export function SiteFooter() {
   return (
     <footer className="border-t border-line bg-surface">
       <div className="mx-auto max-w-[1240px] px-5 py-10 sm:px-8 sm:py-12">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
-          <div className="lg:col-span-1">
+        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr]">
+          <div>
             <Link href="/" aria-label="تقویم، بازگشت به خانه" className="flex items-center gap-2.5 text-forest">
               <Image src="/icon.svg" width={36} height={36} alt="" unoptimized className="size-9 shrink-0" />
               <span className="text-xl font-extrabold">تقویم<span className="mr-1 text-clay">.</span></span>
@@ -33,65 +48,17 @@ export function SiteFooter() {
 
           <nav aria-label="صفحات" className="flex flex-col gap-3">
             <h3 className="text-xs font-semibold text-ink">صفحات</h3>
-            <Link href="/about" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
-              درباره ما
-            </Link>
-            <Link href="/changelog" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
-              تغییرات و نسخه‌ها
-            </Link>
-            <Link href="/contact" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
-              تماس با ما
-            </Link>
-            <a
-              href="https://www.ashavid.ca"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-muted hover:text-forest"
-            >
-              <Building2 size={14} />
-              اشاویید
-              <ArrowUpLeft size={12} className="opacity-60" />
-            </a>
+            {PAGES.map((page) => (
+              <Link key={page.href} href={page.href} className="text-xs text-muted hover:text-forest">{page.label}</Link>
+            ))}
           </nav>
 
-          <div className="flex flex-col gap-3">
+          <nav aria-label="دسترسی سریع" className="flex flex-col gap-3">
             <h3 className="text-xs font-semibold text-ink">دسترسی سریع</h3>
-            <Link href="/#calendar" className="text-xs text-muted hover:text-forest">تقویم ماهانه</Link>
-            <Link href="/#tools" className="text-xs text-muted hover:text-forest">تبدیل تاریخ</Link>
-            <Link href="/#prayer" className="text-xs text-muted hover:text-forest">اوقات شرعی</Link>
-            <Link href="/about#subscribe" className="text-xs text-muted hover:text-forest">افزودن به تقویم گوگل و اپل</Link>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <h3 className="text-xs font-semibold text-ink">ساخته‌شده توسط</h3>
-            <a
-              href="https://farjadp.com"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-muted hover:text-forest"
-            >
-              فرجاد پورمحمد
-              <ArrowUpLeft size={12} className="opacity-60" />
-            </a>
-            <a
-              href="https://github.com/farjadp/taghvim"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-1.5 text-xs text-muted hover:text-forest"
-            >
-              <GitBranch size={14} />
-              کد پروژه در گیت‌هاب
-              <ArrowUpLeft size={12} className="opacity-60" />
-            </a>
-            <a href="mailto:farjad@ashavid.ca" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest">
-              <Mail size={14} />
-              farjad@ashavid.ca
-            </a>
-            <a href="tel:+14376611674" className="flex items-center gap-1.5 text-xs text-muted hover:text-forest" dir="ltr">
-              <Phone size={14} />
-              +1 (437) 661-1674
-            </a>
-          </div>
+            {SHORTCUTS.map((shortcut) => (
+              <Link key={shortcut.href} href={shortcut.href} className="text-xs text-muted hover:text-forest">{shortcut.label}</Link>
+            ))}
+          </nav>
         </div>
 
         <div className="mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-line pt-6 text-[0.625rem] text-muted">

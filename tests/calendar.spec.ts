@@ -548,11 +548,27 @@ test("serves a subscribable calendar feed that a client can parse", async ({ req
   expect(unfolded).not.toContain("۲۲ بهمن");
 });
 
-test("the about page carries the feed URL and the footer points at it", async ({ page }) => {
+test("the help page carries the feed URL and the footer points at it", async ({ page }) => {
   await page.getByRole("contentinfo").getByRole("link", { name: "افزودن به تقویم گوگل و اپل" }).click();
-  await expect(page).toHaveURL(/\/about#subscribe$/);
+  await expect(page).toHaveURL(/\/help#subscribe$/);
   const section = page.locator("#subscribe");
   await expect(section).toContainText("https://taghv.im/calendar.ics");
   // The caveat has to travel with the URL, not live somewhere else on the page
   await expect(section).toContainText("قمری");
+});
+
+test("the help page lists every section and its contents match", async ({ page }) => {
+  await page.goto("/help");
+  const contents = page.getByRole("navigation", { name: "فهرست راهنما" }).getByRole("link");
+  const sections = page.locator("main section[id]");
+  const count = await contents.count();
+  expect(count).toBeGreaterThanOrEqual(9);
+  expect(await sections.count()).toBe(count);
+  // Every entry must point at a section that exists on the page
+  for (const link of await contents.all()) {
+    const href = await link.getAttribute("href");
+    await expect(page.locator(`main section${href!.replace("#", "#")}`)).toHaveCount(1);
+  }
+  const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
