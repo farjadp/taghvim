@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.7 — 2026-09-08
+// Version: 0.9.10 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -434,7 +434,9 @@ test("the footer answers why the calendar is built this way", async ({ page }) =
   const section = page.locator("#why");
   await expect(section.getByRole("heading", { name: "چرا ساخته شد؟" })).toBeVisible();
   // The reasoning must be in view, not merely present somewhere down the page
-  expect(await section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
+  // `html` scrolls smoothly, so the jump to the anchor is still animating when
+  // the assertions above finish; poll instead of reading the position once.
+  await expect.poll(() => section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
 });
 
 test("serves a manifest, sitemap and robots that agree with each other", async ({ request, baseURL }) => {
@@ -630,4 +632,19 @@ test("every page has its own canonical, its own og:title and valid structured da
     expect(Boolean(breadcrumb), path).toBe(crumb);
     if (breadcrumb) expect(breadcrumb.itemListElement).toHaveLength(2);
   }
+});
+
+// The Chrome Web Store listing links here, so it has to exist and has to be
+// honest about the one request the site does make.
+test("the privacy section is reachable and names the one external request", async ({ page }) => {
+  await page.getByRole("contentinfo").getByRole("link", { name: "حریم خصوصی" }).click();
+  await expect(page).toHaveURL(/\/about#privacy$/);
+  const section = page.locator("#privacy");
+  await expect(section.getByRole("heading", { name: "حریم خصوصی" })).toBeVisible();
+  // Not rounded down to "no third-party requests": the memorial photo is one
+  await expect(section).toContainText("عکس بخش یادبود");
+  await expect(section).toContainText("افزونهٔ کروم");
+  // `html` scrolls smoothly, so the jump to the anchor is still animating when
+  // the assertions above finish; poll instead of reading the position once.
+  await expect.poll(() => section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
 });

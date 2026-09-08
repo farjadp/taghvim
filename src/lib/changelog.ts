@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.17 — 2026-09-08
+// Version: 0.9.18 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -29,9 +29,19 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.10',
+    at: '2026-09-08T18:10:00-04:00',
+    status: 'ready',
+    title: 'صفحهٔ حریم خصوصی',
+    changes: [
+      { kind: 'added', text: 'بخش «حریم خصوصی» در صفحهٔ درباره: چه چیزی در مرورگرت ذخیره می‌شود، چه چیزی از بیرون بارگذاری می‌شود، و افزونهٔ کروم چه فرقی دارد. پیوندش در پاورقی است.' },
+      { kind: 'fixed', text: 'یک ادعای نادرست اصلاح شد. جایی نوشته بودیم هیچ درخواستی به سرور شخص ثالث نمی‌رود، در حالی که عکس بخش یادبود از سرویس منبع بارگذاری می‌شود. حالا همین‌جا نوشته شده، و اگر کلید یادبود را خاموش کنی واقعاً هیچ درخواستی به بیرون نمی‌رود.' },
+    ],
+  },
+  {
     version: '0.9.9',
     at: '2026-09-08T17:30:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'آیکن‌های افزونه در هر اندازه',
     changes: [
       { kind: 'fixed', text: 'افزونهٔ کروم حالا آیکن ۱۶، ۳۲، ۴۸ و ۱۲۸ پیکسلی دارد. پیش‌تر فقط دو اندازهٔ بزرگ داشت و کروم آن‌ها را کوچک می‌کرد؛ در نوار ابزار محو دیده می‌شد.' },

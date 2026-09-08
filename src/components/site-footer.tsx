@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.9.5 — 2026-09-08
+// Version: 0.9.10 — 2026-09-08
 // Why: Shared footer. Deliberately short: the brand line with the link to why
 //      the calendar is built this way, the three pages, and four things a
 //      visitor might actually be looking for. Who built it, the company, the
@@ -17,6 +17,7 @@ const PAGES = [
   { href: "/help", label: "راهنما" },
   { href: "/about", label: "درباره ما" },
   { href: "/changelog", label: "تغییرات و نسخه‌ها" },
+  { href: "/about#privacy", label: "حریم خصوصی" },
 ];
 
 const SHORTCUTS = [

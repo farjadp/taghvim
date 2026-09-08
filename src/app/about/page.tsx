@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.5 — 2026-09-08
+// Version: 0.9.10 — 2026-09-08
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -80,13 +80,8 @@ export default function AboutPage() {
               حالت تیره، سه اندازهٔ قلم و پنج قلم فارسی، از منوی تنظیمات در نوار بالا.
             </FeatureCard>
             <FeatureCard icon={<ShieldCheck size={20} />} title="حریم خصوصی">
-              بدون حساب کاربری، بدون پایگاه داده. شش رکورد تنظیم در مرورگر خودت می‌ماند:
-              شهر اوقات شرعی، پوسته، قلم، اندازهٔ قلم، ساعت شهرهای انتخابی و تنظیمات نمایش.
-              تنظیمات نمایش شامل مذهبی، دولتی، جهانی و یادبود است؛ ملی و فرهنگی همیشه نمایش داده می‌شود.
-              کلیدهای ذخیره‌سازی: <bdi dir="ltr">taghvim-city</bdi>، <bdi dir="ltr">taghvim-theme</bdi>،
-              <bdi dir="ltr"> taghvim-font</bdi>، <bdi dir="ltr">taghvim-size</bdi>،
-              <bdi dir="ltr"> taghvim-clocks</bdi> و <bdi dir="ltr">taghvim-view</bdi>.
-              انتخاب قبلی مناسبت‌ها خودکار به تنظیمات جدید منتقل می‌شود.
+              بدون حساب کاربری، بدون پایگاه داده، بدون آمارگیری. چند تنظیم فقط در مرورگر
+              خودت می‌ماند. جزئیاتش در بخش «حریم خصوصی» همین صفحه.
             </FeatureCard>
           </div>
         </section>
@@ -111,6 +106,62 @@ export default function AboutPage() {
               پایهٔ تقویم رسمی تثبیت شده است. پس این فهرست تقویم رسمی کامل نیست و برای
               برنامه‌ریزی تعطیلات قمری به آن تکیه نکن.
             </p>
+          </div>
+        </section>
+
+        {/* A real privacy section, not a feature card: the Chrome Web Store
+            listing points at #privacy, and a store listing must be able to
+            link to something that says exactly what is stored and what leaves
+            the browser. Writing it is what caught the README's false claim
+            that nothing is requested from a third party — the memorial photo
+            is. Say so here rather than round it down to zero. */}
+        <section id="privacy" className="mb-12 scroll-mt-24">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-ink">
+            <ShieldCheck size={20} className="text-forest" />
+            حریم خصوصی
+          </h2>
+          <div className="space-y-4 text-sm leading-7 text-muted">
+            <p>
+              حساب کاربری وجود ندارد، پایگاه دادهٔ کاربران وجود ندارد، و هیچ ابزار آماری یا
+              تبلیغاتی روی این سایت نیست. چیزی دربارهٔ تو ثبت یا به جایی فرستاده نمی‌شود.
+            </p>
+
+            <h3 className="pt-2 text-sm font-semibold text-ink">چه چیزی ذخیره می‌شود</h3>
+            <p>
+              شش تنظیم، فقط در حافظهٔ مرورگر خودت و فقط روی همین دستگاه: شهر اوقات شرعی،
+              پوسته، قلم، اندازهٔ قلم، ساعت شهرهای انتخابی، و اینکه کدام دسته از مناسبت‌ها
+              را می‌بینی. هیچ‌کدام به سرور ما نمی‌رسد؛ ما اصلاً سروری برای نگه‌داشتنشان
+              نداریم. پاک کردن دادهٔ سایت در مرورگر، همه را برمی‌گرداند به حالت اول.
+            </p>
+
+            <h3 className="pt-2 text-sm font-semibold text-ink">چه چیزی از بیرون بارگذاری می‌شود</h3>
+            <p>
+              یک چیز: <strong className="font-medium text-ink">عکس بخش یادبود</strong>، که از
+              همان جایی می‌آید که فهرست جاویدنامان منتشر شده است. یعنی مرورگر تو یک درخواست
+              به آن سرویس می‌فرستد و آن سرویس نشانی آی‌پی تو را می‌بیند، مثل هر تصویری که در
+              وب باز می‌کنی. نشانی صفحه‌ای که از آن آمده‌ای فرستاده نمی‌شود.
+            </p>
+            <p>
+              اگر کلید «یادبود» را در راهنمای زیر تقویم خاموش کنی، آن عکس بارگذاری نمی‌شود و
+              دیگر <strong className="font-medium text-ink">هیچ درخواستی به بیرون از این سایت نمی‌رود</strong>.
+              قلم‌ها، آیکن‌ها و کل تقویم روی همین سرور میزبانی می‌شوند.
+            </p>
+
+            <h3 className="pt-2 text-sm font-semibold text-ink">افزونهٔ کروم</h3>
+            <p>
+              افزونهٔ تب جدید هیچ مجوزی نمی‌خواهد و <strong className="font-medium text-ink">هیچ
+              درخواست شبکه‌ای نمی‌فرستد</strong>؛ یادبود در آن نیست، پس آن یک استثنا هم وجود
+              ندارد. تنظیماتش جدا از سایت و در حافظهٔ خود افزونه می‌ماند. یک بررسی خودکار
+              بعد از هر بیلد، نبودِ هر درخواست شبکه‌ای را در بستهٔ نهایی تأیید می‌کند.
+            </p>
+
+            <h3 className="pt-2 text-sm font-semibold text-ink">میزبانی</h3>
+            <p>
+              مثل هر سایت دیگری، سرور میزبان برای کارکرد و امنیت لاگ‌های فنی معمول را نگه
+              می‌دارد. ما از آن‌ها برای شناسایی یا ردیابی کسی استفاده نمی‌کنیم و چیزی به آن
+              اضافه نکرده‌ایم.
+            </p>
+            <p className="text-xs">آخرین به‌روزرسانی: ۱۸ شهریور ۱۴۰۵</p>
           </div>
         </section>
 
