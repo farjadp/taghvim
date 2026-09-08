@@ -9,15 +9,18 @@
 // ============================================================================
 
 import type { Metadata } from "next";
+import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FEED_NAME } from "@/lib/ics";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "راهنما | تقویم",
   description: "چطور از تقویم استفاده کنی: گشتن در ماه‌ها، مناسبت‌ها، اوقات شرعی، ابزارهای تاریخ، نصب روی گوشی و افزودن به تقویم گوگل و اپل.",
-};
+  path: "/help",
+});
 
 // Each entry becomes a section and a row in the contents list, so the two can
 // never fall out of step.
@@ -111,6 +114,7 @@ export default function HelpPage() {
   return (
     <>
       <SiteHeader active="help" />
+      <StructuredData data={breadcrumbStructuredData("راهنما", "/help")} />
       <main className="mx-auto max-w-[980px] px-5 pt-12 pb-16 sm:px-8">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">راهنما</h1>

@@ -6,6 +6,8 @@
 // ============================================================================
 
 import type { Metadata } from "next";
+import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -13,16 +15,18 @@ import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Fl
 import { ZODIAC_NOTICE } from "@/lib/zodiac";
 import { FEED_NAME } from "@/lib/ics";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "درباره ما | تقویم",
   description: "معرفی تقویم ایرانی، اهداف و امکانات پروژهٔ تقویم.",
-};
+  path: "/about",
+});
 
 // Sections: intro, features, limitations (disclaimers), credits
 export default function AboutPage() {
   return (
     <>
       <SiteHeader active="about" />
+      <StructuredData data={breadcrumbStructuredData("درباره ما", "/about")} />
       <main className="mx-auto max-w-[820px] px-5 pt-12 pb-16 sm:px-8">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">درباره تقویم</h1>

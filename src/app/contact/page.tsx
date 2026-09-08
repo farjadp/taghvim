@@ -6,20 +6,24 @@
 // ============================================================================
 
 import type { Metadata } from "next";
+import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { Mail, Phone, MapPin, Globe, Link as LinkIcon, AtSign, Send, Building2, ArrowUpLeft } from "lucide-react";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "تماس با ما | تقویم",
   description: "راه‌های ارتباطی با تیم تقویم و مشخصات برنامه‌نویس.",
-};
+  path: "/contact",
+});
 
 // Sections: company contact, social links, related sites
 export default function ContactPage() {
   return (
     <>
       <SiteHeader active="contact" />
+      <StructuredData data={breadcrumbStructuredData("تماس با ما", "/contact")} />
       <main className="mx-auto max-w-[820px] px-5 pt-12 pb-16 sm:px-8">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">تماس با ما</h1>

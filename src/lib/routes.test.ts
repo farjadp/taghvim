@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/routes.test.ts
-// Version: 0.9.2 — 2026-09-08
+// Version: 0.9.7 — 2026-09-08
 // Why: A sitemap that silently misses a page is worse than none, so the route
 //      list is checked against the pages that actually exist on disk, and the
 //      origin against metadataBase. Also guards the manifest's icon files.
@@ -38,9 +38,13 @@ describe('routes', () => {
     expect([...ROUTES.map((route) => route.path)].sort()).toEqual(pageRoutes(appDir).sort());
   });
 
-  it('uses the same origin as metadataBase', () => {
+  // The layout used to repeat the origin as a literal, which this test compared
+  // against. It imports SITE_ORIGIN now, so drift is impossible by construction
+  // and what is worth asserting is that the literal has not crept back.
+  it('takes metadataBase from this module instead of repeating the origin', () => {
     const layout = readFileSync(`${appDir}/layout.tsx`, 'utf8');
-    expect(layout).toContain(`new URL("${SITE_ORIGIN}")`);
+    expect(layout).toContain('metadataBase: new URL(SITE_ORIGIN)');
+    expect(layout).not.toContain(`"${SITE_ORIGIN}"`);
   });
 });
 

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.13 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.7',
+    at: '2026-09-08T15:10:00-04:00',
+    status: 'ready',
+    title: 'دیده‌شدن در موتورهای جست‌وجو',
+    changes: [
+      { kind: 'fixed', text: 'هر صفحه حالا عنوان و توضیح خودش را در پیش‌نمایش اشتراک‌گذاری دارد. پیش‌تر فرستادن نشانی «راهنما» یا «تغییرات»، عنوان صفحهٔ اصلی را نشان می‌داد.' },
+      { kind: 'added', text: 'نشانی متعارف (canonical) برای هر صفحه، تا موتورهای جست‌وجو نسخهٔ اصلی هر صفحه را بشناسند.' },
+      { kind: 'added', text: 'دادهٔ ساختاریافته دربارهٔ سایت و مسیر هر صفحه، به زبان فارسی و با تصریح اینکه استفاده از تقویم رایگان است.' },
+    ],
+  },
   {
     version: '0.9.6',
     at: '2026-09-08T14:30:00-04:00',

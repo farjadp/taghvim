@@ -8,16 +8,19 @@
 // ============================================================================
 
 import type { Metadata } from "next";
+import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
+import { StructuredData } from "@/components/structured-data";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { CircleDot, Compass, Rss } from "lucide-react";
 import { fa, formatDate } from "@/lib/calendar";
 import { CHANGE_LABELS, RELEASES, UPCOMING, UPCOMING_NOTICE, type ChangeKind } from "@/lib/changelog";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "تغییرات | تقویم",
   description: "فهرست نسخه‌های تقویم با تاریخ و ساعت، و کارهایی که در دست بررسی‌اند.",
-};
+  path: "/changelog",
+});
 
 // Release times are shown in Tehran, to the minute, in Persian digits
 const clock = new Intl.DateTimeFormat("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", hour12: false });
@@ -33,6 +36,7 @@ export default function ChangelogPage() {
   return (
     <>
       <SiteHeader active="changelog" />
+      <StructuredData data={breadcrumbStructuredData("تغییرات", "/changelog")} />
       <main className="mx-auto max-w-[820px] px-5 pt-12 pb-16 sm:px-8">
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">تغییرات</h1>

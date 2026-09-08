@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.6 — 2026-09-08
+// Version: 0.9.7 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -596,4 +596,38 @@ test("every page carries a complete social preview", async ({ page, request, bas
   // cannot pass while the meta tags still claim 1200x630.
   expect(body.readUInt32BE(16)).toBe(1200);
   expect(body.readUInt32BE(20)).toBe(630);
+});
+
+// Machines read these and people never see them, so the only way they stay
+// right is a test. Every secondary page shared the home page's og:title before.
+test("every page has its own canonical, its own og:title and valid structured data", async ({ page }) => {
+  const routes = [
+    { path: "/", crumb: false },
+    { path: "/help", crumb: true },
+    { path: "/about", crumb: true },
+    { path: "/changelog", crumb: true },
+    { path: "/contact", crumb: true },
+  ];
+  const seen = new Set<string>();
+
+  for (const { path, crumb } of routes) {
+    await page.goto(path);
+    const title = await page.title();
+    const canonical = await page.locator('link[rel="canonical"]').getAttribute("href");
+    const ogTitle = await page.locator('meta[property="og:title"]').getAttribute("content");
+
+    expect(canonical, path).toBe(`https://taghv.im${path === "/" ? "" : path}`);
+    expect(ogTitle, path).toBe(title);
+    expect(seen.has(ogTitle!), `${path} repeats another page's og:title`).toBe(false);
+    seen.add(ogTitle!);
+
+    const blocks = await page.locator('script[type="application/ld+json"]').allTextContents();
+    const parsed = blocks.map((block) => JSON.parse(block));
+    // The site graph is in the layout, so it is on every page
+    const graph = parsed.find((node) => Array.isArray(node["@graph"]));
+    expect(graph["@graph"].map((node: { "@type": string }) => node["@type"])).toEqual(["WebSite", "WebApplication"]);
+    const breadcrumb = parsed.find((node) => node["@type"] === "BreadcrumbList");
+    expect(Boolean(breadcrumb), path).toBe(crumb);
+    if (breadcrumb) expect(breadcrumb.itemListElement).toHaveLength(2);
+  }
 });
