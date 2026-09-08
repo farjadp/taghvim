@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.4 — 2026-09-08
+// Version: 0.9.5 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.2',
     at: '2026-09-08T13:20:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'تقویم، اول صفحه در موبایل',
     changes: [
       { kind: 'changed', text: 'در گوشی، تقویم ماهانه بالای صفحه می‌آید و تاریخ امروز و ساعت زیر آن. پیش‌تر باید بیشتر از یک صفحه اسکرول می‌کردی تا به تقویم برسی. در دسکتاپ چیزی عوض نشده.' },
