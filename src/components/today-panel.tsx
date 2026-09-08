@@ -1,9 +1,11 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.2 — 2026-09-08
+// Version: 0.9.8 — 2026-09-08
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
-//      Hijri calendars and its zodiac sign.
+//      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
+//      and OtherCalendars, so the Chrome extension can place them itself;
+//      TodayPanel composes both for the site and is unchanged in behaviour.
 //      On phones this whole block sits BELOW the month grid; see calendar-app.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
 //      The hero cannot clip its own overflow, because the clock picker opens
@@ -43,11 +45,11 @@ function SunDrawing() {
   );
 }
 
-export function TodayPanel({ now, initialNow, className = "" }: { now: Date; initialNow: string; className?: string }) {
+// The green card: weekday, date, copy button, Tehran clock and the second clocks.
+export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const persian = toCalendar(now);
-  const sign = signFor(now);
   useEffect(() => {
     if (!copied) return;
     const timer = setTimeout(() => setCopied(false), 2500);
@@ -64,7 +66,6 @@ export function TodayPanel({ now, initialNow, className = "" }: { now: Date; ini
     }
   }
   return (
-    <section aria-label="تاریخ و ساعت امروز" className={`grid gap-5 lg:grid-cols-[1.7fr_1fr] ${className}`}>
       <div className="relative isolate rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><SunDrawing /></div>
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
@@ -83,8 +84,15 @@ export function TodayPanel({ now, initialNow, className = "" }: { now: Date; ini
         <div className="relative z-20 mt-5"><WorldClocks now={now} /></div>
         <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : "بر پایهٔ ساعت دستگاه شما"}</p>
       </div>
-      {/* The sign of the month, drawn once small beside its name and once large
-          and faint behind the whole card, the way the hero carries its sun. */}
+  );
+}
+
+// The white card: the same day in the Gregorian and Hijri calendars, and the
+// sign of the month, drawn once small beside its name and once large and
+// faint behind the whole card, the way the hero carries its sun.
+export function OtherCalendars({ now }: { now: Date }) {
+  const sign = signFor(now);
+  return (
       <div data-testid="other-calendars" className="relative isolate flex flex-col justify-between overflow-hidden rounded-[1.75rem] border border-line bg-surface p-6 sm:p-7">
         <ZodiacIcon sign={sign} className="pointer-events-none absolute -bottom-6 -left-6 size-44 text-forest opacity-[0.07]" strokeWidth={1} />
         <div className="relative z-10 flex items-center justify-between"><h2 className="text-base font-semibold">امروز در تقویم‌های دیگر</h2><ArrowDownLeft size={19} className="text-muted" /></div>
@@ -92,6 +100,15 @@ export function TodayPanel({ now, initialNow, className = "" }: { now: Date; ini
         <div className="relative z-10 border-b border-line py-4"><div className="flex items-center justify-between text-xs text-muted"><span>هجری قمری</span><span dir="ltr">HIJRI</span></div><p className="mt-2 text-lg font-medium">{formatDate(now, "islamic")}</p><p className="mt-1 text-[0.625rem] text-muted">محاسباتی؛ ممکن است با تقویم رسمی یک روز اختلاف داشته باشد.</p></div>
         <div className="relative z-10 pt-4"><div className="flex items-center justify-between text-xs text-muted"><span>برج فلکی</span><span dir="ltr">ZODIAC</span></div><p className="mt-2 flex flex-wrap items-center gap-2 text-lg font-medium"><ZodiacIcon sign={sign} className="size-5 text-forest" />{sign.name}<span className="text-xs font-normal text-muted">عنصر {sign.element}</span></p><p className="mt-1 text-[0.625rem] text-muted">{ZODIAC_SHORT_NOTICE}</p></div>
       </div>
+  );
+}
+
+// What the site renders: both cards side by side on desktop, stacked on phones.
+export function TodayPanel({ now, initialNow, className = "" }: { now: Date; initialNow: string; className?: string }) {
+  return (
+    <section aria-label="تاریخ و ساعت امروز" className={`grid gap-5 lg:grid-cols-[1.7fr_1fr] ${className}`}>
+      <TodayHero now={now} initialNow={initialNow} />
+      <OtherCalendars now={now} />
     </section>
   );
 }

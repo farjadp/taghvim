@@ -12,3 +12,6 @@ test-results/
 # Next.js regenerates this on every dev/build; it flipped between
 # .next/dev/types and .next/types and kept showing up as drift.
 next-env.d.ts
+
+# Chrome extension build output (npm run build:extension)
+extension/dist/

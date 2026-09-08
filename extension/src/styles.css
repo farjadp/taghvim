@@ -1,0 +1,18 @@
+/* ============================================================================
+   Source: extension/src/styles.css
+   Version: 0.9.8 — 2026-09-08
+   Why: The extension uses the site's stylesheet unchanged — same tokens, same
+        fonts, same dark palette. The @source lines tell Tailwind where the
+        classes live, because this build's root is extension/, not the repo.
+   Env / Deps: ../../src/app/globals.css (imports tailwindcss and every font).
+   ============================================================================ */
+
+@source "../../src/components";
+@source "../../src/lib";
+@source "./";
+
+@import "../../src/app/globals.css";
+
+/* A new tab is a fixed viewport, not a scrolling document: the shell owns the
+   height and lets one column scroll internally. */
+html, body, #root { height: 100%; }

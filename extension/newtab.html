@@ -1,0 +1,22 @@
+<!doctype html>
+<!--
+  Source: extension/newtab.html
+  Version: 0.9.8 — 2026-09-08
+  Why: The new-tab document. Vite bundles the module script; the pre-paint
+       theme script (boot.js) is injected by the build, because MV3 forbids
+       inline scripts and it must run before first paint to avoid a white
+       flash in dark mode.
+  Env / Deps: extension/vite.config.ts injects boot.js and the manifest assets.
+-->
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>تقویم</title>
+    <link rel="icon" href="./icon.svg" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="./src/main.tsx"></script>
+  </body>
+</html>

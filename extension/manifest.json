@@ -1,0 +1,17 @@
+{
+  "manifest_version": 3,
+  "name": "تقویم",
+  "short_name": "تقویم",
+  "description": "تب جدید، تقویم ایرانی: تاریخ امروز به شمسی، میلادی و قمری، ماه جاری و مناسبت‌های روز. بدون اینترنت، بدون ردیابی.",
+  "version": "0.9.8",
+  "icons": {
+    "192": "icon-192.png",
+    "512": "icon-512.png"
+  },
+  "chrome_url_overrides": {
+    "newtab": "newtab.html"
+  },
+  "permissions": [],
+  "host_permissions": [],
+  "offline_enabled": true
+}

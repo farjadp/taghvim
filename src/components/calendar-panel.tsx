@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-panel.tsx
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.9.8 — 2026-09-08
 // Why: Monthly Jalali grid, RTL keyboard navigation and interactive legend.
 //      Event groups and memorial visibility are controlled below the grid.
 // Env / Deps: Pure UI; lib/events filters grid events with the same groups as the list.
@@ -26,6 +26,9 @@ interface CalendarPanelProps {
   selected: Date;
   groups: EventGroups;
   memorial: boolean;
+  // The extension's new tab renders no memorial panel, so a switch for it
+  // would toggle nothing; it hides the control instead.
+  showMemorialSwitch?: boolean;
   onToggleView: (key: keyof EventGroups | "memorial") => void;
   onSelect: (date: Date) => void;
   onNavigate: (delta: number) => void;
@@ -33,7 +36,7 @@ interface CalendarPanelProps {
   onJump: (year: number, month: number) => void;
 }
 
-export function CalendarPanel({ year, month, today, selected, groups, memorial, onToggleView, onSelect, onNavigate, onToday, onJump }: CalendarPanelProps) {
+export function CalendarPanel({ year, month, today, selected, groups, memorial, showMemorialSwitch = true, onToggleView, onSelect, onNavigate, onToday, onJump }: CalendarPanelProps) {
   const grid = monthGrid(year, month);
   const selectedParts = toCalendar(selected);
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
@@ -88,7 +91,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
         <div data-testid="view-controls" className="mt-2.5 flex flex-wrap items-center gap-2">
           <span className="text-[0.625rem] text-muted">نمایش:</span>
           <span className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[0.625rem] text-muted"><span aria-hidden="true" className="size-1.5 rounded-full bg-forest-deep" />ملی و فرهنگی</span>
-          {VIEW_SWITCHES.map(({ key, label }) => {
+          {VIEW_SWITCHES.filter(({ key }) => showMemorialSwitch || key !== "memorial").map(({ key, label }) => {
             const on = key === "memorial" ? memorial : groups[key];
             return <button key={key} type="button" role="switch" aria-checked={on} onClick={() => onToggleView(key)} className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.625rem] transition-colors ${on ? "border-forest bg-leaf text-forest" : "border-line text-muted hover:text-forest"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${on ? "bg-forest-deep" : "bg-line"}`} />{label}</button>;
           })}

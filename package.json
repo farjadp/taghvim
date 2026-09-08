@@ -1,6 +1,6 @@
 {
   "name": "taghvim",
-  "version": "0.9.7",
+  "version": "0.9.8",
   "private": true,
   "type": "module",
   "scripts": {
@@ -13,7 +13,8 @@
     "sync:javidnaman": "node scripts/sync-javidnaman.mjs",
     "check:live": "node scripts/check-live.mjs",
     "build:icons": "node scripts/build-icons.mjs",
-    "build:og": "node scripts/build-og.mjs"
+    "build:og": "node scripts/build-og.mjs",
+    "build:extension": "vite build --config extension/vite.config.ts && node scripts/check-extension.mjs"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "5.3.0",
@@ -30,11 +31,14 @@
     "@axe-core/playwright": "4.13.0",
     "@playwright/test": "1.62.1",
     "@tailwindcss/postcss": "4.3.3",
+    "@tailwindcss/vite": "4.3.3",
     "@types/node": "26.4.0",
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.1.1",
     "tailwindcss": "4.3.3",
     "typescript": "5.9.3",
+    "vite": "8.2.2",
     "vitest": "4.1.11"
   }
 }
