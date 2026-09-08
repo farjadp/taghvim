@@ -1,8 +1,8 @@
 // ============================================================================
 // Source: src/components/events-panel.tsx
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.9.0 — 2026-09-08
 // Why: Selected-day events and the month's event list with category chips.
-// Env / Deps: Chips for religious/state exist only when the scope is 'all'.
+// Env / Deps: lib/events uses the grid's groups; only enabled category chips appear.
 // ============================================================================
 
 "use client";
@@ -10,26 +10,26 @@
 import { useState } from "react";
 import { ArrowUpLeft, Leaf, Info } from "lucide-react";
 import { dayKey, fa, formatDate, fromCalendar, MONTHS, monthLength } from "@/lib/calendar";
-import { EVENTS_NOTICE, eventsForDate, type EventScope } from "@/lib/events";
+import { EVENTS_NOTICE, eventsForDate, type EventGroups } from "@/lib/events";
 
-// Category chips; the last two only exist when the religious/state scope is on.
+// National and all-events chips stay available; others follow their group's visibility.
 const FILTERS = [
   { key: "all", label: "همه" },
   { key: "iran", label: "ایرانی" },
   { key: "world", label: "جهانی" },
-  { key: "religious", label: "مذهبی", scoped: true },
-  { key: "state", label: "دولتی", scoped: true },
+  { key: "religious", label: "مذهبی" },
+  { key: "state", label: "دولتی" },
 ] as const;
 
-export function EventsPanel({ year, month, selected, scope, onSelect }: { year: number; month: number; selected: Date; scope: EventScope; onSelect: (date: Date) => void }) {
+export function EventsPanel({ year, month, selected, groups, onSelect }: { year: number; month: number; selected: Date; groups: EventGroups; onSelect: (date: Date) => void }) {
   const [filter, setFilter] = useState<string>("all");
-  const filters = FILTERS.filter((item) => !("scoped" in item) || scope === "all");
-  // If the scope was switched off while a scoped chip was active, fall back to "all"
+  const filters = FILTERS.filter((item) => item.key === "all" || item.key === "iran" || groups[item.key]);
+  // If a group was switched off while its chip was active, fall back to "all".
   const activeFilter = filters.some((item) => item.key === filter) ? filter : "all";
-  const selectedEvents = eventsForDate(selected, scope);
+  const selectedEvents = eventsForDate(selected, groups);
   const events = Array.from({ length: monthLength(year, month) }, (_, i) => {
     const date = fromCalendar({ year, month, day: i + 1 });
-    return eventsForDate(date, scope).map((event) => ({ ...event, date, day: i + 1 }));
+    return eventsForDate(date, groups).map((event) => ({ ...event, date, day: i + 1 }));
   }).flat().filter((event) => activeFilter === "all" || event.category === activeFilter);
   return (
     <aside className="flex min-w-0 flex-col rounded-[1.75rem] border border-line bg-surface">

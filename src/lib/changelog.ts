@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.8.1 — 2026-09-07
+// Version: 0.9.0 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.0',
+    at: '2026-09-08T01:37:48-04:00',
+    status: 'ready',
+    title: 'نمایش مستقل مناسبت‌ها',
+    changes: [
+      { kind: 'added', text: 'چهار کلید مستقل مذهبی، دولتی، جهانی و یادبود در راهنمای زیر تقویم. ملی و فرهنگی همیشه نمایش داده می‌شود.' },
+      { kind: 'changed', text: 'کلید مشترک نوار بالا حذف شد؛ اوقات شرعی با کلید مذهبی نمایش داده می‌شود و یادبود هم جداگانه قابل پنهان‌کردن است.' },
+      { kind: 'fixed', text: 'انتخاب قبلی مناسبت‌ها به تنظیمات جدید منتقل می‌شود. خاموش‌کردن یک دسته، مناسبت و علامت تعطیلی آن را هم‌زمان از فهرست و تقویم حذف می‌کند.' },
+    ],
+  },
   {
     version: '0.8.1',
     at: '2026-09-07T02:30:48-04:00',

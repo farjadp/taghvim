@@ -1,8 +1,8 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.9.0 — 2026-09-08
 // Why: Curated occasions: national, state, lunar religious, and world.
-//      Not the official calendar. Scope filtering lives here so grid and list agree.
+//      Not the official calendar. Group filtering lives here so grid and list agree.
 // Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
 // ============================================================================
 
@@ -20,9 +20,10 @@ export type CalendarEvent = {
   category: EventCategory;
 };
 
-// 'secular' hides 'state' and 'religious' — this is the app's default scope.
-// 'all' returns every category; the UI opts into it with a persisted toggle.
-export type EventScope = 'secular' | 'all';
+// National occasions always remain visible; the other groups are independent.
+export type EventGroups = { religious: boolean; state: boolean; world: boolean };
+export const DEFAULT_GROUPS: EventGroups = { religious: false, state: false, world: true };
+export const ALL_GROUPS: EventGroups = { religious: true, state: true, world: true };
 
 // Shown verbatim in the UI. Preserve it: the dataset is curated, not the official calendar.
 export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری با تقویم محاسباتی islamic-civil درج شده‌اند و ممکن است با تقویم رسمی ایران (مبتنی بر رؤیت هلال) تا یک روز تفاوت داشته باشند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
@@ -94,7 +95,7 @@ const PERSIAN_EVENTS: FixedEvents = {
   '12-29': [['روز ملی شدن صنعت نفت ایران', true]],
 };
 
-// Occasions tied to the Islamic Republic and its institutions. Hidden in 'secular' scope.
+// Occasions tied to the Islamic Republic and its institutions. Hidden unless state is enabled.
 // Key format: `${persianMonth}-${persianDay}`
 const STATE_EVENTS: FixedEvents = {
   '1-12': [['روز جمهوری اسلامی ایران', true]],
@@ -194,8 +195,8 @@ const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
 };
 
 // Returns the curated events for one civil day in Asia/Tehran.
-// `scope` defaults to 'all' so the library stays neutral; the UI passes its own setting.
-export function eventsForDate(date: Date, scope: EventScope = 'all'): CalendarEvent[] {
+// All groups default on so the library stays neutral; the UI passes its own setting.
+export function eventsForDate(date: Date, groups: EventGroups = ALL_GROUPS): CalendarEvent[] {
   const persian = toCalendar(date);
   const gregorian = toCalendar(date, 'gregorian');
   const islamic = toCalendar(date, 'islamic');
@@ -209,12 +210,12 @@ export function eventsForDate(date: Date, scope: EventScope = 'all'): CalendarEv
   const lunarTitle = LUNAR_HOLIDAYS[`${islamic.month}-${islamic.day}`];
   const overriddenTitles = new Set(Object.values(officialOverrides));
   const religiousTitle = officialLunarTitle ?? (lunarTitle && !overriddenTitles.has(lunarTitle) ? lunarTitle : undefined);
-  const showAll = scope === 'all';
   // Order matters for display: national first, then state, then religious, then world.
+  // Hidden groups contribute no rows or holiday flags, keeping list and shading consistent.
   return [
     ...iran.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'iran' })),
-    ...(showAll ? state.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'state' })) : []),
-    ...(showAll && religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
-    ...world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })),
+    ...(groups.state ? state.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'state' })) : []),
+    ...(groups.religious && religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
+    ...(groups.world ? world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })) : []),
   ];
 }

@@ -1,9 +1,9 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.4.0 — 2026-09-07
-// Why: Browser tests: navigation, tools, scope toggle, prayer city, keyboard
-//      RTL navigation, midnight rollover, accessibility, overflow.
-// Env / Deps: Playwright on port 3100 with a frozen clock; desktop + iPhone 13.
+// Version: 0.9.0 — 2026-09-08
+// Why: Browser tests: independent legend controls, migration, tools and navigation,
+//      midnight rollover, accessibility, overflow and responsive layout.
+// Env / Deps: Playwright with a frozen clock; desktop + iPhone 13; E2E_PORT configurable.
 // ============================================================================
 
 import { expect, test } from "@playwright/test";
@@ -51,21 +51,104 @@ test("date conversion validates and converts actual dates", async ({ page }) => 
   await expect(page.locator("#tools").getByRole("alert")).toContainText("تاریخ معتبر نیست");
 });
 
-test("religious and state occasions are hidden by default and the toggle persists", async ({ page }) => {
-  const toggle = page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" });
+test("legend switches independently control state holidays and persist", async ({ page }) => {
+  const calendar = page.getByRole("region", { name: "تقویم ماهانه" });
+  const toggle = calendar.getByRole("switch", { name: "دولتی", exact: true });
   await expect(toggle).toHaveAttribute("aria-checked", "false");
-  await expect(page.getByTestId("prayer-times")).toHaveCount(0);
-  // 22 Bahman is a state holiday: unshaded in secular scope, shaded once the scope is on
+  await expect(page.locator("header").getByRole("switch")).toHaveCount(0);
+  await expect(calendar.getByText("ملی و فرهنگی", { exact: true })).toBeVisible();
+  await expect(calendar.getByRole("button", { name: "ملی و فرهنگی" })).toHaveCount(0);
   await page.getByLabel("انتخاب ماه تقویم").selectOption("11");
+  const shaded = calendar.getByRole("group", { name: /روزهای ماه/ }).locator("button.bg-holiday");
   const bahman22 = page.getByRole("button", { name: "۲۲ بهمن ۱۴۰۵", exact: true });
-  await expect(bahman22).toBeVisible();
-  expect(await bahman22.evaluate((el) => getComputedStyle(el).backgroundColor)).not.toContain("252, 232, 227");
+  await expect(shaded).toHaveCount(5);
+  await expect(bahman22).not.toHaveClass(/bg-holiday/);
   await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-checked", "true");
-  await expect(page.getByTestId("prayer-times")).toBeVisible();
-  expect(await bahman22.evaluate((el) => getComputedStyle(el).backgroundColor)).toContain("252, 232, 227");
+  await expect(shaded).toHaveCount(6);
+  await expect(bahman22).toHaveClass(/bg-holiday/);
+  await expect(calendar.getByRole("switch", { name: "مذهبی", exact: true })).toHaveAttribute("aria-checked", "false");
+  await expect(page.getByTestId("prayer-times")).toHaveCount(0);
+  await bahman22.click();
+  await expect(page.getByTestId("selected-events")).toContainText("پیروزی انقلاب اسلامی ایران");
+  await toggle.click();
+  await expect(page.getByTestId("selected-events")).not.toContainText("پیروزی انقلاب اسلامی ایران");
+  await toggle.click();
   await page.reload();
-  await expect(page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" })).toHaveAttribute("aria-checked", "true");
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+});
+
+test("religious switch controls prayer navigation and panel without state occasions", async ({ page }) => {
+  const toggle = page.getByRole("switch", { name: "مذهبی", exact: true });
+  const prayerLink = page.getByRole("navigation", { name: "ناوبری اصلی" }).getByRole("link", { name: "اوقات شرعی" });
+  await expect(prayerLink).toHaveCount(0);
+  await expect(page.getByTestId("prayer-times")).toHaveCount(0);
+  await toggle.click();
+  await expect(prayerLink).toBeVisible();
+  await expect(page.getByTestId("prayer-times")).toBeVisible();
+  await expect(page.getByRole("switch", { name: "دولتی", exact: true })).toHaveAttribute("aria-checked", "false");
+  await page.reload();
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+  await expect(prayerLink).toBeVisible();
+  await toggle.click();
+  await expect(prayerLink).toHaveCount(0);
+  await expect(page.getByTestId("prayer-times")).toHaveCount(0);
+});
+
+test("memorial can be hidden independently and restored after reload", async ({ page }) => {
+  const toggle = page.getByRole("switch", { name: "یادبود", exact: true });
+  await expect(toggle).toHaveAttribute("aria-checked", "true");
+  await toggle.click();
+  await expect(page.getByTestId("memorial")).toHaveCount(0);
+  await page.reload();
+  await expect(toggle).toHaveAttribute("aria-checked", "false");
+  await expect(page.getByTestId("memorial")).toHaveCount(0);
+  await toggle.click();
+  await expect(page.getByTestId("memorial")).toBeVisible();
+  await expect(page.getByTestId("memorial")).toContainText("اینجا پیش‌تر اوقات شرعی را اعلام می‌کردیم.");
+});
+
+test("world switch removes events and its active list filter", async ({ page }) => {
+  const list = page.locator("aside");
+  await page.getByRole("button", { name: "۱۷ شهریور ۱۴۰۵", exact: true }).click();
+  await expect(page.getByTestId("selected-events")).toContainText("سوادآموزی");
+  await list.getByRole("button", { name: "جهانی", exact: true }).click();
+  await page.getByRole("switch", { name: "جهانی", exact: true }).click();
+  await expect(page.getByTestId("selected-events")).not.toContainText("سوادآموزی");
+  await expect(list.getByRole("button", { name: "جهانی", exact: true })).toHaveCount(0);
+  await expect(list.getByRole("button", { name: "همه", exact: true })).toHaveAttribute("aria-pressed", "true");
+  await expect(list).toContainText("شهریار");
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "جهانی", exact: true })).toHaveAttribute("aria-checked", "false");
+});
+
+for (const legacy of ["secular", "all"]) {
+  test(`migrates legacy ${legacy} preference on first read`, async ({ page }) => {
+    await page.evaluate((value) => {
+      localStorage.removeItem("taghvim-view");
+      localStorage.setItem("taghvim-scope", value);
+    }, legacy);
+    await page.reload();
+    await expect(page.getByRole("switch", { name: "مذهبی", exact: true })).toHaveAttribute("aria-checked", String(legacy === "all"));
+    await expect(page.getByRole("switch", { name: "دولتی", exact: true })).toHaveAttribute("aria-checked", String(legacy === "all"));
+    expect(await page.evaluate(() => localStorage.getItem("taghvim-scope"))).toBeNull();
+    expect(await page.evaluate(() => JSON.parse(localStorage.getItem("taghvim-view")!))).toEqual({
+      religious: legacy === "all", state: legacy === "all", world: true, memorial: true,
+    });
+  });
+}
+
+test("blocked storage still allows independent in-memory switches", async ({ page }) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.addInitScript(() => {
+    Object.defineProperty(window, "localStorage", { get() { throw new Error("Storage blocked"); } });
+  });
+  await page.reload();
+  await page.getByRole("switch", { name: "مذهبی", exact: true }).click();
+  await expect(page.getByTestId("prayer-times")).toBeVisible();
+  await page.getByRole("switch", { name: "یادبود", exact: true }).click();
+  await expect(page.getByTestId("memorial")).toHaveCount(0);
+  expect(errors).toEqual([]);
 });
 
 test("memorial shows one identified person with a link to the source page", async ({ page }) => {
@@ -78,7 +161,7 @@ test("memorial shows one identified person with a link to the source page", asyn
 
 test("city choice changes prayer times and survives refresh", async ({ page }) => {
   // Prayer times only render inside the religious scope
-  await page.getByRole("switch", { name: "مناسبت‌های مذهبی و دولتی" }).click();
+  await page.getByRole("switch", { name: "مذهبی", exact: true }).click();
   const prayers = page.getByTestId("prayer-times");
   const before = await prayers.innerText();
   await page.getByLabel("انتخاب شهر").selectOption("mashhad");
@@ -145,12 +228,23 @@ test("main workflows pass automated accessibility checks in both themes", async 
     return result.violations.map(({ id, nodes }) => ({ id, nodes: nodes.map(({ target, failureSummary }) => ({ target, failureSummary })) }));
   };
   expect(await audit()).toEqual([]);
+  await page.getByRole("switch", { name: "مذهبی", exact: true }).click();
+  await page.getByRole("switch", { name: "دولتی", exact: true }).click();
+  await page.getByRole("switch", { name: "جهانی", exact: true }).click();
+  await page.getByRole("switch", { name: "یادبود", exact: true }).click();
+  await page.waitForTimeout(400);
+  expect(await audit()).toEqual([]);
   // Same page, dark palette: every token has a dark counterpart and must still pass contrast
   await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
   await page.getByRole("group", { name: "پوسته" }).getByRole("button", { name: "تیره" }).click();
   await page.keyboard.press("Escape");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
   // Colours animate for 150ms (transition-colors); auditing mid-transition reads blended values
+  await page.waitForTimeout(400);
+  expect(await audit()).toEqual([]);
+  for (const name of ["مذهبی", "دولتی", "جهانی", "یادبود"]) {
+    await page.getByRole("switch", { name, exact: true }).click();
+  }
   await page.waitForTimeout(400);
   expect(await audit()).toEqual([]);
 });
@@ -264,6 +358,55 @@ test("page has no horizontal overflow or client errors", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "شهریور ۱۴۰۵", exact: true })).toBeVisible();
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   expect(errors).toEqual([]);
+});
+
+test("legend controls fit the card and remain keyboard accessible", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  if (!mobile) await page.setViewportSize({ width: 1280, height: 1100 });
+  await page.emulateMedia({ reducedMotion: "reduce", colorScheme: "light" });
+  await page.evaluate(() => document.fonts.ready);
+  const calendar = page.getByRole("region", { name: "تقویم ماهانه" });
+  const controls = page.getByTestId("view-controls");
+  const legend = page.getByTestId("calendar-legend");
+  await expect(controls.getByRole("switch")).toHaveCount(4);
+  const sizes = await calendar.evaluate((card) => {
+    const block = card.querySelector<HTMLElement>('[data-testid="calendar-legend"]')!;
+    const row = block.querySelector<HTMLElement>('[data-testid="view-controls"]')!;
+    const box = card.getBoundingClientRect();
+    const fullHeight = block.getBoundingClientRect().height;
+    const classes = row.className;
+    row.className = "hidden";
+    const baseHeight = block.getBoundingClientRect().height;
+    row.className = classes;
+    return { width: box.width, height: box.height, legend: fullHeight, increase: fullHeight - baseHeight };
+  });
+  if (!mobile) {
+    expect(sizes.width).toBeGreaterThan(727);
+    expect(sizes.width).toBeLessThan(729);
+    expect(sizes.increase).toBeGreaterThanOrEqual(30);
+    expect(sizes.increase).toBeLessThanOrEqual(40);
+  }
+  console.log(`${testInfo.project.name} legend dimensions: ${JSON.stringify(sizes)}`);
+  const religious = controls.getByRole("switch", { name: "مذهبی", exact: true });
+  await religious.focus();
+  await page.keyboard.press("Space");
+  await expect(religious).toHaveAttribute("aria-checked", "true");
+  await page.keyboard.press("Tab");
+  await expect(controls.getByRole("switch", { name: "دولتی", exact: true })).toBeFocused();
+  await calendar.screenshot({ path: testInfo.outputPath("legend-light.png") });
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "پوسته" }).getByRole("button", { name: "تیره" }).click();
+  await page.getByRole("group", { name: "اندازهٔ قلم" }).getByRole("button", { name: "بزرگ" }).click();
+  await page.keyboard.press("Escape");
+  await page.waitForTimeout(400);
+  await calendar.screenshot({ path: testInfo.outputPath("legend-dark-large.png") });
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  expect(await legend.evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true);
+  for (const toggle of await controls.getByRole("switch").all()) {
+    await expect(toggle).toBeVisible();
+    const bounds = await toggle.boundingBox();
+    expect(bounds!.height).toBeGreaterThanOrEqual(24);
+  }
 });
 
 test("non-Friday holidays are highlighted in red on the calendar grid", async ({ page }) => {
