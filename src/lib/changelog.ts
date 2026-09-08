@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.11 — 2026-09-08
+// Version: 0.9.12 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.6',
     at: '2026-09-08T14:30:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'تصویر پیش‌نمایش برای اشتراک‌گذاری',
     changes: [
       { kind: 'added', text: 'وقتی نشانی سایت را در تلگرام، ایکس یا واتساپ می‌فرستی، به‌جای یک لینک خشک، کارت پیش‌نمایش با نشان و شعار تقویم نشان داده می‌شود.' },
