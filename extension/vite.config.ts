@@ -63,8 +63,11 @@ function extensionAssets(): Plugin {
       this.emitFile({ type: "asset", fileName: "boot.js", source: PREFERENCES_BOOT_SCRIPT });
       this.emitFile({ type: "asset", fileName: "manifest.json", source: readFileSync(resolve(here, "manifest.json")) });
       this.emitFile({ type: "asset", fileName: "icon.svg", source: readFileSync(resolve(repo, "src/app/icon.svg")) });
-      for (const size of [192, 512]) {
-        this.emitFile({ type: "asset", fileName: `icon-${size}.png`, source: readFileSync(resolve(repo, `public/icon-${size}.png`)) });
+      // Every size the manifest names, read from the manifest so the two
+      // cannot disagree — a missing icon fails the check script, not Chrome.
+      const manifest = JSON.parse(readFileSync(resolve(here, "manifest.json"), "utf8")) as { icons: Record<string, string> };
+      for (const file of new Set(Object.values(manifest.icons))) {
+        this.emitFile({ type: "asset", fileName: file, source: readFileSync(resolve(repo, "public", file)) });
       }
     } },
   };
