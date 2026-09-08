@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/routes.ts
-// Version: 0.9.5 — 2026-09-08
+// Version: 0.9.12 — 2026-09-08
 // Why: The site's public routes in one place, so the sitemap cannot drift from
 //      what actually ships. A unit test walks src/app and fails when a page
 //      exists that this list does not name.
@@ -13,6 +13,7 @@ export const SITE_ORIGIN = 'https://taghv.im';
 // because the date does, the rest only when they are edited.
 export const ROUTES = [
   { path: '/', changeFrequency: 'daily', priority: 1 },
+  { path: '/download', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/help', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },

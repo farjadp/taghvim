@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/changelog/page.tsx
-// Version: 0.6.0 — 2026-09-07
+// Version: 0.9.12 — 2026-09-08
 // Why: Public release history — what changed, when, and what is being looked
 //      at next. Linked from the footer and the header of secondary pages.
 // Env / Deps: Data from lib/changelog; dates rendered as Tehran civil time
@@ -83,7 +83,7 @@ export default function ChangelogPage() {
         </ol>
 
         <section className="mt-12 rounded-2xl bg-leaf px-6 py-7">
-          <h2 className="flex items-center gap-2 text-lg font-semibold text-forest"><Compass size={19} />در راه</h2>
+          <h2 id="upcoming" className="flex scroll-mt-24 items-center gap-2 text-lg font-semibold text-forest"><Compass size={19} />در راه</h2>
           <ul className="mt-4 space-y-3">
             {UPCOMING.map((item) => (
               <li key={item} className="flex items-start gap-2.5 text-sm leading-7 text-ink">

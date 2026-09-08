@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.10 — 2026-09-08
+// Version: 0.9.12 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -647,4 +647,31 @@ test("the privacy section is reachable and names the one external request", asyn
   // `html` scrolls smoothly, so the jump to the anchor is still animating when
   // the assertions above finish; poll instead of reading the position once.
   await expect.poll(() => section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
+});
+
+// The page exists to tell people how to get the calendar, and its whole value
+// is that it does not claim something that is not built.
+test("the download page states each method's real status", async ({ page }) => {
+  // The home page has its own header — the app shell's, not SiteHeader's — and
+  // it carries no link here. The footer is the only path from the home page.
+  await page.getByRole("contentinfo").getByRole("link", { name: "دریافت تقویم" }).click();
+  await expect(page).toHaveURL(/\/download$/);
+  // Secondary pages do get it in the header
+  await expect(page.getByRole("banner").getByRole("link", { name: "دریافت", exact: true })).toBeVisible();
+
+  const status = async (id: string) => (await page.locator(`#${id}`).locator("span").filter({ hasText: /آماده|بازبینی|ساخته نشده/ }).first().textContent())?.trim();
+  expect(await status("home-screen")).toBe("آماده");
+  expect(await status("calendar-feed")).toBe("آماده");
+  // In review until lib/downloads gets a store URL, and not a moment before
+  expect(await status("chrome")).toBe("در حال بازبینی");
+  expect(await status("android")).toBe("هنوز ساخته نشده");
+
+  // No dead link to a listing that does not exist yet
+  await expect(page.locator('a[href*="chromewebstore.google.com"], a[href*="chrome.google.com/webstore"]')).toHaveCount(0);
+  // The honest caveats travel with their methods
+  await expect(page.locator("#home-screen")).toContainText("آفلاین");
+  await expect(page.locator("#calendar-feed")).toContainText("قمری");
+
+  const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });

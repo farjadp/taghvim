@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.18 — 2026-09-08
+// Version: 0.9.19 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.11',
+    at: '2026-09-08T19:20:00-04:00',
+    status: 'live',
+    title: 'صفحهٔ دریافت',
+    changes: [
+      { kind: 'added', text: 'صفحهٔ «دریافت تقویم»: چهار راه داشتن تقویم روی دستگاهت، هر کدام با وضعیت واقعی‌اش — افزودن به صفحهٔ خانه و فهرست اشتراکی آماده‌اند، افزونهٔ کروم در بازبینی گوگل است، و برنامهٔ اندروید هنوز ساخته نشده.' },
+    ],
+  },
   {
     version: '0.9.10',
     at: '2026-09-08T18:10:00-04:00',
