@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.9 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,11 +31,11 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.5',
     at: '2026-09-08T14:10:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'صفحهٔ راهنما، و پاورقی کوتاه‌تر',
     changes: [
       { kind: 'added', text: 'صفحهٔ «راهنما» با نُه بخش: گشتن در تقویم، کم و زیاد کردن مناسبت‌ها، اوقات شرعی، ابزارهای تاریخ، ساعت شهرها، پوسته و قلم، نصب روی گوشی، افزودن به تقویم گوگل و اپل، و یادبود.' },
-      { kind: 'changed', text: 'پاورقی از دوازده پیوند به هفت‌تا رسید. سازنده، شرکت، گیت‌هاب و راه‌های تماس همه در صفحهٔ «درباره ما» جمع شدند.' },
+      { kind: 'changed', text: 'پاورقی از چهارده پیوند به نُه رسید. سازنده، شرکت، گیت‌هاب و راه‌های تماس همه در صفحهٔ «درباره ما» جمع شدند.' },
     ],
   },
   {
