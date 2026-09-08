@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.13 — 2026-09-08
+// Version: 0.9.14 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.7',
     at: '2026-09-08T15:10:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'دیده‌شدن در موتورهای جست‌وجو',
     changes: [
       { kind: 'fixed', text: 'هر صفحه حالا عنوان و توضیح خودش را در پیش‌نمایش اشتراک‌گذاری دارد. پیش‌تر فرستادن نشانی «راهنما» یا «تغییرات»، عنوان صفحهٔ اصلی را نشان می‌داد.' },
