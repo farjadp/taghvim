@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.1 — 2026-09-08
+// Version: 0.9.2 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -468,4 +468,32 @@ test("serves a manifest, sitemap and robots that agree with each other", async (
 test("every page links the manifest and the apple touch icon", async ({ page }) => {
   await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
   await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
+});
+
+// The month grid used to start at 942px on a 664px-tall phone screen, so the page
+// people open to see a calendar opened on everything except the calendar.
+test("puts the month grid first on phones and leaves the desktop order alone", async ({ page }, testInfo) => {
+  const mobile = testInfo.project.name === "mobile";
+  if (!mobile) await page.setViewportSize({ width: 1280, height: 900 });
+  const positions = await page.evaluate(() => {
+    const main = document.querySelector("main")!;
+    const top = (el: Element) => Math.round(el.getBoundingClientRect().top + window.scrollY);
+    return {
+      calendar: top(document.querySelector("#calendar")!),
+      hero: top(document.querySelector('[aria-label="تاریخ و ساعت امروز"]')!),
+      tools: top(document.querySelector("#tools")!),
+      display: getComputedStyle(main).display,
+    };
+  });
+  if (mobile) {
+    // Calendar above the hero, and the hero still above the tools below it
+    expect(positions.calendar).toBeLessThan(positions.hero);
+    expect(positions.hero).toBeLessThan(positions.tools);
+    expect(positions.calendar).toBeLessThan(300);
+  } else {
+    // Desktop keeps normal flow: hero row first, then the calendar row
+    expect(positions.display).toBe("block");
+    expect(positions.hero).toBeLessThan(positions.calendar);
+    expect(positions.calendar).toBeLessThan(positions.tools);
+  }
 });

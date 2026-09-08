@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.9.2 — 2026-09-08
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and independent event/panel visibility.
 // Env / Deps: lib/view guards taghvim-view persistence and legacy migration.
@@ -98,9 +98,18 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
           <SettingsMenu />
         </div>
       </header>
-      <main id="main" className="mx-auto max-w-[1240px] px-4 pt-8 pb-10 sm:px-8 sm:pt-10">
-        <TodayPanel now={now} initialNow={initialNow} />
-        <div className="mt-7 grid items-stretch gap-5 lg:grid-cols-[1.7fr_1fr]">
+      {/* On phones the month grid comes first and the hero follows it: measured in
+          a sandbox, the first day cell sat at 1128px on a 664px screen, so the
+          calendar was more than a screen down on the page people open to see a
+          calendar. Desktop is untouched — `lg:block` restores normal flow, where
+          `order` means nothing and the original margins apply again.
+          Only the grid is ordered, and with `order-first` rather than a number:
+          the tools, memorial and prayer panels take no className, so they keep
+          the default order 0 — any positive number here would have put them
+          above everything instead. */}
+      <main id="main" className="mx-auto flex max-w-[1240px] flex-col px-4 pt-8 pb-10 sm:px-8 sm:pt-10 lg:block">
+        <TodayPanel now={now} initialNow={initialNow} className="max-lg:mt-7" />
+        <div className="order-first mt-7 grid items-stretch gap-5 max-lg:mt-0 lg:grid-cols-[1.7fr_1fr]">
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>

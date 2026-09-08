@@ -1,9 +1,10 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.8.0 — 2026-09-07
+// Version: 0.9.2 — 2026-09-08
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign.
+//      On phones this whole block sits BELOW the month grid; see calendar-app.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
 //      The hero cannot clip its own overflow, because the clock picker opens
 //      out of it, so the sun drawing is clipped by its own wrapper instead.
@@ -42,7 +43,7 @@ function SunDrawing() {
   );
 }
 
-export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string }) {
+export function TodayPanel({ now, initialNow, className = "" }: { now: Date; initialNow: string; className?: string }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const persian = toCalendar(now);
@@ -63,7 +64,7 @@ export function TodayPanel({ now, initialNow }: { now: Date; initialNow: string 
     }
   }
   return (
-    <section aria-label="تاریخ و ساعت امروز" className="grid gap-5 lg:grid-cols-[1.7fr_1fr]">
+    <section aria-label="تاریخ و ساعت امروز" className={`grid gap-5 lg:grid-cols-[1.7fr_1fr] ${className}`}>
       <div className="relative isolate rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><SunDrawing /></div>
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
