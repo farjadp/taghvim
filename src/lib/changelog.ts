@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.9.1 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.0',
     at: '2026-09-08T01:37:48-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'نمایش مستقل مناسبت‌ها',
     changes: [
       { kind: 'added', text: 'چهار کلید مستقل مذهبی، دولتی، جهانی و یادبود در راهنمای زیر تقویم. ملی و فرهنگی همیشه نمایش داده می‌شود.' },

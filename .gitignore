@@ -8,3 +8,7 @@ playwright-report/
 test-results/
 .DS_Store
 .claude/
+
+# Next.js regenerates this on every dev/build; it flipped between
+# .next/dev/types and .next/types and kept showing up as drift.
+next-env.d.ts
