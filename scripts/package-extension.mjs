@@ -1,10 +1,13 @@
 // ============================================================================
 // Source: scripts/package-extension.mjs
-// Version: 0.9.9 — 2026-09-08
+// Version: 0.9.11 — 2026-09-08
 // Why: Turns extension/dist into what the Chrome Web Store actually asks for:
-//      one ZIP to upload, and 1280x800 screenshots for the listing. The
-//      screenshots are rendered from the BUILT page in a real browser, so what
-//      the listing shows is what the extension does, not a mockup.
+//      one ZIP to upload, 1280x800 screenshots, the 128x128 store icon, and
+//      the two promo tiles. The screenshots are rendered from the BUILT page in
+//      a real browser, so what the listing shows is what the extension does,
+//      not a mockup; the tiles are drawn from the same tokens as the site.
+//      Screenshots and tiles must be 24-bit PNG with NO alpha — the store
+//      rejects alpha — which is what an opaque page screenshot produces.
 // Env / Deps: Playwright's chromium and the `zip` binary. Runs the build first
 //      so the ZIP can never be older than the source. The ZIP is git-ignored;
 //      the screenshots are committed, since the listing should be reviewable.
@@ -13,6 +16,7 @@
 import { execFileSync } from 'node:child_process';
 import { createServer } from 'node:http';
 import { existsSync, mkdirSync, readFileSync, rmSync } from 'node:fs';
+import { readFile } from 'node:fs/promises';
 import { dirname, extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { chromium } from '@playwright/test';
@@ -57,8 +61,78 @@ for (const theme of ['light', 'dark']) {
   await page.waitForTimeout(1100);
   await page.screenshot({ path: join(store, `newtab-${theme}.png`) });
 }
+
+// --- the promo tiles --------------------------------------------------------
+// Drawn, not screenshotted: a tile is marketing, and 440x280 is far too small
+// to show a calendar grid legibly. Same tokens as the site, same mark, and
+// Chromium so the Persian actually shapes — satori would not.
+const PAPER = '#f7f8f4';
+const FOREST = '#214f40';
+const CLAY = '#a9503b';
+const MUTED = '#5c6a61';
+const mark = readFileSync(join(root, 'src/app/icon.svg'), 'utf8').replace('width="64" height="64"', '');
+const fonts = await Promise.all([
+  readFile(join(root, 'node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-400-normal.woff')),
+  readFile(join(root, 'node_modules/@fontsource/vazirmatn/files/vazirmatn-arabic-800-normal.woff')),
+]);
+const face = (data, weight) => `@font-face{font-family:Vazirmatn;font-weight:${weight};src:url(data:font/woff;base64,${data.toString('base64')}) format('woff')}`;
+
+const SUN = `<svg class="sun" viewBox="0 0 250 240" fill="none" stroke="${FOREST}">
+  <path d="M30 232V121a95 95 0 0 1 190 0v111M43 232V121a82 82 0 0 1 164 0v111M56 232V121a69 69 0 0 1 138 0v111" stroke-width=".8"/>
+  <circle cx="125" cy="120" r="30"/><circle cx="125" cy="120" r="24" stroke-dasharray="1 4"/>
+  <path d="M18 176h214M18 185h214M18 194h214" stroke-width=".8"/></svg>`;
+
+const tile = ({ width, height, pad, markSize, name, tagline, line, sun }) => `<!doctype html>
+<html dir="rtl" lang="fa"><head><meta charset="utf-8"><style>
+  ${face(fonts[0], 400)} ${face(fonts[1], 800)}
+  *{margin:0;box-sizing:border-box}
+  body{width:${width}px;height:${height}px;position:relative;display:flex;flex-direction:column;
+       align-items:flex-start;justify-content:center;gap:${Math.round(height * 0.045)}px;
+       padding:0 ${pad}px;background:${PAPER};color:${FOREST};
+       font-family:Vazirmatn,sans-serif;-webkit-font-smoothing:antialiased}
+  .brand{display:flex;align-items:center;gap:${Math.round(markSize * 0.22)}px}
+  .brand svg{width:${markSize}px;height:${markSize}px}
+  .name{font-size:${name}px;font-weight:800;line-height:1}
+  .dot{color:${CLAY};margin-right:${Math.round(name * 0.14)}px}
+  .tagline{font-size:${tagline}px;font-weight:800;line-height:1.3}
+  .line{font-size:${line}px;font-weight:400;line-height:1.8;color:${MUTED};max-width:${width - pad * 2}px}
+  .frame{position:absolute;inset:0;overflow:hidden}
+  .sun{position:absolute;top:50%;left:${sun.left}px;width:${sun.size}px;height:${sun.size}px;
+       transform:translateY(-50%);opacity:.08}
+</style></head><body>
+  <div class="frame">${SUN}</div>
+  <div class="brand">${mark}<span class="name">تقویم<span class="dot">.</span></span></div>
+  <p class="tagline">روزها را بهتر ببین</p>
+  <p class="line">تب جدید، تقویم ایرانی. شمسی، میلادی و قمری کنار هم.</p>
+</body></html>`;
+
+const TILES = [
+  { file: 'promo-small.png', width: 440, height: 280, pad: 34, markSize: 40, name: 32, tagline: 30, line: 15, sun: { left: -70, size: 260 } },
+  { file: 'promo-marquee.png', width: 1400, height: 560, pad: 110, markSize: 92, name: 74, tagline: 76, line: 32, sun: { left: -120, size: 560 } },
+];
+
+for (const spec of TILES) {
+  const canvas = await browser.newPage({ viewport: { width: spec.width, height: spec.height }, deviceScaleFactor: 1 });
+  await canvas.setContent(tile(spec), { waitUntil: 'load' });
+  await canvas.evaluate(() => document.fonts.ready);
+  await canvas.screenshot({ path: join(store, spec.file) });
+  await canvas.close();
+}
+
+// The 128x128 the listing asks for, beside the rest so every graphic the form
+// wants is in one folder. Flattened onto the same cream the icon is drawn on:
+// the mark is opaque anyway, and the store's other slots reject alpha, so one
+// consistent 24-bit RGB folder is easier to reason about than a mixed one.
+const icon = await browser.newPage({ viewport: { width: 128, height: 128 }, deviceScaleFactor: 1 });
+await icon.setContent(`<body style="margin:0;background:${PAPER}"><img src="data:image/png;base64,${readFileSync(join(root, 'public/icon-128.png')).toString('base64')}" width="128" height="128"></body>`);
+await icon.screenshot({ path: join(store, 'store-icon-128.png') });
+await icon.close();
+
 await browser.close();
 await new Promise((done) => server.close(done));
 
 console.log(`\nupload  extension/${zipName} (${(zipBytes / 1024).toFixed(0)} KB)`);
-console.log(`listing extension/store/newtab-light.png, newtab-dark.png (1280x800)`);
+console.log('listing extension/store/');
+for (const [label, file] of [['icon 128x128', 'store-icon-128.png'], ['screenshot 1280x800', 'newtab-light.png'], ['screenshot 1280x800', 'newtab-dark.png'], ['small tile 440x280', 'promo-small.png'], ['marquee 1400x560', 'promo-marquee.png']]) {
+  console.log(`        ${file.padEnd(22)} ${label}`);
+}
