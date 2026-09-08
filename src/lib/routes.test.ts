@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/routes.test.ts
-// Version: 0.9.1 — 2026-09-08
+// Version: 0.9.2 — 2026-09-08
 // Why: A sitemap that silently misses a page is worse than none, so the route
 //      list is checked against the pages that actually exist on disk, and the
 //      origin against metadataBase. Also guards the manifest's icon files.
@@ -19,9 +19,14 @@ const appDir = fileURLToPath(new URL('../app', import.meta.url));
 const root = fileURLToPath(new URL('../..', import.meta.url));
 
 // Every page.tsx under src/app is a public route; nested groups do not exist here.
+// `src/app/sandbox` is the one exclusion: those pages are noindex, unlinked and
+// deleted once the design question they exist for is answered, so they must
+// never reach the sitemap. If that directory outlives its decision, that is a
+// cleanup problem, not a routing one.
 function pageRoutes(dir: string, prefix = ''): string[] {
   const found: string[] = [];
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.name === 'sandbox') continue;
     if (entry.isDirectory()) found.push(...pageRoutes(`${dir}/${entry.name}`, `${prefix}/${entry.name}`));
     else if (entry.name === 'page.tsx') found.push(prefix === '' ? '/' : prefix);
   }
