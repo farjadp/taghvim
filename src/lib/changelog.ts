@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.15 — 2026-09-08
+// Version: 0.9.16 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.8',
     at: '2026-09-08T17:00:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'افزونهٔ کروم: تب جدید، تقویم',
     changes: [
       { kind: 'added', text: 'افزونه‌ای برای کروم که تب جدید را با تقویم جایگزین می‌کند: تاریخ امروز و ساعت تهران، ماه جاری و مناسبت‌های روز. هیچ مجوزی نمی‌خواهد و هیچ درخواستی به اینترنت نمی‌فرستد. فعلاً از مخزن ساخته و نصب می‌شود؛ در فروشگاه کروم نیست.' },
