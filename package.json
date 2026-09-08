@@ -1,6 +1,6 @@
 {
   "name": "taghvim",
-  "version": "0.9.5",
+  "version": "0.9.6",
   "private": true,
   "type": "module",
   "scripts": {
@@ -12,7 +12,8 @@
     "typecheck": "tsc --noEmit",
     "sync:javidnaman": "node scripts/sync-javidnaman.mjs",
     "check:live": "node scripts/check-live.mjs",
-    "build:icons": "node scripts/build-icons.mjs"
+    "build:icons": "node scripts/build-icons.mjs",
+    "build:og": "node scripts/build-og.mjs"
   },
   "dependencies": {
     "@fontsource/vazirmatn": "5.3.0",

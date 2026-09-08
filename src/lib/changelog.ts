@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.9 — 2026-09-08
+// Version: 0.9.10 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.6',
+    at: '2026-09-08T14:30:00-04:00',
+    status: 'ready',
+    title: 'تصویر پیش‌نمایش برای اشتراک‌گذاری',
+    changes: [
+      { kind: 'added', text: 'وقتی نشانی سایت را در تلگرام، ایکس یا واتساپ می‌فرستی، به‌جای یک لینک خشک، کارت پیش‌نمایش با نشان و شعار تقویم نشان داده می‌شود.' },
+    ],
+  },
   {
     version: '0.9.5',
     at: '2026-09-08T14:10:00-04:00',

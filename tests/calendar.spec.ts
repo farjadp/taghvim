@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.4 — 2026-09-08
+// Version: 0.9.6 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -571,4 +571,29 @@ test("the help page lists every section and its contents match", async ({ page }
   }
   const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
+});
+
+// The social card is the first thing anyone sees of this site on X or Telegram,
+// and it is the one page element nobody ever looks at while developing.
+test("every page carries a complete social preview", async ({ page, request, baseURL }) => {
+  for (const path of ["/", "/help", "/about"]) {
+    await page.goto(path);
+    const content = (selector: string) => page.locator(selector).getAttribute("content");
+    expect(await content('meta[property="og:image"]'), path).toBe("https://taghv.im/og.png");
+    expect(await content('meta[property="og:image:width"]')).toBe("1200");
+    expect(await content('meta[property="og:image:height"]')).toBe("630");
+    // Alt is the part the file-based convention silently dropped
+    expect((await content('meta[property="og:image:alt"]'))?.length).toBeGreaterThan(20);
+    expect(await content('meta[name="twitter:card"]')).toBe("summary_large_image");
+    expect(await content('meta[property="og:locale"]')).toBe("fa_IR");
+  }
+
+  const image = await request.get(`${baseURL}/og.png`);
+  expect(image.status()).toBe(200);
+  expect(image.headers()["content-type"]).toContain("image/png");
+  const body = await image.body();
+  // PNG header: the IHDR chunk carries the real dimensions, so a resized file
+  // cannot pass while the meta tags still claim 1200x630.
+  expect(body.readUInt32BE(16)).toBe(1200);
+  expect(body.readUInt32BE(20)).toBe(630);
 });
