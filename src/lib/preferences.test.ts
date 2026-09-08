@@ -6,7 +6,7 @@
 // ============================================================================
 
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PREFERENCES, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
+import { DEFAULT_PREFERENCES, FONTS, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
 
 const store = (values: Record<string, string>) => (key: string) => values[key] ?? null;
 
@@ -34,5 +34,28 @@ describe("preferences", () => {
   it("boot script uses the storage keys and swallows storage errors", () => {
     for (const key of Object.values(PREFERENCE_KEYS)) expect(PREFERENCES_BOOT_SCRIPT).toContain(key);
     expect(PREFERENCES_BOOT_SCRIPT).toMatch(/try\{.*\}catch\(e\)\{\}/);
+  });
+});
+
+describe('fonts', () => {
+  it('offers five faces with unique values and Persian labels', () => {
+    expect(FONTS).toHaveLength(5);
+    expect(new Set(FONTS.map((font) => font.value)).size).toBe(FONTS.length);
+    for (const font of FONTS) expect(font.label.trim().length).toBeGreaterThan(1);
+  });
+
+  it('accepts every offered font, including the two added last', () => {
+    for (const font of FONTS) {
+      expect(parsePreferences(store({ [PREFERENCE_KEYS.font]: font.value })).font).toBe(font.value);
+    }
+  });
+
+  // The boot script used to name each non-default font by hand, so a new one
+  // was not applied until hydration and the page flashed the wrong face.
+  it('names every non-default font in the pre-paint boot script', () => {
+    for (const font of FONTS) {
+      if (font.value === DEFAULT_PREFERENCES.font) continue;
+      expect(PREFERENCES_BOOT_SCRIPT).toContain(`"${font.value}"`);
+    }
   });
 });

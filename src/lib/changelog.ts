@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.5 — 2026-09-08
+// Version: 0.9.6 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.3',
+    at: '2026-09-08T13:35:00-04:00',
+    status: 'ready',
+    title: 'ایران‌سنس و ایران‌یکان',
+    changes: [
+      { kind: 'added', text: 'دو قلم تازه در منوی تنظیمات: ایران‌سنس و ایران‌یکان. حالا پنج قلم فارسی هست و هر کدام فقط وقتی دانلود می‌شود که انتخابش کنی.' },
+      { kind: 'fixed', text: 'قلم انتخابی پیش از اولین رسم صفحه اعمال می‌شود؛ پیش‌تر فقط شبنم و ساحل در آن فهرست بودند و قلم تازه یک لحظه دیر می‌رسید.' },
+    ],
+  },
   {
     version: '0.9.2',
     at: '2026-09-08T13:20:00-04:00',

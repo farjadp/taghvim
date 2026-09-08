@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.1 — 2026-09-08
+// Version: 0.9.3 — 2026-09-08
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -71,7 +71,7 @@ export default function AboutPage() {
               می‌توانی این پنل را پنهان یا دوباره نمایش بدهی.
             </FeatureCard>
             <FeatureCard icon={<Palette size={20} />} title="پوسته و قلم">
-              حالت تیره، سه اندازهٔ قلم و سه قلم فارسی، از منوی تنظیمات در نوار بالا.
+              حالت تیره، سه اندازهٔ قلم و پنج قلم فارسی، از منوی تنظیمات در نوار بالا.
             </FeatureCard>
             <FeatureCard icon={<ShieldCheck size={20} />} title="حریم خصوصی">
               بدون حساب کاربری، بدون پایگاه داده. شش رکورد تنظیم در مرورگر خودت می‌ماند:

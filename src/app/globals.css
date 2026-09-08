@@ -1,7 +1,7 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.4.0 — 2026-09-07
-   Why: Visual system: colour tokens, Vazirmatn faces, base element styles.
+   Version: 0.9.3 — 2026-09-08
+   Why: Visual system: colour tokens, the five font faces, base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
    ============================================================================ */
 
@@ -14,6 +14,27 @@
 /* Optional faces; a browser only downloads the one the visitor selects */
 @import "shabnam-font/dist/font-face.css";
 @import "sahel-font/dist/font-face.css";
+
+/* IRANSansX and IRANYekanX are commercial faces from fontiran.com, licensed by
+   Farjad — not OFL like the three above, so never describe the set as OFL.
+   Both are variable fonts whose weight axis spans 100-1000, which is why one
+   file covers every weight the interface uses instead of five. The packages
+   also ship "FaNum" builds: those render Latin digits as Persian glyphs and
+   would break the Gregorian date and the LTR clock, so they are not used. */
+@font-face {
+  font-family: "IRANSansX";
+  src: url("./fonts/IRANSansXV.woff2") format("woff2");
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "IRANYekanX";
+  src: url("./fonts/IRANYekanXVF.woff2") format("woff2");
+  font-weight: 100 1000;
+  font-style: normal;
+  font-display: swap;
+}
 
 /* Light palette. `forest` is the green used for text and accents, `forest-deep`
    the green used as a background under white text — identical in light mode,
@@ -93,6 +114,8 @@
   /* Font family: the Tailwind font-sans utility reads this variable */
   html[data-font="shabnam"] { --font-sans: "Shabnam", "Vazirmatn", sans-serif; }
   html[data-font="sahel"] { --font-sans: "Sahel", "Vazirmatn", sans-serif; }
+  html[data-font="iransans"] { --font-sans: "IRANSansX", "Vazirmatn", sans-serif; }
+  html[data-font="iranyekan"] { --font-sans: "IRANYekanX", "Vazirmatn", sans-serif; }
 }
 
 @layer base {

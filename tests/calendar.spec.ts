@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.2 — 2026-09-08
+// Version: 0.9.3 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -496,4 +496,30 @@ test("puts the month grid first on phones and leaves the desktop order alone", a
     expect(positions.hero).toBeLessThan(positions.calendar);
     expect(positions.calendar).toBeLessThan(positions.tools);
   }
+});
+
+// The two commercial faces are variable and only fetched when chosen; the FaNum
+// builds in the same packages would have rewritten the Gregorian digits.
+test("the added fonts load only when picked and leave Latin digits alone", async ({ page }) => {
+  const gregorian = page.getByTestId("other-calendars").locator('p[dir="ltr"]').first();
+  // The server renders the real date and the frozen clock replaces it on
+  // hydration, so settle on the frozen value before comparing anything.
+  await expect(gregorian).toHaveText("2026-09-06");
+  const familiesLoaded = () => page.evaluate(() => [...document.fonts].filter((f) => f.status === "loaded").map((f) => f.family));
+  expect(await familiesLoaded()).not.toContain("IRANYekanX");
+
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "قلم" }).getByRole("button", { name: "ایران‌یکان" }).click();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("html")).toHaveAttribute("data-font", "iranyekan");
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.locator("body").evaluate((el) => getComputedStyle(el).fontFamily)).toContain("IRANYekanX");
+  expect(await familiesLoaded()).toContain("IRANYekanX");
+  // Still Latin: a FaNum build would have turned these into ۲۰۲۶-۰۹-۰۶
+  await expect(gregorian).toHaveText("2026-09-06");
+  expect(await gregorian.textContent()).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+
+  // Survives a reload, and the pre-paint boot script applies it before hydration
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-font", "iranyekan");
 });
