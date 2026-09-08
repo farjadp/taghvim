@@ -1,8 +1,9 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.9.1 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
-//      midnight rollover, accessibility, overflow and responsive layout.
+//      midnight rollover, accessibility, overflow, responsive layout, and the
+//      crawler/install files served from the app router.
 // Env / Deps: Playwright with a frozen clock; desktop + iPhone 13; E2E_PORT configurable.
 // ============================================================================
 
@@ -421,4 +422,50 @@ test("non-Friday holidays are highlighted in red on the calendar grid", async ({
   // The background should be a light red/pink, not white
   const bgColor = await nowruzCell.evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(bgColor).toContain("252, 232, 227"); // rgb for #fce8e3
+});
+
+// The launch thread asked eight times what makes this different from time.ir and
+// the site never said. The footer now carries the one link to that answer.
+test("the footer answers why the calendar is built this way", async ({ page }) => {
+  const link = page.getByRole("contentinfo").getByRole("link", { name: /چرا این تقویم با بقیه فرق دارد/ });
+  await expect(link).toBeVisible();
+  await link.click();
+  await expect(page).toHaveURL(/\/about#why$/);
+  const section = page.locator("#why");
+  await expect(section.getByRole("heading", { name: "چرا ساخته شد؟" })).toBeVisible();
+  // The reasoning must be in view, not merely present somewhere down the page
+  expect(await section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
+});
+
+test("serves a manifest, sitemap and robots that agree with each other", async ({ request, baseURL }) => {
+  const manifestResponse = await request.get("/manifest.webmanifest");
+  expect(manifestResponse.status()).toBe(200);
+  const manifest = await manifestResponse.json();
+  expect(manifest.display).toBe("standalone");
+  expect(manifest.dir).toBe("rtl");
+  // Every icon the manifest names must actually be served, at the size it claims
+  for (const icon of manifest.icons) {
+    const image = await request.get(icon.src);
+    expect(image.status(), `${icon.src} is missing`).toBe(200);
+    expect(image.headers()["content-type"]).toContain("image/png");
+  }
+  expect((await request.get("/apple-icon.png")).status()).toBe(200);
+
+  const robots = await (await request.get("/robots.txt")).text();
+  expect(robots).toContain("Allow: /");
+  expect(robots).toContain("Sitemap: https://taghv.im/sitemap.xml");
+
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  for (const path of ["/", "/about", "/contact", "/changelog"]) {
+    expect(sitemap, `${path} missing from sitemap`).toContain(`<loc>https://taghv.im${path}</loc>`);
+  }
+  // Nothing in the sitemap may 404 on the server that is actually running
+  for (const path of ["/", "/about", "/contact", "/changelog"]) {
+    expect((await request.get(`${baseURL}${path}`)).status(), path).toBe(200);
+  }
+});
+
+test("every page links the manifest and the apple touch icon", async ({ page }) => {
+  await expect(page.locator('link[rel="manifest"]')).toHaveCount(1);
+  await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
 });

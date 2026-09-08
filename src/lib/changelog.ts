@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.1 — 2026-09-08
+// Version: 0.9.2 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.1',
+    at: '2026-09-08T11:40:00-04:00',
+    status: 'ready',
+    title: 'نصب روی صفحهٔ خانه',
+    changes: [
+      { kind: 'added', text: 'تقویم را می‌توانی به صفحهٔ خانهٔ گوشی اضافه کنی؛ با آیکن خودش باز می‌شود و نوار مرورگر را نشان نمی‌دهد. برای دیدن تقویم هنوز به اینترنت نیاز است.' },
+      { kind: 'added', text: 'یک پیوند در پاورقی به بخش «چرا ساخته شد؟» می‌رود، برای کسی که می‌پرسد این تقویم چه فرقی با بقیه دارد.' },
+      { kind: 'added', text: 'نقشهٔ سایت و پروندهٔ robots اضافه شد تا موتورهای جست‌وجو هر چهار صفحه را ببینند.' },
+    ],
+  },
   {
     version: '0.9.0',
     at: '2026-09-08T01:37:48-04:00',

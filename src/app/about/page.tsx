@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.9.1 — 2026-09-08
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -31,7 +31,7 @@ export default function AboutPage() {
           </p>
         </div>
 
-        <section className="mb-12">
+        <section id="why" className="mb-12 scroll-mt-24">
           <h2 className="mb-4 text-lg font-semibold text-ink">چرا ساخته شد؟</h2>
           <div className="space-y-4 text-sm leading-7 text-muted">
             <p>

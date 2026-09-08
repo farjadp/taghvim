@@ -1,7 +1,8 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.6.0 — 2026-09-07
-// Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers.
+// Version: 0.9.1 — 2026-09-08
+// Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers,
+//      and the link to why the calendar is built this way.
 // Env / Deps: Server component used by every page.
 // ============================================================================
 
@@ -23,6 +24,11 @@ export function SiteFooter() {
             <p className="mt-4 max-w-xs text-xs leading-6 text-muted">
               تقویم ایرانی با رابط کاربری فارسی و راست‌چین. بدون ثبت‌نام، بدون تبلیغات، برای هر روز.
             </p>
+            {/* Asked eight times under the launch thread and answered nowhere on the site */}
+            <Link href="/about#why" className="mt-3 inline-flex items-center gap-1.5 text-xs text-forest hover:underline">
+              چرا این تقویم با بقیه فرق دارد
+              <ArrowUpLeft size={12} className="opacity-60" />
+            </Link>
           </div>
 
           <nav aria-label="صفحات" className="flex flex-col gap-3">
