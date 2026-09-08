@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.3 — 2026-09-08
+// Version: 0.9.4 — 2026-09-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -522,4 +522,37 @@ test("the added fonts load only when picked and leave Latin digits alone", async
   // Survives a reload, and the pre-paint boot script applies it before hydration
   await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-font", "iranyekan");
+});
+
+// A subscription feed is added once and never looked at again, so the checks
+// that matter are the ones a calendar client would make.
+test("serves a subscribable calendar feed that a client can parse", async ({ request }) => {
+  const response = await request.get("/calendar.ics");
+  expect(response.status()).toBe(200);
+  expect(response.headers()["content-type"]).toContain("text/calendar");
+  const feed = await response.text();
+
+  expect(feed.startsWith("BEGIN:VCALENDAR\r\n")).toBe(true);
+  expect(feed.trimEnd().endsWith("END:VCALENDAR")).toBe(true);
+  // CRLF only, and no line longer than the 75 octets RFC 5545 allows
+  expect(feed.replace(/\r\n/g, "")).not.toContain("\n");
+  for (const line of feed.split("\r\n")) expect(new TextEncoder().encode(line).length).toBeLessThanOrEqual(75);
+
+  const unfolded = feed.replace(/\r\n[ \t]/g, "");
+  const uids = [...unfolded.matchAll(/^UID:(.*)$/gm)].map((match) => match[1]);
+  expect(uids.length).toBeGreaterThan(100);
+  expect(new Set(uids).size).toBe(uids.length);
+  expect(unfolded).toContain("نوروز");
+  // Solar only: nothing in here may depend on sighting the crescent
+  expect(unfolded).not.toContain("عاشورا");
+  expect(unfolded).not.toContain("۲۲ بهمن");
+});
+
+test("the about page carries the feed URL and the footer points at it", async ({ page }) => {
+  await page.getByRole("contentinfo").getByRole("link", { name: "افزودن به تقویم گوگل و اپل" }).click();
+  await expect(page).toHaveURL(/\/about#subscribe$/);
+  const section = page.locator("#subscribe");
+  await expect(section).toContainText("https://taghv.im/calendar.ics");
+  // The caveat has to travel with the URL, not live somewhere else on the page
+  await expect(section).toContainText("قمری");
 });

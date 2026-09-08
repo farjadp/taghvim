@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.3 — 2026-09-08
+// Version: 0.9.4 — 2026-09-08
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -8,8 +8,9 @@
 import type { Metadata } from "next";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
-import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette } from "lucide-react";
+import { CalendarDays, ArrowLeftRight, Hourglass, MapPin, Globe, ShieldCheck, Flame, Palette, CalendarPlus } from "lucide-react";
 import { ZODIAC_NOTICE } from "@/lib/zodiac";
+import { FEED_NAME } from "@/lib/ics";
 
 export const metadata: Metadata = {
   title: "درباره ما | تقویم",
@@ -82,6 +83,35 @@ export default function AboutPage() {
               <bdi dir="ltr"> taghvim-clocks</bdi> و <bdi dir="ltr">taghvim-view</bdi>.
               انتخاب قبلی مناسبت‌ها خودکار به تنظیمات جدید منتقل می‌شود.
             </FeatureCard>
+          </div>
+        </section>
+
+        {/* The subscription URL has to be readable and copyable, so it gets its
+            own section rather than a card in the features grid. */}
+        <section id="subscribe" className="mb-12 scroll-mt-24">
+          <h2 className="mb-4 flex items-center gap-2 text-lg font-semibold text-ink">
+            <CalendarPlus size={20} className="text-forest" />
+            افزودن به تقویم گوگل و اپل
+          </h2>
+          <div className="space-y-4 text-sm leading-7 text-muted">
+            <p>
+              این نشانی را یک بار به تقویم گوشی یا رایانه‌ات اضافه کن تا {FEED_NAME} داخل
+              همان تقویمی بیاید که هر روز باز می‌کنی. بعد از آن، خودِ تقویم هر چند وقت
+              یک‌بار فهرست را تازه می‌کند و اگر تاریخی اصلاح شود، خودبه‌خود اصلاح می‌شود.
+            </p>
+            <p className="rounded-xl border border-line bg-paper px-4 py-3 font-medium break-all text-ink">
+              <bdi dir="ltr">https://taghv.im/calendar.ics</bdi>
+            </p>
+            <p>
+              در آی‌فون: تنظیمات ← برنامه‌ها ← تقویم ← حساب‌ها ← افزودن حساب ← دیگر ←
+              افزودن تقویم اشتراکی. در تقویم گوگل: تقویم‌های دیگر ← از طریق نشانی وب.
+            </p>
+            <p>
+              <strong className="font-medium text-ink">تعطیلات مذهبی قمری در این فهرست نیست.</strong>{" "}
+              تاریخشان بر پایهٔ رؤیت هلال تعیین می‌شود و اینجا فقط سه تاریخ از سال ۱۴۰۵ بر
+              پایهٔ تقویم رسمی تثبیت شده است. پس این فهرست تقویم رسمی کامل نیست و برای
+              برنامه‌ریزی تعطیلات قمری به آن تکیه نکن.
+            </p>
           </div>
         </section>
 

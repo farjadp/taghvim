@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.9.1 — 2026-09-08
+// Version: 0.9.4 — 2026-09-08
 // Why: Shared footer: navigation, AshaVid/personal links, repo link, disclaimers,
 //      and the link to why the calendar is built this way.
 // Env / Deps: Server component used by every page.
@@ -59,6 +59,7 @@ export function SiteFooter() {
             <Link href="/#calendar" className="text-xs text-muted hover:text-forest">تقویم ماهانه</Link>
             <Link href="/#tools" className="text-xs text-muted hover:text-forest">تبدیل تاریخ</Link>
             <Link href="/#prayer" className="text-xs text-muted hover:text-forest">اوقات شرعی</Link>
+            <Link href="/about#subscribe" className="text-xs text-muted hover:text-forest">افزودن به تقویم گوگل و اپل</Link>
           </div>
 
           <div className="flex flex-col gap-3">
