@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.10 — 2026-09-08
+// Version: 0.9.11 — 2026-09-08
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -199,7 +199,7 @@ export const RELEASES: Release[] = [
 // Written for visitors, not as internal strategy: what is being considered,
 // in plain terms, with the honest caveats attached. Order carries no meaning.
 export const UPCOMING: string[] = [
-  'نصب روی صفحهٔ اصلی موبایل، بدون فروشگاه و بدون نصب برنامه. همین سایت، با آیکن خودش، و بدون نیاز به اینترنت برای دیدن تقویم.',
+  'کارکرد آفلاین، تا تقویم بدون اینترنت هم باز شود. نصب روی صفحهٔ خانهٔ گوشی از نسخهٔ ۰.۹.۱ کار می‌کند و راهنمایش هست، ولی برای دیدن تقویم هنوز به اینترنت نیاز داری.',
   'ربات تلگرام که هر روز صبح تاریخ و مناسبت‌های آن روز را بفرستد.',
   'افزونهٔ کروم، تا تقویم در تب جدید باز شود.',
   'تصویر زمینهٔ ماهانه برای موبایل، تا تقویم روی صفحهٔ قفل باشد.',
