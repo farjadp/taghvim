@@ -1,14 +1,18 @@
 // ============================================================================
 // Source: src/lib/events.test.ts
-// Version: 0.2.0 — 2026-09-07
-// Why: Unit tests for the events dataset, categories, scope filtering and
+// Version: 0.9.0 — 2026-09-08
+// Why: Unit tests for the events dataset, independent group filtering and
 //      official 1405 lunar overrides.
 // Env / Deps: Vitest.
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { fromCalendar } from './calendar';
-import { EVENTS_NOTICE, eventsForDate } from './events';
+import { addDays, fromCalendar } from './calendar';
+import { ALL_GROUPS, DEFAULT_GROUPS, EVENTS_NOTICE, eventsForDate, type EventGroups } from './events';
+
+const combinations: EventGroups[] = Array.from({ length: 8 }, (_, mask) => ({
+  religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4),
+}));
 
 const persian = (month: number, day: number) => fromCalendar({ year: 1404, month, day });
 
@@ -27,18 +31,64 @@ describe('selected calendar events', () => {
     expect(eventsForDate(persian(month, day)).some((event) => event.holiday && event.category === 'state')).toBe(true);
   });
 
-  // Default scope is the caller's choice; 'secular' must strip state and religious rows entirely,
-  // including their holiday flag, so the grid does not shade a day it cannot explain.
-  it('hides state and religious events in secular scope but keeps national and world ones', () => {
-    const bahman22 = eventsForDate(persian(11, 22), 'secular');
-    expect(bahman22.some((event) => event.category === 'state')).toBe(false);
-    expect(bahman22.some((event) => event.holiday)).toBe(false);
-    const ashura = fromCalendar({ year: 1405, month: 6, day: 8 });
-    expect(eventsForDate(ashura, 'all').some((event) => event.category === 'religious')).toBe(true);
-    expect(eventsForDate(ashura, 'secular').some((event) => event.category === 'religious')).toBe(false);
-    expect(eventsForDate(persian(1, 1), 'secular')).toContainEqual(expect.objectContaining({ title: expect.stringContaining('نوروز'), holiday: true }));
-    expect(eventsForDate(persian(9, 30), 'secular').some((event) => event.title.includes('یلدا'))).toBe(true);
-    expect(eventsForDate(fromCalendar({ year: 2025, month: 12, day: 25 }, 'gregorian'), 'secular').some((event) => event.category === 'world')).toBe(true);
+  it('exports app defaults while leaving the library default inclusive', () => {
+    expect(DEFAULT_GROUPS).toEqual({ religious: false, state: false, world: true });
+    expect(ALL_GROUPS).toEqual({ religious: true, state: true, world: true });
+    expect(eventsForDate(persian(11, 22))).toEqual(eventsForDate(persian(11, 22), ALL_GROUPS));
+  });
+
+  // Disabled rows, including holiday flags, must disappear from both list and shading.
+  it.each(combinations)('filters a full override year independently: %j', (groups) => {
+    const start = fromCalendar({ year: 1405, month: 1, day: 1 });
+    const end = fromCalendar({ year: 1406, month: 1, day: 1 });
+    for (let date = start; date < end; date = addDays(date, 1)) {
+      const all = eventsForDate(date);
+      const visible = eventsForDate(date, groups);
+      expect(visible).toEqual(all.filter((event) => event.category === 'iran' || groups[event.category]));
+      expect(visible.filter((event) => event.category === 'iran')).toEqual(all.filter((event) => event.category === 'iran'));
+      expect(visible.filter((event) => event.holiday)).toEqual(all.filter((event) => event.holiday && (event.category === 'iran' || groups[event.category])));
+    }
+  });
+
+  it.each(combinations)('keeps Ashura independent of 22 Bahman: %j', (groups) => {
+    const ashura = fromCalendar({ year: 1447, month: 1, day: 10 }, 'islamic');
+    expect(eventsForDate(ashura, groups).some((event) => event.title === 'عاشورا' && event.holiday)).toBe(groups.religious);
+    expect(eventsForDate(persian(11, 22), groups).some((event) => event.category === 'state' && event.holiday)).toBe(groups.state);
+  });
+
+  it('removes hidden holidays entirely and allows world events to be switched off', () => {
+    expect(eventsForDate(persian(11, 22), DEFAULT_GROUPS).some((event) => event.holiday)).toBe(false);
+    const ashura = fromCalendar({ year: 1447, month: 1, day: 10 }, 'islamic');
+    expect(eventsForDate(ashura, DEFAULT_GROUPS).some((event) => event.holiday)).toBe(false);
+    const christmas = fromCalendar({ year: 2025, month: 12, day: 25 }, 'gregorian');
+    expect(eventsForDate(christmas, DEFAULT_GROUPS).some((event) => event.category === 'world')).toBe(true);
+    expect(eventsForDate(christmas, { ...ALL_GROUPS, world: false }).some((event) => event.category === 'world')).toBe(false);
+  });
+
+  it.each(combinations)('returns fresh objects across every enabled source: %j', (groups) => {
+    const dates = [persian(1, 1), persian(11, 22), fromCalendar({ year: 1405, month: 6, day: 8 }), new Date('2025-12-25T12:00:00Z')];
+    for (const date of dates) {
+      const original = eventsForDate(date, groups);
+      const expected = structuredClone(original);
+      original.forEach((event) => { event.title = 'changed'; event.holiday = !event.holiday; });
+      original.length = 0;
+      expect(eventsForDate(date, groups)).toEqual(expected);
+    }
+  });
+
+  it.each(combinations)('preserves override dates and suppresses computed duplicates: %j', (groups) => {
+    const overrides = [[6, 8, 'میلاد پیامبر'], [10, 2, 'میلاد امام علی'], [10, 16, 'مبعث']] as const;
+    const start = fromCalendar({ year: 1405, month: 1, day: 1 });
+    const end = fromCalendar({ year: 1406, month: 1, day: 1 });
+    for (const [month, day, title] of overrides) {
+      const matches: Date[] = [];
+      for (let date = start; date < end; date = addDays(date, 1)) {
+        for (const event of eventsForDate(date, groups)) {
+          if (event.category === 'religious' && event.title.includes(title)) matches.push(date);
+        }
+      }
+      expect(matches).toEqual(groups.religious ? [fromCalendar({ year: 1405, month, day })] : []);
+    }
   });
 
   it.each([

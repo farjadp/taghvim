@@ -32,7 +32,7 @@ export const FONTS: { value: Font; label: string }[] = [
 
 export const DEFAULT_PREFERENCES: Preferences = { theme: "auto", size: "md", font: "vazirmatn" };
 
-// One localStorage key per preference, alongside taghvim-city and taghvim-scope.
+// One localStorage key per display preference, alongside city, view and clocks.
 export const PREFERENCE_KEYS = { theme: "taghvim-theme", size: "taghvim-size", font: "taghvim-font" } as const;
 
 // Reads through an injectable getter (localStorage in the app, a map in tests).

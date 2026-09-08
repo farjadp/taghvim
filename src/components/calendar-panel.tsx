@@ -1,30 +1,39 @@
 // ============================================================================
 // Source: src/components/calendar-panel.tsx
-// Version: 0.2.0 — 2026-09-07
-// Why: Monthly Jalali grid with Saturday-first weeks, holiday shading,
-//      Gregorian + Hijri day numbers per cell, and RTL keyboard navigation.
-// Env / Deps: Pure UI; events come from lib/events filtered by the current scope.
+// Version: 0.9.0 — 2026-09-08
+// Why: Monthly Jalali grid, RTL keyboard navigation and interactive legend.
+//      Event groups and memorial visibility are controlled below the grid.
+// Env / Deps: Pure UI; lib/events filters grid events with the same groups as the list.
 // ============================================================================
 
 "use client";
 
 import { ChevronLeft, ChevronRight, RotateCcw, CalendarDays } from "lucide-react";
 import { dayKey, fa, formatDate, fromCalendar, MONTHS, monthGrid, monthLength, toCalendar, WEEKDAYS } from "@/lib/calendar";
-import { eventsForDate, type EventScope } from "@/lib/events";
+import { eventsForDate, type EventGroups } from "@/lib/events";
+
+const VIEW_SWITCHES = [
+  { key: "religious", label: "مذهبی" },
+  { key: "state", label: "دولتی" },
+  { key: "world", label: "جهانی" },
+  { key: "memorial", label: "یادبود" },
+] as const;
 
 interface CalendarPanelProps {
   year: number;
   month: number;
   today: Date;
   selected: Date;
-  scope: EventScope;
+  groups: EventGroups;
+  memorial: boolean;
+  onToggleView: (key: keyof EventGroups | "memorial") => void;
   onSelect: (date: Date) => void;
   onNavigate: (delta: number) => void;
   onToday: () => void;
   onJump: (year: number, month: number) => void;
 }
 
-export function CalendarPanel({ year, month, today, selected, scope, onSelect, onNavigate, onToday, onJump }: CalendarPanelProps) {
+export function CalendarPanel({ year, month, today, selected, groups, memorial, onToggleView, onSelect, onNavigate, onToday, onJump }: CalendarPanelProps) {
   const grid = monthGrid(year, month);
   const selectedParts = toCalendar(selected);
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
@@ -57,24 +66,34 @@ export function CalendarPanel({ year, month, today, selected, scope, onSelect, o
         }}>
           {grid.map(({ date, persian, inMonth, isFriday }) => {
             const supported = persian.year >= 1200 && persian.year <= 1600;
-            const events = supported ? eventsForDate(date, scope) : [];
+            const events = supported ? eventsForDate(date, groups) : [];
             // Both secondary calendars on every cell: Gregorian (LTR digits) and Hijri (Persian digits)
             const hijriDay = supported ? toCalendar(date, "islamic").day : 0;
             const active = supported && dayKey(date) === dayKey(selected);
             const isToday = supported && dayKey(date) === dayKey(today);
-            // Friday is always a holiday; other holidays come from the (scope-filtered) events
+            // Friday is always a holiday; other holidays come from the (group-filtered) events
             const holiday = isFriday || events.some((event) => event.holiday);
             const nonFridayHoliday = holiday && !isFriday;
-            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${MONTHS[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-white shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
+            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${MONTHS[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-memorial-ink shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
               <span className={`text-lg leading-6 tabular-nums sm:text-[1.375rem] ${holiday && !active ? "font-bold" : "font-medium"}`}>{fa(persian.day)}</span>
-              <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-[#d9e3cf]" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
-              {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-[#d9e3cf]" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
+              <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-memorial-ink/80" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
+              {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
               {nonFridayHoliday && !active && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-clay" />}
             </button>;
           })}
         </div>
       </div>
-      <div className="flex flex-wrap items-center justify-between gap-2 border-t border-line px-5 py-4 text-[0.625rem] text-muted sm:px-7"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span></div><span>اعداد کوچک: میلادی · قمری</span></div>
+      <div data-testid="calendar-legend" className="border-t border-line px-5 py-4 text-[0.625rem] text-muted sm:px-7">
+        <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span></div><span>اعداد کوچک: میلادی · قمری</span></div>
+        <div data-testid="view-controls" className="mt-2.5 flex flex-wrap items-center gap-2">
+          <span className="text-[0.625rem] text-muted">نمایش:</span>
+          <span className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[0.625rem] text-muted"><span aria-hidden="true" className="size-1.5 rounded-full bg-forest-deep" />ملی و فرهنگی</span>
+          {VIEW_SWITCHES.map(({ key, label }) => {
+            const on = key === "memorial" ? memorial : groups[key];
+            return <button key={key} type="button" role="switch" aria-checked={on} onClick={() => onToggleView(key)} className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.625rem] transition-colors ${on ? "border-forest bg-leaf text-forest" : "border-line text-muted hover:text-forest"}`}><span aria-hidden="true" className={`size-1.5 rounded-full ${on ? "bg-forest-deep" : "bg-line"}`} />{label}</button>;
+          })}
+        </div>
+      </div>
       <p className="sr-only">روز انتخاب‌شده: {formatDate(selected)}</p>
     </section>
   );
