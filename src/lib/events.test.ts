@@ -41,6 +41,23 @@ describe('selected calendar events', () => {
     }
   });
 
+  it('names the two men as Farjad named them, wherever they appear', () => {
+    // Khamenei has no occasion in this dataset; the guard exists so that adding one cannot
+    // quietly reintroduce either name in its official form.
+    for (let month = 1; month <= 12; month += 1) {
+      for (let day = 1; day <= 31; day += 1) {
+        let events;
+        try { events = eventsForDate(persian(month, day), ALL_GROUPS); } catch { continue; }
+        for (const { title } of events) {
+          expect(title).not.toContain('امام خمینی');
+          if (title.includes('خمینی')) expect(title).toContain('دجال زمان');
+          if (title.includes('خامنه')) expect(title).toContain('ضحاک تاریخ');
+        }
+      }
+    }
+    expect(eventsForDate(persian(3, 14), ALL_GROUPS).some((event) => event.title.includes('دجال زمان'))).toBe(true);
+  });
+
   it('names 22 Bahman as the uprising, not the victory', () => {
     const events = eventsForDate(persian(11, 22), ALL_GROUPS);
     expect(events.some((event) => event.category === 'state' && event.title.includes('شورش ۵۷'))).toBe(true);
