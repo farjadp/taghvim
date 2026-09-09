@@ -36,6 +36,9 @@ export type BridgeOptions = {
   maxLeave?: number;
   // Shortest run worth reporting. Three is a normal weekend plus one day; four is news.
   minLength?: number;
+  // Fewest days the run must hand over for free — its length minus the leave it costs.
+  // Two days off bought with two days of leave is not a bridge, it is a swap.
+  minFree?: number;
 };
 
 // Shown verbatim beside any bridge list. Preserve it: the run is computed from a curated
@@ -58,35 +61,54 @@ function readDay(date: Date, groups: EventGroups): Day {
   };
 }
 
-// A maximal run of days off, as indices into the padded day list.
-type Anchor = { from: number; to: number };
+// A window into the padded day list. `leave` counts the work days inside it.
+type Span = { from: number; to: number; leave: number };
 
-function anchorsOf(days: Day[]): Anchor[] {
-  const anchors: Anchor[] = [];
-  for (let index = 0; index < days.length; index += 1) {
-    if (!days[index].off) continue;
-    const from = index;
-    while (index + 1 < days.length && days[index + 1].off) index += 1;
-    anchors.push({ from, to: index });
+// Every window that cannot be widened without spending more than `budget` days of leave.
+// Two pointers: `left` is always the earliest day still affordable for the current `right`,
+// so each recorded window is already as wide as its budget allows on the left; the guard on
+// `right` keeps only the ones that are also as wide as they can be on the right.
+function widestSpans(days: Day[], budget: number): Span[] {
+  const spans: Span[] = [];
+  let left = 0;
+  let work = 0;
+  for (let right = 0; right < days.length; right += 1) {
+    if (!days[right].off) work += 1;
+    while (work > budget) {
+      if (!days[left].off) work -= 1;
+      left += 1;
+    }
+    const stuck = right === days.length - 1 || (!days[right + 1].off && work === budget);
+    if (stuck) spans.push({ from: left, to: right, leave: work });
   }
-  return anchors;
+  return spans;
 }
 
-// Bridges overlap by nature: the same four days can be described as one run or as two.
-// A candidate is dropped when another one covers it and costs no more leave — that is the
-// same holiday said twice, and a list that says it twice is a worse list.
+// Bridges overlap by nature: the same holiday can be described as a short free run or a
+// longer one bought with leave, and the leave can be taken before it or after it. Of two runs
+// that touch the same days, one is simply worse — it costs at least as much and gives no more.
+// Dropping those is what turns the arithmetic into a list somebody can read; a cheaper run is
+// never dropped for a longer one, so the free long weekends always survive.
 function dominated(candidate: Bridge, others: Bridge[]): boolean {
-  return others.some((other) =>
-    other !== candidate
-    && other.leave.length <= candidate.leave.length
-    && other.start.getTime() <= candidate.start.getTime()
-    && other.end.getTime() >= candidate.end.getTime()
-    && other.length > candidate.length);
+  return others.some((other) => {
+    if (other === candidate) return false;
+    const overlaps = other.start.getTime() <= candidate.end.getTime()
+      && other.end.getTime() >= candidate.start.getTime();
+    if (!overlaps || other.leave.length > candidate.leave.length) return false;
+    // Same price and same length: keep the earlier one, so the choice is stable rather than
+    // dependent on the order the windows happened to be built in.
+    return other.length > candidate.length
+      || (other.length === candidate.length && other.start.getTime() < candidate.start.getTime());
+  });
 }
 
 /**
  * Every run of days off between `from` and `to` that is at least `minLength` days long and
- * costs at most `maxLeave` days of leave, newest last.
+ * costs at most `maxLeave` days of leave, in date order.
+ *
+ * A run may open or close on a leave day — «take Tuesday off and Tuesday to Friday is yours»
+ * is the whole point — so the same holiday can appear more than once at different prices.
+ * That is deliberate: taking the day before and taking the day after are different choices.
  *
  * The window is padded by a week on both sides before the runs are built, because a run that
  * starts on the last Friday of the previous month is still that long — cutting it at the
@@ -95,6 +117,7 @@ function dominated(candidate: Bridge, others: Bridge[]): boolean {
 export function findBridges(from: Date, to: Date, groups: EventGroups, options: BridgeOptions = {}): Bridge[] {
   const maxLeave = options.maxLeave ?? 2;
   const minLength = options.minLength ?? 4;
+  const minFree = options.minFree ?? 3;
   if (from.getTime() > to.getTime()) throw new RangeError('from must not be after to');
   if (maxLeave < 0 || minLength < 1) throw new RangeError('maxLeave and minLength must be positive');
 
@@ -102,34 +125,36 @@ export function findBridges(from: Date, to: Date, groups: EventGroups, options: 
   const total = daysBetween(from, to) + 2 * padding + 1;
   const days: Day[] = Array.from({ length: total }, (_, index) => readDay(addDays(from, index - padding), groups));
 
-  const anchors = anchorsOf(days);
-  const candidates: Bridge[] = [];
-  for (let start = 0; start < anchors.length; start += 1) {
-    let leave = 0;
-    for (let end = start; end < anchors.length; end += 1) {
-      // Cost of reaching this anchor from the previous one: the work days between them.
-      if (end > start) leave += anchors[end].from - anchors[end - 1].to - 1;
-      if (leave > maxLeave) break;
-      const span = days.slice(anchors[start].from, anchors[end].to + 1);
-      if (span.length < minLength) continue;
-      candidates.push({
-        start: span[0].date,
-        end: span[span.length - 1].date,
-        length: span.length,
-        leave: span.filter((day) => !day.off).map((day) => day.date),
-        titles: [...new Set(span.flatMap((day) => day.titles))],
-        uncertain: span.some((day) => day.uncertain),
-      });
+  // The same span comes back from more than one budget; its real cost is the work days in it,
+  // so keeping one copy per span loses nothing.
+  const spans = new Map<string, Span>();
+  for (let budget = 0; budget <= maxLeave; budget += 1) {
+    for (const span of widestSpans(days, budget)) {
+      if (span.to - span.from + 1 < minLength) continue;
+      spans.set(`${span.from}-${span.to}`, span);
     }
   }
+
+  const candidates = [...spans.values()].map((span): Bridge => {
+    const run = days.slice(span.from, span.to + 1);
+    return {
+      start: run[0].date,
+      end: run[run.length - 1].date,
+      length: run.length,
+      leave: run.filter((day) => !day.off).map((day) => day.date),
+      titles: [...new Set(run.flatMap((day) => day.titles))],
+      uncertain: run.some((day) => day.uncertain),
+    };
+  });
 
   // Padding exists to measure runs, not to report them: a run entirely outside the asked
   // window is not this window's news.
   const window = { from: dayKey(from), to: dayKey(to) };
-  return candidates
-    .filter((bridge) => !dominated(bridge, candidates))
+  const worthwhile = candidates.filter((bridge) => bridge.length - bridge.leave.length >= minFree);
+  return worthwhile
+    .filter((bridge) => !dominated(bridge, worthwhile))
     .filter((bridge) => dayKey(bridge.end) >= window.from && dayKey(bridge.start) <= window.to)
-    .sort((a, b) => a.start.getTime() - b.start.getTime());
+    .sort((a, b) => a.start.getTime() - b.start.getTime() || a.leave.length - b.leave.length);
 }
 
 /** The first bridge that has not ended yet, or undefined when the window holds none. */
