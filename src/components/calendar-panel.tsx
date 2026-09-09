@@ -34,9 +34,8 @@ interface CalendarPanelProps {
   onNavigate: (delta: number) => void;
   onToday: () => void;
   onJump: (year: number, month: number) => void;
-  // SANDBOX: marks a cell that carries one of the visitor's own dates. Optional and inert
-  // when not passed. Delete this, its use below, and src/components/sandbox-dates.tsx if the
-  // calendar is not to carry these marks.
+  // Marks a cell carrying one of the visitor's own dates from /dates. Optional and inert
+  // when not passed — the extension has no such list, and neither does a visitor with none.
   marked?: (date: Date) => boolean;
 }
 
@@ -92,7 +91,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
         </div>
       </div>
       <div data-testid="calendar-legend" className="border-t border-line px-5 py-4 text-[0.625rem] text-muted sm:px-7">
-        <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span></div><span>اعداد کوچک: میلادی · قمری</span></div>
+        <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span>{marked && <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest" />تاریخ‌های من</span>}</div><span>اعداد کوچک: میلادی · قمری</span></div>
         <div data-testid="view-controls" className="mt-2.5 flex flex-wrap items-center gap-2">
           <span className="text-[0.625rem] text-muted">نمایش:</span>
           <span className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[0.625rem] text-muted"><span aria-hidden="true" className="size-1.5 rounded-full bg-forest-deep" />ملی و فرهنگی</span>

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.10 — 2026-09-08
+// Version: 0.9.17 — 2026-09-09
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -132,6 +132,17 @@ export default function AboutPage() {
               پوسته، قلم، اندازهٔ قلم، ساعت شهرهای انتخابی، و اینکه کدام دسته از مناسبت‌ها
               را می‌بینی. هیچ‌کدام به سرور ما نمی‌رسد؛ ما اصلاً سروری برای نگه‌داشتنشان
               نداریم. پاک کردن دادهٔ سایت در مرورگر، همه را برمی‌گرداند به حالت اول.
+            </p>
+            {/* The seventh item is not a setting, and saying «تنظیمات» about it would be a
+                lie of category: it is content, and the content is people's names. */}
+            <p>
+              و یک چیز که تنظیم نیست: اگر در{" "}
+              <Link href="/dates" className="font-medium text-forest underline">تاریخ‌های من</Link>{" "}
+              تولد یا سالگردی وارد کنی، عنوان و تاریخی که نوشته‌ای هم در همان حافظهٔ مرورگر
+              ذخیره می‌شود. این تنها چیزی است که ذخیره می‌کنیم و <strong>محتوا</strong> است نه
+              تنظیم، و ممکن است اسم آدم‌ها در آن باشد. باز هم به هیچ سروری نمی‌رسد، بین
+              دستگاه‌هایت همگام نمی‌شود، و با پاک کردن دادهٔ سایت از بین می‌رود — و همان‌جا
+              می‌شود تک‌تکشان را پاک کرد. اگر هیچ تاریخی وارد نکنی، اصلاً چیزی نوشته نمی‌شود.
             </p>
 
             <h3 className="pt-2 text-sm font-semibold text-ink">چه چیزی از بیرون بارگذاری می‌شود</h3>

@@ -15,6 +15,7 @@ import { ArrowUpLeft, Info, TriangleAlert } from "lucide-react";
 import { addDays, fa, formatDate, MONTHS, toCalendar, WEEKDAYS, weekdayIndex } from "@/lib/calendar";
 import { type EventGroups } from "@/lib/events";
 import { BRIDGES_NOTICE, findBridges, type Bridge } from "@/lib/bridges";
+import { Occasions } from "./occasions";
 
 // Slicing WEEKDAYS gives «سه‌» — a name cut mid zero-width joiner. Initials instead.
 const WEEKDAY_INITIALS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
@@ -60,7 +61,7 @@ export function BridgeCard({ bridge }: { bridge: Bridge }) {
       {bridge.leave.length > 0 && (
         <p className="mt-3 text-[0.625rem] leading-5 text-muted">مرخصی: {bridge.leave.map(dayLabel).join(" و ")}</p>
       )}
-      <p className="mt-1 text-[0.625rem] leading-5 text-muted">{bridge.titles.join(" · ")}</p>
+      <p className="mt-1 text-[0.625rem] leading-5 text-muted"><Occasions events={bridge.occasions} /></p>
       {bridge.uncertain && (
         <p className="mt-1 inline-flex items-center gap-1 text-[0.625rem] text-clay">
           <TriangleAlert size={11} />ممکن است یک روز جابه‌جا شود

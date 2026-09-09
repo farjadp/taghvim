@@ -10,13 +10,14 @@
 // ============================================================================
 
 import { addDays, daysBetween, fromCalendar, toCalendar } from './calendar';
-import { eventsForDate, hasOfficialLunarDate, type EventGroups } from './events';
+import { eventsForDate, hasOfficialLunarDate, type CalendarEvent, type EventGroups } from './events';
 
 export type Occasion = {
   date: Date;
   // Whole civil days from `now` to the occasion; 0 means today.
   days: number;
-  titles: string[];
+  // The whole events, not their titles: the category decides how each one is drawn.
+  occasions: CalendarEvent[];
   holiday: boolean;
   // A computed lunar date rather than a pinned one — may move by a day.
   uncertain: boolean;
@@ -45,7 +46,9 @@ export function nextAnchors(now: Date): Occasion[] {
   return ANCHORS
     .map(({ month, day, title }) => {
       const date = nextFixed(now, month, day);
-      return { date, days: daysBetween(now, date), titles: [title], holiday: month === 1, uncertain: false };
+      // Nowruz and Yalda are national occasions, not the state's.
+      const occasion: CalendarEvent = { title, holiday: month === 1, category: 'iran' };
+      return { date, days: daysBetween(now, date), occasions: [occasion], holiday: occasion.holiday, uncertain: false };
     })
     .sort((a, b) => a.days - b.days);
 }
@@ -64,7 +67,7 @@ export function nextHolidays(now: Date, groups: EventGroups, limit = 3, horizon 
     found.push({
       date,
       days: offset,
-      titles: holidays.map((event) => event.title),
+      occasions: holidays,
       holiday: true,
       uncertain: holidays.some((event) => event.category === 'religious' && !hasOfficialLunarDate(date)),
     });

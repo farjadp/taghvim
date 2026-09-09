@@ -10,10 +10,11 @@
 
 "use client";
 
-import { Info, TriangleAlert } from "lucide-react";
+import { ArrowUpLeft, Info, TriangleAlert } from "lucide-react";
 import { dayKey, fa, formatDate } from "@/lib/calendar";
 import { type EventGroups } from "@/lib/events";
 import { COUNTDOWN_NOTICE, nextAnchors, nextHolidays, type Occasion } from "@/lib/countdown";
+import { Occasions } from "./occasions";
 
 // How many of the next holidays to list beside the two anchors.
 const HOLIDAY_COUNT = 3;
@@ -26,7 +27,7 @@ export function CountdownTool({ now, groups }: { now: Date; groups: EventGroups 
     const key = dayKey(item.date);
     const existing = merged.get(key);
     if (!existing) merged.set(key, item);
-    else merged.set(key, { ...existing, titles: [...new Set([...existing.titles, ...item.titles])] });
+    else merged.set(key, { ...existing, occasions: [...new Map([...existing.occasions, ...item.occasions].map((event) => [event.title, event])).values()] });
   }
   const items = [...merged.values()].sort((a, b) => a.days - b.days);
 
@@ -41,7 +42,7 @@ export function CountdownTool({ now, groups }: { now: Date; groups: EventGroups 
               {item.days > 0 && <span className="mr-1.5 text-[0.625rem] font-normal text-muted">روز</span>}
             </span>
             <span className="flex-1 text-xs leading-6">
-              <span className={item.holiday ? "font-medium text-clay" : "font-medium"}>{item.titles.join(" · ")}</span>
+              <span className={item.holiday ? "font-medium text-clay" : "font-medium"}><Occasions events={item.occasions} /></span>
               {item.holiday && <span className="mr-2 text-[0.625rem] text-clay">تعطیل</span>}
               <span className="block text-[0.625rem] text-muted">{formatDate(item.date, "persian", true)}</span>
               {item.uncertain && (
@@ -53,6 +54,12 @@ export function CountdownTool({ now, groups }: { now: Date; groups: EventGroups 
           </li>
         ))}
       </ul>
+      {/* The visitor's own dates answer the same question this tab does, so this is where
+          they are reachable from; the tab strip stays at five. */}
+      <a href="/dates" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-forest hover:underline">
+        تولدها و سالگردهای خودت را هم اضافه کن
+        <ArrowUpLeft size={13} className="opacity-60" />
+      </a>
       <details className="mt-5 rounded-lg bg-paper p-3 text-[0.625rem] leading-6 text-muted">
         <summary className="flex cursor-pointer items-center gap-1.5"><Info size={13} />دربارهٔ این شمارش</summary>
         <p className="pt-2">{COUNTDOWN_NOTICE}</p>

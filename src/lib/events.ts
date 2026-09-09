@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.10.0 — 2026-09-09
+// Version: 0.11.0 — 2026-09-09
 // Why: Curated occasions: national, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
 // Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
@@ -9,7 +9,10 @@
 import { toCalendar } from './calendar';
 
 // 'iran'      — national and cultural occasions (Nowruz, poets, Yalda, professions)
-// 'state'     — occasions of the Islamic Republic and its institutions
+// 'state'     — occasions of the Islamic Republic and its institutions. The name «ایران»
+//               is deliberately not attached to any of them, and every one of them is
+//               rendered behind `StateMark`: Farjad's editorial call of 9 Sep, consistent
+//               with the memorial panel, which has always named the same government.
 // 'religious' — lunar religious holidays, computed via islamic-civil
 // 'world'     — international observances on the Gregorian calendar
 export type EventCategory = 'iran' | 'state' | 'religious' | 'world';
@@ -98,7 +101,7 @@ const PERSIAN_EVENTS: FixedEvents = {
 // Occasions tied to the Islamic Republic and its institutions. Hidden unless state is enabled.
 // Key format: `${persianMonth}-${persianDay}`
 const STATE_EVENTS: FixedEvents = {
-  '1-12': [['روز جمهوری اسلامی ایران', true]],
+  '1-12': [['روز جمهوری اسلامی', true]],
   '3-3': [['سالروز آزادسازی خرمشهر؛ روز مقاومت، ایثار و پیروزی']],
   '3-14': [['رحلت امام خمینی', true]],
   '3-15': [['قیام پانزده خرداد', true]],
@@ -112,9 +115,9 @@ const STATE_EVENTS: FixedEvents = {
   '9-5': [['روز بسیج مستضعفین']],
   '9-7': [['روز نیروی دریایی']],
   '10-7': [['روز نهضت سوادآموزی']],
-  '11-12': [['بازگشت امام خمینی به ایران؛ آغاز دهه فجر']],
+  '11-12': [['بازگشت امام خمینی؛ آغاز دهه فجر']],
   '11-19': [['روز نیروی هوایی']],
-  '11-22': [['پیروزی انقلاب اسلامی ایران', true]],
+  '11-22': [['متأسفانه شورش ۵۷ (جمهوری اسلامی)', true]],
 };
 
 // International observances keyed on the Gregorian calendar. Never holidays in Iran.

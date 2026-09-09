@@ -9,7 +9,7 @@
 // ============================================================================
 
 import { addDays, dayKey, daysBetween, weekdayIndex } from './calendar';
-import { eventsForDate, hasOfficialLunarDate, type EventGroups } from './events';
+import { eventsForDate, hasOfficialLunarDate, type CalendarEvent, type EventGroups } from './events';
 
 // Friday is the Iranian weekend. Thursday is not: it is a half day for some employers
 // and a full one for others, so treating it as off would invent bridges that do not exist.
@@ -23,9 +23,10 @@ export type Bridge = {
   length: number;
   // The work days inside the run that have to be taken as leave. Empty means it is free.
   leave: Date[];
-  // Titles of the official holidays inside the run, in order, without duplicates.
-  // Fridays contribute nothing here: a weekend has no title.
-  titles: string[];
+  // The official holidays inside the run, in order, without duplicate titles. The whole
+  // event is kept rather than its title, because the category decides how it is drawn.
+  // Fridays contribute nothing here: a weekend has no occasion.
+  occasions: CalendarEvent[];
   // True when any holiday in the run is a computed lunar date rather than one pinned to
   // the official calendar, so the run may shift by a day. The UI must say so.
   uncertain: boolean;
@@ -45,7 +46,7 @@ export type BridgeOptions = {
 // dataset, and a lunar holiday inside it can move by a day.
 export const BRIDGES_NOTICE = 'این بازه‌ها از همان فهرست گزیدهٔ مناسبت‌ها محاسبه می‌شوند و تقویم رسمی نیستند. فقط جمعه تعطیل هفتگی حساب شده است؛ پنجشنبه نه. بازه‌ای که روی یک تعطیلی قمری محاسباتی بنشیند ممکن است یک روز جابه‌جا شود.';
 
-type Day = { date: Date; off: boolean; titles: string[]; uncertain: boolean };
+type Day = { date: Date; off: boolean; occasions: CalendarEvent[]; uncertain: boolean };
 
 // One day's answer to the only two questions a bridge asks: is it off, and why.
 function readDay(date: Date, groups: EventGroups): Day {
@@ -56,7 +57,7 @@ function readDay(date: Date, groups: EventGroups): Day {
   return {
     date,
     off: weekdayIndex(date) === FRIDAY || holidays.length > 0,
-    titles: holidays.map((event) => event.title),
+    occasions: holidays,
     uncertain,
   };
 }
@@ -142,7 +143,7 @@ export function findBridges(from: Date, to: Date, groups: EventGroups, options: 
       end: run[run.length - 1].date,
       length: run.length,
       leave: run.filter((day) => !day.off).map((day) => day.date),
-      titles: [...new Set(run.flatMap((day) => day.titles))],
+      occasions: [...new Map(run.flatMap((day) => day.occasions).map((event) => [event.title, event])).values()],
       uncertain: run.some((day) => day.uncertain),
     };
   });

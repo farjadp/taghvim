@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.27 — 2026-09-09
+// Version: 0.9.28 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,18 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.17',
+    at: '2026-09-09T16:20:00-04:00',
+    status: 'ready',
+    title: 'تاریخ‌های من',
+    changes: [
+      { kind: 'added', text: 'صفحهٔ «تاریخ‌های من»: تولدها و سالگردها را به تاریخ شمسی نگه دار. هر کدام روی خانهٔ همان روز در تقویم یک نقطه می‌گیرد، و راهنمای زیر تقویم هم نامش را می‌گوید. از زبانهٔ «روزشمار» به آن می‌رسی.' },
+      { kind: 'added', text: 'دکمهٔ خروجی: فهرستت را به فایل تقویم تبدیل می‌کند تا به تقویم گوگل یا اپل اضافه‌اش کنی. یادآوری را همان تقویم می‌دهد؛ این سایت سروری برای یادآوری ندارد. فایل خودش به‌روز نمی‌شود و در توضیح هر ردیف همین نوشته شده.' },
+      { kind: 'changed', text: 'این فهرست فقط در حافظهٔ همین مرورگر می‌ماند و اولین چیزی است که ذخیره می‌کنیم و تنظیم نیست بلکه محتواست. متن «حریم خصوصی» در صفحهٔ «درباره» بازنویسی شد تا همین را صریح بگوید.' },
+      { kind: 'changed', text: 'مناسبت‌های دستهٔ «دولتی» دیگر نام ایران را با خود ندارند و همه با یک نشان مشخص شده‌اند. بیست‌ودوم بهمن به نام چیزی که ساخت نوشته می‌شود، نه چیزی که جشن می‌گیرد. این دسته مثل قبل به‌صورت پیش‌فرض خاموش است.' },
+    ],
+  },
   {
     version: '0.9.16',
     at: '2026-09-09T11:45:00-04:00',

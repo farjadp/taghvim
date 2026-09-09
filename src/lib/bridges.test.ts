@@ -21,7 +21,7 @@ describe('holiday bridges', () => {
   it('finds the Nowruz run, which needs no leave at all', () => {
     const { from, to } = year(1405);
     const nowruz = findBridges(from, to, DEFAULT_GROUPS)
-      .filter((bridge) => bridge.titles.some((title) => title.includes('نوروز')));
+      .filter((bridge) => bridge.occasions.some(({ title }) => title.includes('نوروز')));
     // The same holiday is offered at more than one price, and the cheapest is free.
     const free = nowruz.filter((bridge) => bridge.leave.length === 0);
     expect(free.length).toBeGreaterThan(0);
@@ -95,7 +95,7 @@ describe('holiday bridges', () => {
     // 8 Shahrivar 1405 is one of the three dates pinned to the official calendar, so a run
     // resting on it carries no ±1 day risk and must not be marked as if it did.
     const pinned = findBridges(persian(1405, 6, 1), persian(1405, 6, 15), ALL_GROUPS, { minFree: 2 })
-      .filter((bridge) => bridge.titles.some((title) => title.includes('میلاد پیامبر')));
+      .filter((bridge) => bridge.occasions.some(({ title }) => title.includes('میلاد پیامبر')));
     expect(pinned.length).toBeGreaterThan(0);
     expect(pinned.every((bridge) => bridge.uncertain)).toBe(false);
   });
@@ -104,7 +104,7 @@ describe('holiday bridges', () => {
     // Ask for a window opening in the middle of the Nowruz holidays; the run must still be
     // reported at its true length, starting on 1 Farvardin.
     const inside = findBridges(persian(1405, 1, 3), persian(1405, 1, 20), DEFAULT_GROUPS);
-    const nowruz = inside.find((bridge) => bridge.titles.some((title) => title.includes('نوروز')));
+    const nowruz = inside.find((bridge) => bridge.occasions.some(({ title }) => title.includes('نوروز')));
     expect(nowruz).toBeDefined();
     // The run opens on the Friday before Nowruz, which is outside the window that was asked
     // for — reporting it as starting on 1 Farvardin would understate the holiday by a day.

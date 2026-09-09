@@ -27,6 +27,26 @@ describe('selected calendar events', () => {
     expect(eventsForDate(persian(month, day)).some((event) => event.holiday && event.category === 'iran')).toBe(true);
   });
 
+  // Farjad's editorial call, 9 Sep: the state's own commemorations do not carry the country's
+  // name, and 22 Bahman is named for what it produced rather than for what it celebrates.
+  it('never attaches «ایران» to a state occasion', () => {
+    for (let month = 1; month <= 12; month += 1) {
+      for (let day = 1; day <= 31; day += 1) {
+        let events;
+        try { events = eventsForDate(persian(month, day), ALL_GROUPS); } catch { continue; }
+        for (const event of events.filter((item) => item.category === 'state')) {
+          expect(event.title).not.toContain('ایران');
+        }
+      }
+    }
+  });
+
+  it('names 22 Bahman as the uprising, not the victory', () => {
+    const events = eventsForDate(persian(11, 22), ALL_GROUPS);
+    expect(events.some((event) => event.category === 'state' && event.title.includes('شورش ۵۷'))).toBe(true);
+    expect(events.every((event) => !event.title.includes('پیروزی انقلاب'))).toBe(true);
+  });
+
   it.each([[1, 12], [3, 14], [3, 15], [11, 22]])('files state holidays %i/%i under the state category', (month, day) => {
     expect(eventsForDate(persian(month, day)).some((event) => event.holiday && event.category === 'state')).toBe(true);
   });

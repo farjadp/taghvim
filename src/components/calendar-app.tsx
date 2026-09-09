@@ -13,6 +13,7 @@ import Image from "next/image";
 import { ArrowLeftRight, CalendarDays, Hourglass, MapPin } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
+import { datesOn, readDates, type Anniversary } from "@/lib/dates";
 import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
@@ -34,8 +35,10 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
   const [tool, setTool] = useState<ToolTab>(DEFAULT_TOOL);
   // Defaults match server rendering; read/migrate browser preferences only after hydration.
   const [preferences, setPreferences] = useState<ViewPreferences>(DEFAULT_VIEW);
+  // The visitor's own dates, read once after hydration like the preferences beside them.
+  const [dates, setDates] = useState<Anniversary[]>([]);
   const followingToday = useRef(true);
-  useEffect(() => { setPreferences(readView()); }, []);
+  useEffect(() => { setPreferences(readView()); setDates(readDates()); }, []);
   function toggleView(key: keyof ViewPreferences) {
     const next = { ...preferences, [key]: !preferences[key] };
     setPreferences(next);
@@ -110,7 +113,7 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
       <main id="main" className="mx-auto flex max-w-[1240px] flex-col px-4 pt-8 pb-10 sm:px-8 sm:pt-10 lg:block">
         <TodayPanel now={now} initialNow={initialNow} className="max-lg:mt-7" />
         <div className="order-first mt-7 grid items-stretch gap-5 max-lg:mt-0 lg:grid-cols-[1.7fr_1fr]">
-          <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} />
+          <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date).length > 0 : undefined} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} />
