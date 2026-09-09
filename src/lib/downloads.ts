@@ -1,13 +1,13 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.13 — 2026-09-09
+// Version: 0.9.15 — 2026-09-09
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
-//      built: a method with no `href` renders no button, and the Chrome
-//      listing appears only once CHROME_STORE_URL stops being null.
-// Env / Deps: None. The Chrome method's status, steps and button are all
-//      derived from CHROME_STORE_URL, so approval is one edit and nothing
-//      else in this file or on the page needs touching.
+//      built: a method with no `href` renders no button, and a store listing
+//      appears only once its URL constant stops being null.
+// Env / Deps: None. Each extension's status, steps and button are derived
+//      from its store URL, so approval is one edit and nothing else in this
+//      file or on the page needs touching.
 // ============================================================================
 
 // Set this the day the Chrome Web Store approves the listing. Until then the
@@ -16,7 +16,14 @@
 export const CHROME_STORE_URL: string | null =
   'https://chromewebstore.google.com/detail/%D8%AA%D9%82%D9%88%DB%8C%D9%85/idfklcgaapfagcichjeonihhbkcfggim';
 
-export type DownloadStatus = 'ready' | 'review' | 'planned';
+// Set this the day addons.mozilla.org approves the listing.
+export const FIREFOX_STORE_URL: string | null = null;
+
+// 'built' is the state between the two: the package exists and passes
+// Mozilla's own linter, but nobody outside this machine can install it yet.
+// Without it the Firefox card would have to lie in one direction or the
+// other — claim a review that has not started, or claim nothing is built.
+export type DownloadStatus = 'ready' | 'built' | 'review' | 'planned';
 
 export type DownloadMethod = {
   id: string;
@@ -30,6 +37,7 @@ export type DownloadMethod = {
 
 export const STATUS_LABELS: Record<DownloadStatus, string> = {
   ready: 'آماده',
+  built: 'ساخته شده، هنوز فرستاده نشده',
   review: 'در حال بازبینی',
   planned: 'هنوز ساخته نشده',
 };
@@ -71,6 +79,28 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
       : undefined,
     action: CHROME_STORE_URL
       ? { label: 'نصب از فروشگاه کروم', href: CHROME_STORE_URL, external: true }
+      : { label: 'کد پروژه در گیت‌هاب', href: 'https://github.com/farjadp/taghvim', external: true },
+  },
+  {
+    id: 'firefox',
+    title: 'افزونهٔ فایرفاکس — تب جدید',
+    status: FIREFOX_STORE_URL ? 'ready' : 'built',
+    summary:
+      'همان افزونه، همان کد، برای فایرفاکس: تاریخ امروز و ساعت تهران، ماه جاری و مناسبت‌های روز در هر تب جدید. مثل نسخهٔ کروم هیچ مجوزی نمی‌خواهد و هیچ درخواستی به اینترنت نمی‌فرستد.',
+    steps: FIREFOX_STORE_URL
+      ? [
+          'صفحه‌اش را در فروشگاه افزونه‌های فایرفاکس باز کن و «Add to Firefox» را بزن.',
+          'فایرفاکس یک بار می‌پرسد که اجازه می‌دهی تب جدید عوض شود؛ باید تأیید کنی. این پرسش را خودِ مرورگر می‌پرسد و نمی‌شود دورش زد.',
+        ]
+      : [
+          'بسته ساخته شده و از بررسی خودکار موزیلا رد شده، ولی هنوز برای انتشار فرستاده نشده است.',
+          'تا آن موقع می‌شود از روی کد پروژه ساختش: مخزن را بگیر، «npm run build:extension:firefox» را بزن، و در about:debugging گزینهٔ «Load Temporary Add-on» را روی پوشهٔ extension/dist-firefox بگذار.',
+        ],
+    note: FIREFOX_STORE_URL
+      ? 'فایرفاکس ۱۴۰ به بالا لازم است. روی فایرفاکس اندروید کار نمی‌کند، چون آنجا جایگزینی تب جدید پشتیبانی نمی‌شود.'
+      : 'افزونهٔ موقت با بستن فایرفاکس پاک می‌شود؛ این راه برای امتحان کردن است، نه برای هر روز.',
+    action: FIREFOX_STORE_URL
+      ? { label: 'نصب از فروشگاه فایرفاکس', href: FIREFOX_STORE_URL, external: true }
       : { label: 'کد پروژه در گیت‌هاب', href: 'https://github.com/farjadp/taghvim', external: true },
   },
   {

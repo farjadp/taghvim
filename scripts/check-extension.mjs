@@ -1,12 +1,16 @@
 // ============================================================================
 // Source: scripts/check-extension.mjs
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.15 — 2026-09-09
 // Why: The extension's whole pitch is "no permissions, no network, nothing
 //      leaves the machine". A manifest and a bundle can quietly stop being
 //      that, so every build is checked: the manifest asks for nothing, the
 //      page loads only its own files, the code makes no request, and every
 //      URL the stylesheet mentions exists on disk.
+//      Both targets go through here. The Firefox build gets two extra checks
+//      that AMO would otherwise fail the upload on: a gecko id must be there
+//      to sign against, and Chrome-only manifest keys must not be.
 // Env / Deps: Runs after `vite build` as part of `npm run build:extension`.
+//      Takes the dist folder as its one argument (default extension/dist).
 //      Exits 1 with a list of failures; prints OK otherwise.
 // ============================================================================
 
@@ -14,7 +18,10 @@ import { existsSync, readFileSync, readdirSync } from 'node:fs';
 import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-const dist = resolve(dirname(fileURLToPath(import.meta.url)), '../extension/dist');
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const dist = resolve(root, process.argv[2] ?? 'extension/dist');
+// The folder name is the target: the Firefox build lands in dist-firefox.
+const target = dist.endsWith('dist-firefox') ? 'firefox' : 'chrome';
 const failures = [];
 const fail = (message) => failures.push(message);
 const read = (file) => readFileSync(join(dist, file), 'utf8');
@@ -28,6 +35,21 @@ if ((manifest.host_permissions ?? []).length) fail(`host_permissions requested: 
 if (manifest.content_security_policy) fail('a custom CSP is set; the MV3 default is the point');
 for (const icon of Object.values(manifest.icons ?? {})) if (!existsSync(join(dist, icon))) fail(`icon missing: ${icon}`);
 if (!/^\d+(\.\d+){1,3}$/.test(manifest.version)) fail(`version is not dotted numeric: ${manifest.version}`);
+if (manifest.version !== JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version) fail('manifest version does not match package.json');
+
+// --- target-specific manifest keys -----------------------------------------
+if (target === 'firefox') {
+  // Without an id AMO has nothing to sign the add-on against, and every later
+  // upload would be treated as a different add-on.
+  if (!manifest.browser_specific_settings?.gecko?.id) fail('browser_specific_settings.gecko.id is missing');
+  if (!manifest.browser_specific_settings?.gecko?.strict_min_version) fail('gecko.strict_min_version is missing');
+  // Chrome-apps leftovers AMO's linter flags as unsupported.
+  for (const key of ['offline_enabled', 'minimum_chrome_version', 'update_url']) {
+    if (key in manifest) fail(`Chrome-only key in the Firefox manifest: ${key}`);
+  }
+} else if (manifest.browser_specific_settings) {
+  fail('browser_specific_settings leaked into the Chrome manifest');
+}
 
 // --- html: every script and stylesheet is local -----------------------------
 const html = read('newtab.html');
@@ -79,9 +101,9 @@ const boot = read('boot.js');
 if (!boot.includes('taghvim-theme') || !boot.includes('data-font')) fail('boot.js does not look like the preferences boot script');
 
 if (failures.length) {
-  console.error(`FAIL  extension check: ${failures.length} problem(s)`);
+  console.error(`FAIL  extension check (${target}): ${failures.length} problem(s)`);
   for (const message of failures) console.error(`      - ${message}`);
   process.exit(1);
 }
 const bytes = readdirSync(join(dist, 'assets')).reduce((sum, name) => sum + readFileSync(join(dist, 'assets', name)).length, 0);
-console.log(`OK    extension: no permissions, no network, ${assets.length} assets, ${(bytes / 1024).toFixed(0)} KB`);
+console.log(`OK    extension (${target}): no permissions, no network, ${assets.length} assets, ${(bytes / 1024).toFixed(0)} KB`);

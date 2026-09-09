@@ -1,16 +1,21 @@
 // ============================================================================
 // Source: scripts/package-extension.mjs
-// Version: 0.9.11 — 2026-09-08
-// Why: Turns extension/dist into what the Chrome Web Store actually asks for:
-//      one ZIP to upload, 1280x800 screenshots, the 128x128 store icon, and
-//      the two promo tiles. The screenshots are rendered from the BUILT page in
-//      a real browser, so what the listing shows is what the extension does,
-//      not a mockup; the tiles are drawn from the same tokens as the site.
-//      Screenshots and tiles must be 24-bit PNG with NO alpha — the store
-//      rejects alpha — which is what an opaque page screenshot produces.
-// Env / Deps: Playwright's chromium and the `zip` binary. Runs the build first
-//      so the ZIP can never be older than the source. The ZIP is git-ignored;
-//      the screenshots are committed, since the listing should be reviewable.
+// Version: 0.9.15 — 2026-09-09
+// Why: Turns the built extension into what the two stores actually ask for.
+//      Chrome: one ZIP, 1280x800 screenshots, the 128x128 icon and the two
+//      promo tiles. Firefox/AMO: its own ZIP (different manifest) plus a
+//      source ZIP — AMO REQUIRES the source of any bundled or minified
+//      add-on, and rejects the submission without it. The screenshots are
+//      rendered from the BUILT page in a real browser, so what the listing
+//      shows is what the extension does, not a mockup; the tiles are drawn
+//      from the same tokens as the site. Screenshots and tiles must be 24-bit
+//      PNG with NO alpha — Chrome rejects alpha — which is what an opaque
+//      page screenshot produces. AMO takes the same PNGs.
+// Env / Deps: Playwright's chromium, `zip`, and `git` (the source ZIP is
+//      `git archive HEAD`, so it is exactly the committed tree and nothing
+//      local). Runs both builds first so no ZIP can be older than the source.
+//      The ZIPs are git-ignored; the screenshots are committed, since the
+//      listing should be reviewable.
 // ============================================================================
 
 import { execFileSync } from 'node:child_process';
@@ -24,17 +29,50 @@ import { chromium } from '@playwright/test';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const dist = join(root, 'extension/dist');
 const store = join(root, 'extension/store');
+const distFirefox = join(root, 'extension/dist-firefox');
 const version = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8')).version;
-const zipName = `taghvim-${version}.zip`;
 
 execFileSync('npm', ['run', 'build:extension'], { cwd: root, stdio: 'inherit' });
+execFileSync('npm', ['run', 'build:extension:firefox'], { cwd: root, stdio: 'inherit' });
 
-// --- the upload ------------------------------------------------------------
-// Zipped from inside dist so the archive has no wrapping folder: the store
-// rejects a package whose manifest.json is not at the root.
-rmSync(join(root, 'extension', zipName), { force: true });
-execFileSync('zip', ['-r', '-q', '-X', join(root, 'extension', zipName), '.'], { cwd: dist });
-const zipBytes = readFileSync(join(root, 'extension', zipName)).length;
+// --- the uploads -----------------------------------------------------------
+// Zipped from inside each dist so the archive has no wrapping folder: both
+// stores reject a package whose manifest.json is not at the root.
+const zip = (name, cwd) => {
+  const file = join(root, 'extension', name);
+  rmSync(file, { force: true });
+  execFileSync('zip', ['-r', '-q', '-X', file, '.'], { cwd });
+  return { name, bytes: readFileSync(file).length };
+};
+const packages = [zip(`taghvim-${version}.zip`, dist), zip(`taghvim-${version}-firefox.zip`, distFirefox)];
+
+// AMO will not accept a bundled add-on without the source that produced it.
+// `git archive` is the committed tree exactly — no node_modules, no dist, no
+// uncommitted local state — and AMO reviewers rebuild it from FIREFOX.md.
+// Which is also the trap: an uncommitted tree means the ZIP above was built
+// from source the source ZIP does not contain, and a reviewer who follows
+// FIREFOX.md gets a different bundle. Commit first, then package.
+const dirty = execFileSync('git', ['status', '--porcelain'], { cwd: root, encoding: 'utf8' }).trim();
+if (dirty) {
+  console.error('FAIL  the working tree is dirty, so the source ZIP would not match the packages built above.');
+  console.error('      Commit first — AMO reviewers rebuild from what is in that ZIP.');
+  for (const line of dirty.split('\n').slice(0, 20)) console.error(`      ${line}`);
+  process.exit(1);
+}
+const sourceName = `taghvim-${version}-source.zip`;
+rmSync(join(root, 'extension', sourceName), { force: true });
+execFileSync('git', ['archive', '--format=zip', '-o', join(root, 'extension', sourceName), 'HEAD'], { cwd: root });
+packages.push({ name: sourceName, bytes: readFileSync(join(root, 'extension', sourceName)).length });
+
+// Mozilla's own linter, run here rather than discovered on upload. Errors are
+// fatal; the warnings that remain are React's internal innerHTML writes and
+// the Android minimum, both expected and both explained in FIREFOX.md.
+const lint = JSON.parse(execFileSync('npx', ['--yes', 'addons-linter', '--output', 'json', distFirefox], { cwd: root, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }));
+if (lint.summary.errors) {
+  console.error(`FAIL  addons-linter: ${lint.summary.errors} error(s)`);
+  for (const item of lint.errors) console.error(`      - ${item.code} ${item.file ?? 'manifest.json'}`);
+  process.exit(1);
+}
 
 // --- the listing screenshots ------------------------------------------------
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
@@ -131,8 +169,10 @@ await icon.close();
 await browser.close();
 await new Promise((done) => server.close(done));
 
-console.log(`\nupload  extension/${zipName} (${(zipBytes / 1024).toFixed(0)} KB)`);
-console.log('listing extension/store/');
-for (const [label, file] of [['icon 128x128', 'store-icon-128.png'], ['screenshot 1280x800', 'newtab-light.png'], ['screenshot 1280x800', 'newtab-dark.png'], ['small tile 440x280', 'promo-small.png'], ['marquee 1400x560', 'promo-marquee.png']]) {
+console.log('\nupload');
+for (const item of packages) console.log(`        extension/${item.name.padEnd(32)} ${(item.bytes / 1024).toFixed(0)} KB`);
+console.log(`        addons-linter: 0 errors, ${lint.summary.warnings} warning(s)`);
+console.log('\nlisting extension/store/');
+for (const [label, file] of [['icon 128x128 — both', 'store-icon-128.png'], ['screenshot 1280x800 — both', 'newtab-light.png'], ['screenshot 1280x800 — both', 'newtab-dark.png'], ['small tile 440x280 — Chrome', 'promo-small.png'], ['marquee 1400x560 — Chrome', 'promo-marquee.png']]) {
   console.log(`        ${file.padEnd(22)} ${label}`);
 }

@@ -1,9 +1,14 @@
 // ============================================================================
 // Source: playwright.config.ts
-// Version: 0.9.0 — 2026-09-08
-// Why: Playwright configuration: two device projects and the dev-server hook.
+// Version: 0.9.15 — 2026-09-09
+// Why: Playwright configuration: the device projects and the dev-server hook.
+//      The `firefox` project exists for one reason — the extension also ships
+//      to Firefox, and a linter that passes says nothing about whether Gecko
+//      paints the page. It runs the extension spec only, against the Firefox
+//      build, so the site's suite is not doubled for no gain.
 // Env / Deps: E2E_PORT defaults to 3100; sandbox worktrees use a separate port.
-//      Port 3000 is reserved on this machine.
+//      Port 3000 is reserved on this machine. The firefox project needs
+//      `npx playwright install firefox`.
 // ============================================================================
 
 import { defineConfig, devices } from "@playwright/test";
@@ -18,6 +23,9 @@ export default defineConfig({
   projects: [
     { name: "desktop", use: { ...devices["Desktop Chrome"] } },
     { name: "mobile", use: { ...devices["iPhone 13"], defaultBrowserType: "chromium" } },
+    // The extension only; the site is served to whatever browser a visitor
+    // brings, but the add-on is a package we hand to Mozilla.
+    { name: "firefox", testMatch: /extension\.spec\.ts/, use: { ...devices["Desktop Firefox"] } },
   ],
   webServer: {
     command: `npm run dev -- --port ${port}`,

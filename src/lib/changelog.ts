@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.23 — 2026-09-09
+// Version: 0.9.24 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,19 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.15',
+    at: '2026-09-09T10:35:00-04:00',
+    status: 'ready',
+    title: 'همان افزونه، برای فایرفاکس',
+    changes: [
+      { kind: 'added', text: 'افزونهٔ فایرفاکس ساخته شد. همان کد و همان صفحه است؛ فقط منیفست فرق دارد، و آن فرق در یک فایل جدا نگه داشته می‌شود تا دو نسخهٔ دستی از هم دور نیفتند. «npm run build:extension:firefox» بسته را می‌سازد.' },
+      { kind: 'added', text: 'صفحهٔ «دریافت تقویم» حالا کارت فایرفاکس هم دارد، با وضعیت «ساخته شده، هنوز فرستاده نشده» — یک برچسب تازه، چون نه «آماده» بود نه «در حال بازبینی» و هیچ‌کدام راست نبود.' },
+      { kind: 'added', text: 'بسته با addons-linter خودِ موزیلا بررسی می‌شود و بیلد با هر خطا رد می‌شود. کنارش زیپ سورس هم ساخته می‌شود، چون فروشگاه فایرفاکس برای افزونهٔ باندل‌شده سورس را اجباری می‌خواهد.' },
+      { kind: 'added', text: 'تست‌های end-to-end حالا در خود فایرفاکس هم اجرا می‌شوند. اینکه بررسی خودکار موزیلا سبز باشد چیزی دربارهٔ درست رسم شدن صفحه نمی‌گوید؛ این می‌گوید.' },
+      { kind: 'changed', text: 'حداقل نسخهٔ فایرفاکس ۱۴۰ گذاشته شد. پایین‌تر از آن، کلیدی که می‌گوید «هیچ داده‌ای جمع نمی‌شود» شناخته نمی‌شود و مرورگر بی‌دلیل از کاربر اجازهٔ داده می‌پرسد.' },
+    ],
+  },
   {
     version: '0.9.14',
     at: '2026-09-09T10:10:00-04:00',

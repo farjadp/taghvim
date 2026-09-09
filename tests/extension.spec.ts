@@ -1,12 +1,15 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.8 — 2026-09-08
-// Why: Loads the BUILT new-tab page — the same files Chrome would load — from
-//      a throwaway static server with every other origin blocked, and reads
-//      the Tehran date off it. A build that needs the network, or that paints
-//      the wrong day, fails here rather than on someone's new tab.
-// Env / Deps: Playwright desktop project only (a new tab is a desktop
-//      surface). Builds extension/dist first if it is missing.
+// Version: 0.9.15 — 2026-09-09
+// Why: Loads the BUILT new-tab page — the same files the browser would load —
+//      from a throwaway static server with every other origin blocked, and
+//      reads the Tehran date off it. A build that needs the network, or that
+//      paints the wrong day, fails here rather than on someone's new tab.
+//      Runs twice: the Chrome package under `desktop`, the Firefox package
+//      under `firefox`. The bundle is the same in both, but the renderer is
+//      not, and Gecko is the half nothing else in this repo exercises.
+// Env / Deps: The desktop and firefox Playwright projects (a new tab is a
+//      desktop surface). Builds whichever dist is missing.
 // ============================================================================
 
 import { execSync } from "node:child_process";
@@ -18,7 +21,10 @@ import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
 // The package is ESM, so there is no __dirname here.
-const dist = fileURLToPath(new URL("../extension/dist", import.meta.url));
+const DIST = {
+  desktop: { dir: fileURLToPath(new URL("../extension/dist", import.meta.url)), build: "build:extension" },
+  firefox: { dir: fileURLToPath(new URL("../extension/dist-firefox", import.meta.url)), build: "build:extension:firefox" },
+} as const;
 const MIME: Record<string, string> = {
   ".html": "text/html; charset=utf-8", ".js": "text/javascript", ".css": "text/css",
   ".woff2": "font/woff2", ".png": "image/png", ".svg": "image/svg+xml", ".json": "application/json",
@@ -27,8 +33,12 @@ const MIME: Record<string, string> = {
 let server: Server;
 let origin: string;
 
-test.beforeAll(async () => {
-  if (!existsSync(join(dist, "manifest.json"))) execSync("npm run build:extension", { stdio: "inherit" });
+test.beforeAll(async ({}, testInfo) => {
+  // Each project serves its own package, so "the files the browser would load"
+  // stays literally true for both stores.
+  const target = DIST[testInfo.project.name as keyof typeof DIST] ?? DIST.desktop;
+  const dist = target.dir;
+  if (!existsSync(join(dist, "manifest.json"))) execSync(`npm run ${target.build}`, { stdio: "inherit" });
   server = createServer((request, response) => {
     // Serve from dist only; a path that escapes it is a 404, not a file read.
     const path = normalize(decodeURIComponent((request.url ?? "/").split("?")[0]));

@@ -13,6 +13,7 @@ test-results/
 # .next/dev/types and .next/types and kept showing up as drift.
 next-env.d.ts
 
-# Chrome extension build output (npm run build:extension)
+# Extension build output (npm run build:extension[:firefox])
 extension/dist/
+extension/dist-firefox/
 extension/*.zip

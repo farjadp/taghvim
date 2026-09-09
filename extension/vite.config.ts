@@ -1,14 +1,19 @@
 // ============================================================================
 // Source: extension/vite.config.ts
-// Version: 0.9.8 — 2026-09-08
-// Why: Builds the Chrome extension from the same source the site uses.
+// Version: 0.9.15 — 2026-09-09
+// Why: Builds the browser extension from the same source the site uses.
 //      `@/` resolves into ../src so panels and lib are imported, never copied.
 //      A small plugin emits what Vite would not otherwise produce: the
 //      manifest, the icons, and boot.js — the pre-paint theme script, which
 //      MV3's CSP forbids inline and which must be a classic (non-module)
 //      script so it runs before the first paint.
-// Env / Deps: vite, @vitejs/plugin-react, @tailwindcss/vite. Output in
-//      extension/dist; `npm run build:extension` runs this then the checks.
+//      One config, two targets: the bundle is identical in Chrome and Firefox
+//      (no background page, no permissions, no browser API is called), so the
+//      only thing that differs is the manifest, and Firefox's differences are
+//      kept as a delta file rather than a second full copy that can drift.
+// Env / Deps: vite, @vitejs/plugin-react, @tailwindcss/vite. `TARGET=firefox`
+//      selects the Gecko build; output in extension/dist or extension/
+//      dist-firefox. `npm run build:extension` runs this then the checks.
 // ============================================================================
 
 import { readFileSync } from "node:fs";
@@ -21,6 +26,25 @@ import { PREFERENCES_BOOT_SCRIPT } from "../src/lib/preferences";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..");
+
+// Chrome is the default so an unset environment builds what it always built.
+const TARGET = process.env.TARGET === "firefox" ? "firefox" : "chrome";
+const outDir = resolve(here, TARGET === "firefox" ? "dist-firefox" : "dist");
+
+// manifest.json is the Chrome manifest and the base for both. The Firefox file
+// holds only what differs, and a `null` there deletes the key outright — that
+// is how `offline_enabled` (a Chrome-apps leftover that makes AMO's linter
+// complain) disappears without a second hand-maintained manifest.
+function manifestFor(target: "chrome" | "firefox"): Record<string, unknown> {
+  const base = JSON.parse(readFileSync(resolve(here, "manifest.json"), "utf8")) as Record<string, unknown>;
+  if (target === "chrome") return base;
+  const delta = JSON.parse(readFileSync(resolve(here, "manifest.firefox.json"), "utf8")) as Record<string, unknown>;
+  for (const [key, value] of Object.entries(delta)) {
+    if (value === null) delete base[key];
+    else base[key] = value;
+  }
+  return base;
+}
 
 // Chrome has read woff2 since 2014. The Shabnam and Sahel packages also ship
 // eot, ttf and woff for browsers this extension can never run in, and Vite
@@ -61,11 +85,11 @@ function extensionAssets(): Plugin {
         }
       }
       this.emitFile({ type: "asset", fileName: "boot.js", source: PREFERENCES_BOOT_SCRIPT });
-      this.emitFile({ type: "asset", fileName: "manifest.json", source: readFileSync(resolve(here, "manifest.json")) });
+      const manifest = manifestFor(TARGET) as { icons: Record<string, string> };
+      this.emitFile({ type: "asset", fileName: "manifest.json", source: `${JSON.stringify(manifest, null, 2)}\n` });
       this.emitFile({ type: "asset", fileName: "icon.svg", source: readFileSync(resolve(repo, "src/app/icon.svg")) });
       // Every size the manifest names, read from the manifest so the two
-      // cannot disagree — a missing icon fails the check script, not Chrome.
-      const manifest = JSON.parse(readFileSync(resolve(here, "manifest.json"), "utf8")) as { icons: Record<string, string> };
+      // cannot disagree — a missing icon fails the check script, not the browser.
       for (const file of new Set(Object.values(manifest.icons))) {
         this.emitFile({ type: "asset", fileName: file, source: readFileSync(resolve(repo, "public", file)) });
       }
@@ -81,12 +105,12 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), extensionAssets()],
   resolve: { alias: { "@": resolve(repo, "src") } },
   build: {
-    outDir: resolve(here, "dist"),
+    outDir,
     emptyOutDir: true,
     rollupOptions: { input: resolve(here, "newtab.html") },
-    // Chrome supports <link rel="modulepreload"> natively. The polyfill Vite
-    // would add is the only `fetch(` in the whole bundle, and the check script
-    // treats any fetch as a failure — so it is not built in.
+    // Chrome and Firefox both support <link rel="modulepreload"> natively. The
+    // polyfill Vite would add is the only `fetch(` in the whole bundle, and the
+    // check script treats any fetch as a failure — so it is not built in.
     modulePreload: { polyfill: false },
     // One CSS file, one JS file: easier to inspect in the check script and
     // nothing to gain from splitting a page that loads once per tab.
