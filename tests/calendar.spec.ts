@@ -781,9 +781,9 @@ test("personal dates live in the tools box, are stored in the browser and mark t
   await expect(tools.getByLabel("عنوان")).toBeVisible();
 
   await tools.getByLabel("عنوان").fill("تولد مریم");
-  await tools.getByLabel("روز", { exact: true }).fill("21");
+  await tools.getByLabel("روز", { exact: true }).fill("۲۱");
   await tools.getByLabel("ماه", { exact: true }).selectOption("6");
-  await tools.getByLabel("سال", { exact: true }).fill("1370");
+  await tools.getByLabel("سال", { exact: true }).fill("۱۳۷۰");
   await tools.getByRole("button", { name: "افزودن", exact: true }).click();
   await expect(tools.getByText("تولد مریم")).toBeVisible();
   await expect(tools.getByText("۳۵ ساله می‌شود")).toBeVisible();
@@ -794,7 +794,7 @@ test("personal dates live in the tools box, are stored in the browser and mark t
 
   // A bad date is refused in Persian and writes nothing.
   await tools.getByLabel("عنوان").fill("بد");
-  await tools.getByLabel("روز", { exact: true }).fill("40");
+  await tools.getByLabel("روز", { exact: true }).fill("۴۰");
   await tools.getByRole("button", { name: "افزودن", exact: true }).click();
   await expect(tools.getByRole("alert")).toContainText("تاریخ معتبر نیست");
   expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"))).toHaveLength(1);

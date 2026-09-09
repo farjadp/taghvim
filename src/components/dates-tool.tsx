@@ -1,9 +1,10 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.2.0 — 2026-09-09
+// Version: 0.3.0 — 2026-09-09
 // Why: The visitor's own birthdays and anniversaries: add, list by nearness,
 //      remove, and export to their own calendar as an .ics.
-// Env / Deps: lib/dates owns the arithmetic; the caller owns the list and its
+// Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
+//      Persian and Arabic-Indic digits work; the caller owns the list and its
 //      persistence, so the calendar grid and this tool always agree.
 //      Nothing here reaches a network.
 // ============================================================================
@@ -13,6 +14,7 @@
 import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Download, Info, Trash2 } from "lucide-react";
 import { fa, formatDate, MONTHS } from "@/lib/calendar";
+import { parseNumericInput } from "@/lib/date-tools";
 import {
   addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
   upcomingDates, type Anniversary, type DateKind, type UpcomingDate,
@@ -59,12 +61,14 @@ export function DatesTool({ now, dates, ready, onChange }: {
   function submit(event: React.FormEvent) {
     event.preventDefault();
     try {
+      // parseNumericInput, not Number: people type Persian digits, and `Number("۱۳")` is NaN.
+      // Every other tool in this box already parses input this way.
       commit(addDate(dates, {
         title: draft.title,
         kind: draft.kind,
-        month: Number(draft.month),
-        day: Number(draft.day),
-        year: draft.year.trim() === "" ? null : Number(draft.year),
+        month: parseNumericInput(draft.month),
+        day: parseNumericInput(draft.day),
+        year: draft.year.trim() === "" ? null : parseNumericInput(draft.year),
       }));
       setDraft({ ...EMPTY, kind: draft.kind });
       setError("");
