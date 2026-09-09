@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.29 — 2026-09-09
+// Version: 0.9.30 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -34,6 +34,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.19',
+    at: '2026-09-09T18:30:00-04:00',
+    status: 'ready',
+    title: 'حروف نام‌های یادبود',
+    changes: [
+      { kind: 'fixed', text: 'نام‌های بخش یادبود یکدست شدند. بعضی از آن‌ها از منبع با «ك» و «ي» عربی آمده بودند که در قلم فارسی شکل دیگری می‌گیرند و گاهی به‌درستی نشان داده نمی‌شدند؛ حالا همه با حروف فارسی نوشته می‌شوند.' },
+    ],
+  },
   {
     version: '0.9.18',
     at: '2026-09-09T17:40:00-04:00',
