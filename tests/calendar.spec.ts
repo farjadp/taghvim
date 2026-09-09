@@ -746,9 +746,23 @@ test("the bridges row sits under the calendar, shows at most three, and links to
   await expect(page.getByTestId("bridges-summary")).not.toContainText("مذهبی و دولتی خاموش");
   const full = page.getByTestId("bridge");
   expect(await full.count()).toBeGreaterThan(3);
+  // The year view above the list: twelve months, and exactly the list's leave days marked.
+  await expect(page.getByRole("group", { name: /فروردین ۱۴۰۵/ })).toBeVisible();
+  expect(await page.getByRole("group", { name: /۱۴۰۵$/ }).count()).toBe(12);
+  // The list also holds the runs that straddle the year's edges (a Nowruz run starts on
+  // 28 Esfand of the year before), and one leave day can sit in two cards, one per price.
+  // The year view marks each day of this year once — so every marked day must be in the
+  // list, and the list may hold more.
+  const listed = new Set(await page.locator("[data-testid=bridge] li[aria-label*='مرخصی']").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("aria-label")!.replace(/^\S+ /, "").replace(" — مرخصی", ""))));
+  const marked = await page.locator("[title$='— روز مرخصی']").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("title")!.replace(" — روز مرخصی", "")));
+  expect(marked.length).toBeGreaterThan(0);
+  for (const day of marked) expect(listed.has(day)).toBe(true);
+  await expect(page.locator("[title$='— امروز']")).toHaveCount(1);
   await page.getByRole("button", { name: "۱۴۰۶" }).click();
   await expect(page.getByRole("heading", { name: "سال ۱۴۰۶" })).toBeVisible();
   expect(await full.count()).toBeGreaterThan(0);
+  expect(await page.getByRole("group", { name: /۱۴۰۶$/ }).count()).toBe(12);
+  await expect(page.locator("[title$='— امروز']")).toHaveCount(0);
   const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
