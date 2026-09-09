@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.16 — 2026-09-09
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -16,14 +16,11 @@
 export const CHROME_STORE_URL: string | null =
   'https://chromewebstore.google.com/detail/%D8%AA%D9%82%D9%88%DB%8C%D9%85/idfklcgaapfagcichjeonihhbkcfggim';
 
-// Set this the day addons.mozilla.org approves the listing.
+// Set this the day addons.mozilla.org approves the listing. Submitted 9 Sep
+// 2026; until it is approved the card says so, exactly as Chrome's did.
 export const FIREFOX_STORE_URL: string | null = null;
 
-// 'built' is the state between the two: the package exists and passes
-// Mozilla's own linter, but nobody outside this machine can install it yet.
-// Without it the Firefox card would have to lie in one direction or the
-// other — claim a review that has not started, or claim nothing is built.
-export type DownloadStatus = 'ready' | 'built' | 'review' | 'planned';
+export type DownloadStatus = 'ready' | 'review' | 'planned';
 
 export type DownloadMethod = {
   id: string;
@@ -37,7 +34,6 @@ export type DownloadMethod = {
 
 export const STATUS_LABELS: Record<DownloadStatus, string> = {
   ready: 'آماده',
-  built: 'ساخته شده، هنوز فرستاده نشده',
   review: 'در حال بازبینی',
   planned: 'هنوز ساخته نشده',
 };
@@ -84,7 +80,9 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
   {
     id: 'firefox',
     title: 'افزونهٔ فایرفاکس — تب جدید',
-    status: FIREFOX_STORE_URL ? 'ready' : 'built',
+    // Same shape as the Chrome card: everything hangs off the store URL, so
+    // approval is one edit and nothing else here or on the page moves.
+    status: FIREFOX_STORE_URL ? 'ready' : 'review',
     summary:
       'همان افزونه، همان کد، برای فایرفاکس: تاریخ امروز و ساعت تهران، ماه جاری و مناسبت‌های روز در هر تب جدید. مثل نسخهٔ کروم هیچ مجوزی نمی‌خواهد و هیچ درخواستی به اینترنت نمی‌فرستد.',
     steps: FIREFOX_STORE_URL
@@ -93,7 +91,7 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
           'فایرفاکس یک بار می‌پرسد که اجازه می‌دهی تب جدید عوض شود؛ باید تأیید کنی. این پرسش را خودِ مرورگر می‌پرسد و نمی‌شود دورش زد.',
         ]
       : [
-          'بسته ساخته شده و از بررسی خودکار موزیلا رد شده، ولی هنوز برای انتشار فرستاده نشده است.',
+          'برای انتشار در فروشگاه افزونه‌های فایرفاکس فرستاده شده و منتظر بازبینی موزیلا است.',
           'تا آن موقع می‌شود از روی کد پروژه ساختش: مخزن را بگیر، «npm run build:extension:firefox» را بزن، و در about:debugging گزینهٔ «Load Temporary Add-on» را روی پوشهٔ extension/dist-firefox بگذار.',
         ],
     note: FIREFOX_STORE_URL

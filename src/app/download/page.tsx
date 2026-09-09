@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/download/page.tsx
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.16 — 2026-09-09
 // Why: One page for getting the calendar onto a device. Every method carries
 //      its real status, so nothing here claims something that is not built:
 //      the Android app says it has not started, and each extension only
@@ -11,7 +11,7 @@
 
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowUpLeft, CalendarPlus, Check, Hourglass, Package, PackageCheck, Puzzle, Smartphone } from "lucide-react";
+import { ArrowUpLeft, CalendarPlus, Check, Hourglass, Package, Puzzle, Smartphone } from "lucide-react";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StructuredData } from "@/components/structured-data";
@@ -36,21 +36,12 @@ const ICONS: Record<string, typeof Smartphone> = {
 // screen reader gets, so the dot is decorative.
 const STATUS_STYLES: Record<DownloadStatus, string> = {
   ready: "border-forest/40 bg-leaf text-forest",
-  // 'built' shares the clay treatment with 'review': both mean "real, but not
-  // yet something you can install", which is the distinction that matters here.
-  built: "border-clay/40 bg-holiday text-clay",
   review: "border-clay/40 bg-holiday text-clay",
   planned: "border-line bg-paper text-muted",
 };
 
-const STATUS_ICONS: Partial<Record<DownloadStatus, typeof Check>> = {
-  ready: Check,
-  built: PackageCheck,
-  review: Hourglass,
-};
-
 function StatusPill({ status }: { status: DownloadStatus }) {
-  const Icon = STATUS_ICONS[status] ?? null;
+  const Icon = status === "ready" ? Check : status === "review" ? Hourglass : null;
   return (
     <span className={`flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-[0.625rem] ${STATUS_STYLES[status]}`}>
       {Icon && <Icon size={12} />}
