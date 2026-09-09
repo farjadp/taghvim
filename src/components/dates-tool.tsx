@@ -89,7 +89,6 @@ export function DatesTool({ now, dates, ready, onChange }: {
   return (
     <div className="grid gap-7 lg:grid-cols-[1fr_1.1fr]">
       <form noValidate onSubmit={submit}>
-        <p className="mb-5 text-sm font-medium">یک تاریخ اضافه کن.</p>
         <label className="block text-xs text-muted">
           <span className="mb-2 block">عنوان</span>
           <input aria-label="عنوان" maxLength={MAX_TITLE} autoComplete="off" value={draft.title}

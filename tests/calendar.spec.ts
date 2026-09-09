@@ -842,3 +842,19 @@ test("the hero draws the day as an image, from what is actually on screen", asyn
   await expect(page.locator("main").getByRole("status").first()).toContainText("تصویر ذخیره شد");
   expect(requests).toEqual([]);
 });
+
+test("every tool says what it answers, in one line", async ({ page }) => {
+  const tools = page.locator("#tools");
+  const tabs = await page.getByRole("tab").all();
+  expect(tabs).toHaveLength(6);
+  const seen = new Set<string>();
+  for (const tab of tabs) {
+    await tab.click();
+    const description = (await tools.getByTestId("tool-description").textContent())?.trim() ?? "";
+    // Present, a sentence rather than a label, and not the tab's own name repeated back.
+    expect(description.length).toBeGreaterThan(20);
+    expect(description).not.toBe((await tab.textContent())?.trim());
+    seen.add(description);
+  }
+  expect(seen.size).toBe(6);
+});

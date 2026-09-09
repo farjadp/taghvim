@@ -101,10 +101,8 @@ export function BridgesTool({ now, groups, moreHref }: {
   const hidden = bridges.length - shown.length;
   return (
     <div>
-      <p className="mb-5 text-sm font-medium">
-        با یک یا دو روز مرخصی، بلندترین تعطیلی پیوسته‌ای که می‌شود گرفت.
-        <span data-testid="bridges-count" className="mr-2 font-normal text-muted">{fa(bridges.length)} بازه در ۱۲ ماه آینده.</span>
-      </p>
+      {/* The description above is the panel's; this is the count, which is data. */}
+      <p data-testid="bridges-count" className="mb-5 text-xs text-muted">{fa(bridges.length)} بازه در ۱۲ ماه آینده.</p>
       {shown.length === 0 ? <BridgesEmpty /> : (
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {shown.map((bridge, index) => <BridgeCard key={index} bridge={bridge} />)}

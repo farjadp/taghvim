@@ -113,7 +113,6 @@ function Age({ now }: { now: Date }) {
       setResult(elapsedAge(birthday, now)); setError("");
     } catch { setError(INVALID_DATE); setResult(null); }
   }}>
-    <p className="mb-5 text-sm font-medium">تاریخ تولدت را به خورشیدی وارد کن.</p>
     <div className="max-w-xl"><DateFields prefix="تولد " value={value} onChange={(next) => { setValue(next); setResult(null); setError(""); }} /></div>
     <div className="mt-5 flex flex-wrap items-center justify-between gap-4"><p className="text-[0.625rem] text-muted">سن تقویمی تا امروز، به وقت ایران</p><SubmitButton>محاسبهٔ سن</SubmitButton></div>
     {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
@@ -123,7 +122,15 @@ function Age({ now }: { now: Date }) {
 
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
 export function ToolsPanel({ now, tab, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges" }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string }) {
-  const tabs = [{ key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange }, { key: "countdown" as const, label: "روزشمار", icon: Timer }, { key: "dates" as const, label: "تاریخ‌های من", icon: CalendarHeart }, { key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
+  const tabs = [
+    { key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange, description: "بازه‌هایی که با یکی دو روز مرخصی به چند روز تعطیلی پشت‌سرهم می‌رسند." },
+    { key: "countdown" as const, label: "روزشمار", icon: Timer, description: "چند روز تا مناسبت‌های بعدی، و تا نوروز و یلدا." },
+    { key: "dates" as const, label: "تاریخ‌های من", icon: CalendarHeart, description: "تولدها و سالگردها به تاریخ شمسی؛ فقط در مرورگر خودت می‌ماند." },
+    { key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight, description: "یک تاریخ را وارد کن، معادلش را در هر سه تقویم بگیر." },
+    { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass, description: "چند روز میان دو تاریخ خورشیدی فاصله است." },
+    { key: "age" as const, label: "محاسبهٔ سن", icon: Cake, description: "از تاریخ تولد خورشیدی تا امروز، به سال و ماه و روز." },
+  ];
+  const active = tabs.find((item) => item.key === tab) ?? tabs[0];
   return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-7"><h2 className="text-lg font-semibold">ابزارهای تاریخ</h2><div role="tablist" aria-label="انتخاب ابزار" className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-paper p-1">{tabs.map(({ key, label, icon: Icon }) => <button id={`tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls="tool-content" onClick={() => onTabChange(key)} onKeyDown={(event) => {
       const index = tabs.findIndex((item) => item.key === key);
@@ -133,6 +140,10 @@ export function ToolsPanel({ now, tab, onTabChange, groups, dates, datesReady, o
       onTabChange(tabs[next].key);
       document.getElementById(`tab-${tabs[next].key}`)?.focus();
     }} className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2.5 text-[0.625rem] transition-colors sm:px-4 sm:text-xs ${tab === key ? "bg-surface font-medium text-forest shadow-xs" : "text-muted hover:text-forest"}`}><Icon size={14} />{label}</button>)}</div></div>
-    <div id="tool-content" role="tabpanel" aria-labelledby={`tab-${tab}`} className="p-5 sm:p-7">{tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} /> : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
+    <div id="tool-content" role="tabpanel" aria-labelledby={`tab-${tab}`} className="p-5 sm:p-7">
+      {/* One line saying what this tool answers, in the panel rather than in each tool, so
+          all six read alike and a new one cannot ship without one. */}
+      <p data-testid="tool-description" className="mb-5 text-sm font-medium">{active.description}</p>
+      {tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} /> : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
   </section>;
 }

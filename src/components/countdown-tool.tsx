@@ -33,7 +33,6 @@ export function CountdownTool({ now, groups }: { now: Date; groups: EventGroups 
 
   return (
     <div>
-      <p className="mb-5 text-sm font-medium">چند روز تا مناسبت‌های بعدی، و تا نوروز و یلدا.</p>
       <ul className="flex flex-col">
         {items.map((item) => (
           <li key={dayKey(item.date)} className="flex items-baseline gap-4 border-b border-line py-3.5 last:border-0">
