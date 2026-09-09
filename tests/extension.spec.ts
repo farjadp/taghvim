@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.22 — 2026-09-09
 // Why: Loads the BUILT new-tab page — the same files the browser would load —
 //      from a throwaway static server with every other origin blocked, and
 //      reads the Tehran date off it. A build that needs the network, or that
@@ -8,6 +8,10 @@
 //      Runs twice: the Chrome package under `desktop`, the Firefox package
 //      under `firefox`. The bundle is the same in both, but the renderer is
 //      not, and Gecko is the half nothing else in this repo exercises.
+//      The day-card button reached the extension by being inside TodayHero,
+//      which the shell imports — so it arrived with no test of its own here.
+//      It has one now, because "the image is drawn locally" is the claim the
+//      whole package rests on and it is the one feature that could break it.
 // Env / Deps: The desktop and firefox Playwright projects (a new tab is a
 //      desktop surface). Builds whichever dist is missing.
 // ============================================================================
@@ -94,4 +98,38 @@ test("the built page passes accessibility checks in light mode", async ({ page }
   await page.goto(`${origin}/newtab.html`);
   const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
+});
+
+test("draws the day as an image without leaving the page", async ({ page }) => {
+  // The card is shared where the browser offers a share sheet and downloaded
+  // where it does not. Real Chrome on macOS DOES offer one from an extension
+  // page — `navigator.canShare({files})` is true there — so the sheet, which
+  // no automation can dismiss, is taken out of the way and the fallback is
+  // what gets asserted. The share branch hands the same File to the browser.
+  await page.addInitScript(() => { Object.defineProperty(navigator, "canShare", { value: undefined }); });
+
+  const foreign: string[] = [];
+  page.on("request", (request) => { if (!request.url().startsWith(origin)) foreign.push(request.url()); });
+  await page.goto(`${origin}/newtab.html`);
+
+  const button = page.getByRole("button", { name: "تصویر امروز" });
+  await expect(button).toBeVisible();
+  const download = page.waitForEvent("download", { timeout: 15000 });
+  await button.click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^taghvim-\d{4}-\d{2}-\d{2}\.png$/);
+  await expect(page.getByRole("status").filter({ hasText: "تصویر" })).toContainText("تصویر ذخیره شد");
+
+  // A real PNG at the size the card is drawn at, not an empty blob: the first
+  // eight bytes are the signature and IHDR carries the dimensions.
+  const stream = await file.createReadStream();
+  const chunks: Buffer[] = [];
+  for await (const chunk of stream) chunks.push(chunk as Buffer);
+  const bytes = Buffer.concat(chunks);
+  expect(bytes.subarray(0, 8)).toEqual(Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]));
+  expect([bytes.readUInt32BE(16), bytes.readUInt32BE(20)]).toEqual([1080, 1080]);
+
+  // The whole point: the image is produced in the browser, so a package that
+  // promises no network must not have started making one to draw it.
+  expect(foreign, "the page reached outside its own origin").toEqual([]);
 });

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/src/new-tab.tsx
-// Version: 0.9.14 — 2026-09-09
+// Version: 0.9.21 — 2026-09-09
 // Why: The new-tab shell: today, the month grid and the day's occasions on
 //      one screen. Every panel is the site's own component imported from
 //      ../../src; only this arrangement is the extension's. The clock,
