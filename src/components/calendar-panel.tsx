@@ -34,9 +34,13 @@ interface CalendarPanelProps {
   onNavigate: (delta: number) => void;
   onToday: () => void;
   onJump: (year: number, month: number) => void;
+  // SANDBOX: marks a cell that carries one of the visitor's own dates. Optional and inert
+  // when not passed. Delete this, its use below, and src/components/sandbox-dates.tsx if the
+  // calendar is not to carry these marks.
+  marked?: (date: Date) => boolean;
 }
 
-export function CalendarPanel({ year, month, today, selected, groups, memorial, showMemorialSwitch = true, onToggleView, onSelect, onNavigate, onToday, onJump }: CalendarPanelProps) {
+export function CalendarPanel({ year, month, today, selected, groups, memorial, showMemorialSwitch = true, onToggleView, onSelect, onNavigate, onToday, onJump, marked }: CalendarPanelProps) {
   const grid = monthGrid(year, month);
   const selectedParts = toCalendar(selected);
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
@@ -82,6 +86,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
               <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-memorial-ink/80" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
               {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
               {nonFridayHoliday && !active && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-clay" />}
+              {supported && marked?.(date) && <span className={`absolute left-1.5 top-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : "bg-forest"}`} />}
             </button>;
           })}
         </div>
