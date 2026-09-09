@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.21',
     at: '2026-09-09T20:10:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'تصویر امروز',
     changes: [
       { kind: 'added', text: 'دکمهٔ «تصویر امروز» بالای صفحه: از روزی که می‌بینی یک تصویر می‌سازد تا بفرستی یا ذخیره کنی.' },
