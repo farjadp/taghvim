@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.16 — 2026-09-09
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
@@ -46,7 +46,12 @@ function SunDrawing() {
 }
 
 // The green card: weekday, date, copy button, Tehran clock and the second clocks.
-export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }) {
+// `slots` are optional insertion points, each rendered only when given, so the hero is
+// byte-for-byte unchanged without them: `underDate` sits under the headline date,
+// `underClocks` between the second clocks and the footnote.
+export type HeroSlots = { underDate?: React.ReactNode; underClocks?: React.ReactNode };
+
+export function TodayHero({ now, initialNow, slots }: { now: Date; initialNow: string; slots?: HeroSlots }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   const persian = toCalendar(now);
@@ -72,6 +77,7 @@ export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }
           <div>
             <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
             <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
+            {slots?.underDate}
           </div>
           <button onClick={copyDate} aria-label="کپی تاریخ امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10">{copied ? <Check size={17} /> : <Copy size={17} />}</button>
         </div>
@@ -82,6 +88,7 @@ export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }
         {/* Above the footnote below it: the city picker opens over that line, and
             equal z-index would let the paragraph swallow the clicks. */}
         <div className="relative z-20 mt-5"><WorldClocks now={now} /></div>
+        {slots?.underClocks}
         <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : "بر پایهٔ ساعت دستگاه شما"}</p>
       </div>
   );
