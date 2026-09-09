@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.25 — 2026-09-09
+// Version: 0.9.26 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.15',
     at: '2026-09-09T10:35:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'همان افزونه، برای فایرفاکس',
     changes: [
       { kind: 'added', text: 'افزونهٔ فایرفاکس ساخته شد. همان کد و همان صفحه است؛ فقط منیفست فرق دارد، و آن فرق در یک فایل جدا نگه داشته می‌شود تا دو نسخهٔ دستی از هم دور نیفتند. «npm run build:extension:firefox» بسته را می‌سازد.' },

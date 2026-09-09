@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.9.0 — 2026-09-08
+// Version: 0.10.0 — 2026-09-09
 // Why: Curated occasions: national, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
 // Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
@@ -193,6 +193,15 @@ const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
     '10-16': 'مبعث پیامبر اکرم (ص)',
   },
 };
+
+// True when this day's lunar holiday is pinned to the official Persian calendar for its year,
+// rather than computed by islamic-civil. Only the pinned ones carry no ±1 day risk, so anything
+// that plans around a date — the holiday bridges — has to be able to tell the two apart.
+export function hasOfficialLunarDate(date: Date): boolean {
+  const persian = toCalendar(date);
+  const overrides = OFFICIAL_LUNAR_OVERRIDES[persian.year];
+  return overrides !== undefined && `${persian.month}-${persian.day}` in overrides;
+}
 
 // Returns the curated events for one civil day in Asia/Tehran.
 // All groups default on so the library stays neutral; the UI passes its own setting.

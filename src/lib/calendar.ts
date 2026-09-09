@@ -1,8 +1,9 @@
 // ============================================================================
 // Source: src/lib/calendar.ts
-// Version: 0.2.0 — 2026-09-07
+// Version: 0.3.0 — 2026-09-09
 // Why: Calendar core: Jalali/Gregorian/Hijri conversion, formatting, month grids.
 //      Every instant is read as a civil day in Asia/Tehran and returned at UTC noon.
+//      weekdayIndex() is the shared Saturday-first weekday, used by formatDate and bridges.
 // Env / Deps: jalaali-js for Jalali; Intl islamic-civil for Hijri. Range 1200–1600 SH.
 // ============================================================================
 
@@ -234,6 +235,11 @@ export function shiftMonth(year: number, month: number, delta: number): { year: 
   return { year: nextYear, month: total - nextYear * 12 + 1 };
 }
 
+// 0 = Saturday … 6 = Friday, the same order as WEEKDAYS and the month grid's columns.
+export function weekdayIndex(date: Date): number {
+  return (noon(tehranDay(date)).getUTCDay() + 1) % 7;
+}
+
 export function formatDate(date: Date, kind: CalendarKind = 'persian', withWeekday = false): string {
   const value = toCalendar(date, kind);
   const names = kind === 'persian' ? MONTHS : kind === 'islamic' ? ISLAMIC_MONTHS : GREGORIAN_MONTHS;
@@ -241,7 +247,7 @@ export function formatDate(date: Date, kind: CalendarKind = 'persian', withWeekd
     ? `${value.day} ${names[value.month - 1]} ${value.year}`
     : `${fa(value.day)} ${names[value.month - 1]} ${fa(value.year)}`;
   if (!withWeekday) return label;
-  const weekday = (noon(tehranDay(date)).getUTCDay() + 1) % 7;
+  const weekday = weekdayIndex(date);
   if (kind === 'gregorian') {
     const name = ['Saturday', 'Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'][weekday];
     return `${name}, ${label}`;
