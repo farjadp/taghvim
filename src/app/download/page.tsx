@@ -1,10 +1,10 @@
 // ============================================================================
 // Source: src/app/download/page.tsx
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.13 — 2026-09-09
 // Why: One page for getting the calendar onto a device. Every method carries
 //      its real status, so nothing here claims something that is not built:
-//      the Android app says it has not started, and the Chrome extension says
-//      it is in review until lib/downloads gets a store URL.
+//      the Android app says it has not started, and the Chrome extension only
+//      offers a store button once lib/downloads has a store URL.
 // Env / Deps: lib/downloads for the data, lib/seo for metadata. Server
 //      component; no state, nothing client-side.
 // ============================================================================

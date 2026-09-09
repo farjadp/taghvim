@@ -662,12 +662,16 @@ test("the download page states each method's real status", async ({ page }) => {
   const status = async (id: string) => (await page.locator(`#${id}`).locator("span").filter({ hasText: /آماده|بازبینی|ساخته نشده/ }).first().textContent())?.trim();
   expect(await status("home-screen")).toBe("آماده");
   expect(await status("calendar-feed")).toBe("آماده");
-  // In review until lib/downloads gets a store URL, and not a moment before
-  expect(await status("chrome")).toBe("در حال بازبینی");
+  // Published on the Web Store since 9 Sep; before that this read «در حال بازبینی»
+  expect(await status("chrome")).toBe("آماده");
   expect(await status("android")).toBe("هنوز ساخته نشده");
 
-  // No dead link to a listing that does not exist yet
-  await expect(page.locator('a[href*="chromewebstore.google.com"], a[href*="chrome.google.com/webstore"]')).toHaveCount(0);
+  // The store link exists now, and it is the real listing rather than a search
+  // page or a placeholder — a dead button here is worse than a sentence.
+  const store = page.locator('a[href*="chromewebstore.google.com"]');
+  await expect(store).toHaveCount(1);
+  await expect(store).toHaveAttribute("href", /\/detail\/[^/]+\/idfklcgaapfagcichjeonihhbkcfggim$/);
+  await expect(store).toHaveAttribute("rel", /noopener/);
   // The honest caveats travel with their methods
   await expect(page.locator("#home-screen")).toContainText("آفلاین");
   await expect(page.locator("#calendar-feed")).toContainText("قمری");

@@ -1,17 +1,20 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.13 — 2026-09-09
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and the Chrome
 //      listing appears only once CHROME_STORE_URL stops being null.
-// Env / Deps: None. When the Web Store approves the extension, set
-//      CHROME_STORE_URL and nothing else needs editing.
+// Env / Deps: None. The Chrome method's status, steps and button are all
+//      derived from CHROME_STORE_URL, so approval is one edit and nothing
+//      else in this file or on the page needs touching.
 // ============================================================================
 
 // Set this the day the Chrome Web Store approves the listing. Until then the
 // page says it is in review and offers the build-it-yourself route instead.
-export const CHROME_STORE_URL: string | null = null;
+// Approved and published 9 Sep 2026; item id fklcgaapfagcichjeonihhbkcfggim.
+export const CHROME_STORE_URL: string | null =
+  'https://chromewebstore.google.com/detail/%D8%AA%D9%82%D9%88%DB%8C%D9%85/idfklcgaapfagcichjeonihhbkcfggim';
 
 export type DownloadStatus = 'ready' | 'review' | 'planned';
 
@@ -48,14 +51,27 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
   {
     id: 'chrome',
     title: 'افزونهٔ کروم — تب جدید',
-    status: 'review',
+    // Everything below hangs off CHROME_STORE_URL: while it is null the card
+    // says the listing is in review and points at the source, and the moment
+    // it holds a URL the same card becomes a store button.
+    status: CHROME_STORE_URL ? 'ready' : 'review',
     summary:
       'هر تب جدیدی که باز می‌کنی تقویم باشد: تاریخ امروز و ساعت تهران، ماه جاری و مناسبت‌های روز. هیچ مجوزی نمی‌خواهد و هیچ درخواستی به اینترنت نمی‌فرستد.',
-    steps: [
-      'برای انتشار در فروشگاه کروم فرستاده شده و منتظر بازبینی گوگل است.',
-      'تا آن موقع می‌شود از روی کد پروژه ساختش: مخزن را بگیر، «npm run build:extension» را بزن، و در chrome://extensions با «Load unpacked» پوشهٔ extension/dist را انتخاب کن.',
-    ],
-    action: { label: 'کد پروژه در گیت‌هاب', href: 'https://github.com/farjadp/taghvim', external: true },
+    steps: CHROME_STORE_URL
+      ? [
+          'در فروشگاه کروم منتشر شده است: صفحه‌اش را باز کن و «Add to Chrome» را بزن.',
+          'بعد از نصب، هر تب جدید تقویم را نشان می‌دهد. برای برگشتن به تب جدید کروم، افزونه را از chrome://extensions خاموش کن.',
+        ]
+      : [
+          'برای انتشار در فروشگاه کروم فرستاده شده و منتظر بازبینی گوگل است.',
+          'تا آن موقع می‌شود از روی کد پروژه ساختش: مخزن را بگیر، «npm run build:extension» را بزن، و در chrome://extensions با «Load unpacked» پوشهٔ extension/dist را انتخاب کن.',
+        ],
+    note: CHROME_STORE_URL
+      ? 'تنظیم‌های افزونه از سایت جدا است: صفحهٔ افزونه دامنهٔ خودش را دارد، پس تم و قلمی که در سایت انتخاب کرده‌ای آنجا اعمال نمی‌شود.'
+      : undefined,
+    action: CHROME_STORE_URL
+      ? { label: 'نصب از فروشگاه کروم', href: CHROME_STORE_URL, external: true }
+      : { label: 'کد پروژه در گیت‌هاب', href: 'https://github.com/farjadp/taghvim', external: true },
   },
   {
     id: 'calendar-feed',
