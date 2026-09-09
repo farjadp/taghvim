@@ -17,12 +17,11 @@ import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
 import { EventsPanel } from "./events-panel";
-import { ToolsPanel, type ToolTab } from "./tools-panel";
+import { DEFAULT_TOOL, ToolsPanel, type ToolTab } from "./tools-panel";
 import { PrayerPanel } from "./prayer-panel";
 import { MemorialPanel } from "./memorial-panel";
 import { SettingsMenu } from "./settings-menu";
 import { SiteFooter } from "./site-footer";
-import { BridgesPanel } from "./bridges-panel";
 
 function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
@@ -32,7 +31,7 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
   const [now, setNow] = useState(new Date(initialNow));
   const [selected, setSelected] = useState(new Date(initialNow));
   const [view, setView] = useState(() => toCalendar(new Date(initialNow)));
-  const [tool, setTool] = useState<ToolTab>("convert");
+  const [tool, setTool] = useState<ToolTab>(DEFAULT_TOOL);
   // Defaults match server rendering; read/migrate browser preferences only after hydration.
   const [preferences, setPreferences] = useState<ViewPreferences>(DEFAULT_VIEW);
   const followingToday = useRef(true);
@@ -114,12 +113,7 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
-        {/* A full-width row under the calendar. `order-first` matches the grid above it, so on
-            phones it stays directly under the calendar and events instead of dropping below the
-            hero — equal order values fall back to DOM order. Capped at three cards; the page
-            behind the link has the rest. */}
-        <BridgesPanel now={now} groups={preferences} moreHref="/bridges" className="order-first mt-7" />
-        <ToolsPanel now={now} tab={tool} onTabChange={setTool} />
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} />
         {/* Memorial visibility is independent; religious occasions also control prayer times. */}
         {preferences.memorial && <MemorialPanel person={person} />}
         {preferences.religious && <PrayerPanel now={now} />}

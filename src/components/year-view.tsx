@@ -22,7 +22,7 @@ type Mark = "leave" | "bridge" | "holiday" | "friday" | null;
 // One label per state, reused by the legend and by each marked cell's title.
 const MARK_LABELS: Record<Exclude<Mark, null>, string> = {
   leave: "روز مرخصی",
-  bridge: "داخل یک پل",
+  bridge: "داخل یک بازه",
   holiday: "تعطیل رسمی",
   friday: "جمعه",
 };

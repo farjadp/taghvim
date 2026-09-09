@@ -1,18 +1,27 @@
 // ============================================================================
 // Source: src/components/tools-panel.tsx
-// Version: 0.6.0 — 2026-09-07
-// Why: Date tools: conversion between calendars, date distance, age.
+// Version: 0.9.16 — 2026-09-09
+// Why: Date tools: continuous holidays, countdown, conversion, distance, age.
+//      «تعطیلات پیوسته» is the first tab and the default one.
 // Env / Deps: Input parsing accepts Persian, Arabic-Indic and Latin digits.
+//      The first two tabs read the visitor's event groups, so the panel takes
+//      them; the other three do not care.
 // ============================================================================
 
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, ArrowLeftRight, Cake, Hourglass } from "lucide-react";
+import { ArrowLeft, ArrowLeftRight, CalendarRange, Cake, Hourglass, Timer } from "lucide-react";
 import { type CalendarKind, dateNumbers, daysBetween, fa, formatDate, fromCalendar, MONTHS, toCalendar } from "@/lib/calendar";
 import { elapsedAge, parseNumericInput } from "@/lib/date-tools";
+import { type EventGroups } from "@/lib/events";
+import { BridgesTool } from "./bridges-tool";
+import { CountdownTool } from "./countdown-tool";
 
-export type ToolTab = "convert" | "distance" | "age";
+export type ToolTab = "bridges" | "countdown" | "convert" | "distance" | "age";
+// What the tools box opens on. «تعطیلات پیوسته» answers a question the other tools do not:
+// not «what is this date» but «when can I actually take time off».
+export const DEFAULT_TOOL: ToolTab = "bridges";
 type DateInput = { year: string; month: string; day: string };
 const KINDS: { value: CalendarKind; label: string }[] = [{ value: "persian", label: "خورشیدی" }, { value: "gregorian", label: "میلادی" }, { value: "islamic", label: "قمری محاسباتی" }];
 const GREGORIAN_MONTHS = ["ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن", "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"];
@@ -107,8 +116,8 @@ function Age({ now }: { now: Date }) {
 }
 
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
-export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void }) {
-  const tabs = [{ key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
+export function ToolsPanel({ now, tab, onTabChange, groups, bridgesHref = "/bridges" }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; bridgesHref?: string }) {
+  const tabs = [{ key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange }, { key: "countdown" as const, label: "روزشمار", icon: Timer }, { key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight }, { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass }, { key: "age" as const, label: "محاسبهٔ سن", icon: Cake }];
   return <section id="tools" aria-label="ابزارهای تاریخ" className="mt-7 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line px-5 py-4 sm:px-7"><h2 className="text-lg font-semibold">ابزارهای تاریخ</h2><div role="tablist" aria-label="انتخاب ابزار" className="flex max-w-full gap-1 overflow-x-auto rounded-xl bg-paper p-1">{tabs.map(({ key, label, icon: Icon }) => <button id={`tab-${key}`} key={key} role="tab" tabIndex={tab === key ? 0 : -1} aria-selected={tab === key} aria-controls="tool-content" onClick={() => onTabChange(key)} onKeyDown={(event) => {
       const index = tabs.findIndex((item) => item.key === key);
@@ -118,6 +127,6 @@ export function ToolsPanel({ now, tab, onTabChange }: { now: Date; tab: ToolTab;
       onTabChange(tabs[next].key);
       document.getElementById(`tab-${tabs[next].key}`)?.focus();
     }} className={`flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg px-2.5 py-2.5 text-[0.625rem] transition-colors sm:px-4 sm:text-xs ${tab === key ? "bg-surface font-medium text-forest shadow-xs" : "text-muted hover:text-forest"}`}><Icon size={14} />{label}</button>)}</div></div>
-    <div id="tool-content" role="tabpanel" aria-labelledby={`tab-${tab}`} className="p-5 sm:p-7">{tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
+    <div id="tool-content" role="tabpanel" aria-labelledby={`tab-${tab}`} className="p-5 sm:p-7">{tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
   </section>;
 }

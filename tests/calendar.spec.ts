@@ -208,10 +208,12 @@ test("calendar days support RTL arrow navigation", async ({ page }) => {
 });
 
 test("tool tabs support RTL keyboard navigation", async ({ page }) => {
-  await page.getByRole("tab", { name: "تبدیل تاریخ‌ها" }).focus();
+  await page.getByRole("tab", { name: "تعطیلات پیوسته" }).focus();
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("tab", { name: "فاصلهٔ دو تاریخ" })).toBeFocused();
-  await expect(page.getByRole("tab", { name: "فاصلهٔ دو تاریخ" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tab", { name: "روزشمار" })).toBeFocused();
+  await expect(page.getByRole("tab", { name: "روزشمار" })).toHaveAttribute("aria-selected", "true");
+  await page.keyboard.press("ArrowRight");
+  await expect(page.getByRole("tab", { name: "تعطیلات پیوسته" })).toHaveAttribute("aria-selected", "true");
 });
 
 test("today rolls over at Tehran midnight without waiting a full minute", async ({ page }) => {
@@ -713,46 +715,47 @@ test("the download page states each method's real status", async ({ page }) => {
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
 
-test("the bridges row sits under the calendar, shows at most three, and links to the full page", async ({ page }) => {
-  const row = page.getByRole("region", { name: "پل‌های تعطیلات" });
-  await expect(row).toBeVisible();
-  // Under the calendar on every viewport: the row starts below the month grid's end.
-  const grid = await page.locator("#calendar").boundingBox();
-  const box = await row.boundingBox();
-  expect(box!.y).toBeGreaterThan(grid!.y + grid!.height - 1);
+test("the tools box opens on continuous holidays, caps them at three, and links to the full page", async ({ page }) => {
+  const tools = page.locator("#tools");
+  // The default tab, without anyone clicking anything.
+  await expect(page.getByRole("tab", { name: "تعطیلات پیوسته" })).toHaveAttribute("aria-selected", "true");
   // 6 Sep 2026 with the default groups: the next twelve months hold only the Nowruz runs.
-  const cards = row.getByTestId("bridge");
+  const cards = tools.getByTestId("bridge");
   expect(await cards.count()).toBeGreaterThan(0);
   expect(await cards.count()).toBeLessThanOrEqual(3);
   await expect(cards.first()).toContainText("نوروز");
   // Every leave day is marked as such, and only leave days are.
   for (const card of await cards.all()) {
-    const leave = (await card.locator("li[aria-label*='مرخصی']").count());
+    const leave = await card.locator("li[aria-label*='مرخصی']").count();
     const priced = /با (\S+) روز مرخصی/.exec((await card.textContent()) ?? "");
     expect(leave).toBe(priced ? ["۱", "۲"].indexOf(priced[1]) + 1 : 0);
   }
   // Switching on the religious group adds runs, but never more than three are shown.
-  const before = await row.getByTestId("bridges-count").textContent();
+  const before = await tools.getByTestId("bridges-count").textContent();
   await page.getByRole("switch", { name: "مذهبی" }).click();
-  await expect(row.getByTestId("bridges-count")).not.toHaveText(before!);
+  await expect(tools.getByTestId("bridges-count")).not.toHaveText(before!);
   expect(await cards.count()).toBeLessThanOrEqual(3);
-  await expect(row.getByText("ممکن است یک روز جابه‌جا شود").first()).toBeVisible();
+  await expect(tools.getByText("ممکن است یک روز جابه‌جا شود").first()).toBeVisible();
 
-  // The link carries the hidden count and lands on the full page, which reads the same switches.
-  const more = row.getByRole("link", { name: /پل دیگر|کل سال/ });
-  await more.click();
+  // The countdown tab counts in whole days and never claims an instant.
+  await page.getByRole("tab", { name: "روزشمار" }).click();
+  await expect(tools.getByText("نوروز").first()).toBeVisible();
+  await expect(tools.getByText(/\d|[۰-۹]/).first()).toBeVisible();
+  await expect(tools.locator("summary", { hasText: "دربارهٔ این شمارش" })).toBeVisible();
+  await expect(cards).toHaveCount(0);
+
+  // Back to the first tab, then through the link to the full page, which reads the same switches.
+  await page.getByRole("tab", { name: "تعطیلات پیوسته" }).click();
+  await tools.getByRole("link", { name: /بازهٔ دیگر|کل سال/ }).click();
   await expect(page).toHaveURL(/\/bridges$/);
-  await expect(page.getByRole("heading", { level: 1, name: "پل‌های تعطیلات" })).toBeVisible();
+  await expect(page.getByRole("heading", { level: 1, name: "تعطیلات پیوسته" })).toBeVisible();
   await expect(page.getByTestId("bridges-summary")).not.toContainText("مذهبی و دولتی خاموش");
   const full = page.getByTestId("bridge");
   expect(await full.count()).toBeGreaterThan(3);
-  // The year view above the list: twelve months, and exactly the list's leave days marked.
+
+  // The year view above the list, drawn from the same runs the cards describe.
   await expect(page.getByRole("group", { name: /فروردین ۱۴۰۵/ })).toBeVisible();
   expect(await page.getByRole("group", { name: /۱۴۰۵$/ }).count()).toBe(12);
-  // The list also holds the runs that straddle the year's edges (a Nowruz run starts on
-  // 28 Esfand of the year before), and one leave day can sit in two cards, one per price.
-  // The year view marks each day of this year once — so every marked day must be in the
-  // list, and the list may hold more.
   const listed = new Set(await page.locator("[data-testid=bridge] li[aria-label*='مرخصی']").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("aria-label")!.replace(/^\S+ /, "").replace(" — مرخصی", ""))));
   const marked = await page.locator("[title$='— روز مرخصی']").evaluateAll((nodes) => nodes.map((node) => node.getAttribute("title")!.replace(" — روز مرخصی", "")));
   expect(marked.length).toBeGreaterThan(0);

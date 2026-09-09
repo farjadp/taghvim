@@ -43,7 +43,7 @@ export type BridgeOptions = {
 
 // Shown verbatim beside any bridge list. Preserve it: the run is computed from a curated
 // dataset, and a lunar holiday inside it can move by a day.
-export const BRIDGES_NOTICE = 'پل‌ها از همان فهرست گزیدهٔ مناسبت‌ها محاسبه می‌شوند و تقویم رسمی نیستند. فقط جمعه تعطیل هفتگی حساب شده است؛ پنجشنبه نه. هر پلی که روی یک تعطیلی قمری محاسباتی بنشیند ممکن است یک روز جابه‌جا شود.';
+export const BRIDGES_NOTICE = 'این بازه‌ها از همان فهرست گزیدهٔ مناسبت‌ها محاسبه می‌شوند و تقویم رسمی نیستند. فقط جمعه تعطیل هفتگی حساب شده است؛ پنجشنبه نه. بازه‌ای که روی یک تعطیلی قمری محاسباتی بنشیند ممکن است یک روز جابه‌جا شود.';
 
 type Day = { date: Date; off: boolean; titles: string[]; uncertain: boolean };
 

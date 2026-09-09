@@ -1,7 +1,7 @@
 // ============================================================================
 // Source: src/components/bridges-page.tsx
 // Version: 0.2.0 — 2026-09-09
-// Why: The full list of holiday bridges for one Persian year, with a year
+// Why: Every continuous holiday of one Persian year, with a year
 //      switch and the year drawn above it. The home page shows three; this is
 //      where the rest live.
 // Env / Deps: lib/bridges; the visitor's group switches from lib/view, read
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react";
 import { fa, fromCalendar, monthLength, toCalendar } from "@/lib/calendar";
 import { findBridges } from "@/lib/bridges";
 import { DEFAULT_VIEW, readView, type ViewPreferences } from "@/lib/view";
-import { BridgeCard, BridgesEmpty, BridgesNotice } from "./bridges-panel";
+import { BridgeCard, BridgesEmpty, BridgesNotice } from "./bridges-tool";
 import { YearView } from "./year-view";
 
 // The label follows the app's own wording for the switches under the calendar.
@@ -54,19 +54,19 @@ export function BridgesPage({ initialNow }: { initialNow: string }) {
         </div>
       </div>
       <p data-testid="bridges-summary" className="px-6 pt-4 text-xs leading-6 text-muted">
-        {fa(bridges.length)} پل در این سال، {fa(free)} تا بدون مرخصی.
+        {fa(bridges.length)} بازهٔ تعطیلات پیوسته در این سال، {fa(free)} تا بدون مرخصی.
         {off.length > 0 && ` دسته‌های ${off.join(" و ")} خاموش‌اند؛ تعطیلات آن‌ها حساب نشده. کلیدها زیر تقویم صفحهٔ اصلی است.`}
       </p>
       {/* The year first, the list under it: the picture says where the runs fall, the cards
           say what each one costs. Both come from the one `bridges` array above. */}
       <YearView year={year} groups={preferences} bridges={bridges} today={today} />
-      <h3 className="mt-8 border-t border-line px-6 pt-5 text-sm font-semibold">پل‌ها، یکی‌یکی</h3>
+      <h3 className="mt-8 border-t border-line px-6 pt-5 text-sm font-semibold">بازه‌ها، یکی‌یکی</h3>
       {bridges.length === 0 ? <BridgesEmpty /> : (
         <div className="grid gap-4 px-6 py-5 sm:grid-cols-2 lg:grid-cols-3">
           {bridges.map((bridge, index) => <BridgeCard key={index} bridge={bridge} />)}
         </div>
       )}
-      <BridgesNotice />
+      <BridgesNotice className="mx-6 mb-5" />
     </section>
   );
 }
