@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { addDays, dayKey, fromCalendar, weekdayIndex } from './calendar';
+import { addDays, dayKey, fromCalendar, toCalendar, weekdayIndex } from './calendar';
 import { ALL_GROUPS, DEFAULT_GROUPS, type EventGroups } from './events';
 import { BRIDGES_NOTICE, findBridges, nextBridge } from './bridges';
 
@@ -35,7 +35,7 @@ describe('holiday bridges', () => {
   it('never reports a run shorter than the minimum or costlier than the budget', () => {
     const { from, to } = year(1405);
     for (const bridge of findBridges(from, to, ALL_GROUPS)) {
-      expect(bridge.length).toBeGreaterThanOrEqual(4);
+      expect(bridge.length).toBeGreaterThanOrEqual(3);
       expect(bridge.leave.length).toBeLessThanOrEqual(2);
     }
   });
@@ -43,11 +43,37 @@ describe('holiday bridges', () => {
   it('never reports a swap: a run must hand over more days than it costs', () => {
     const { from, to } = year(1405);
     for (const bridge of findBridges(from, to, ALL_GROUPS)) {
-      expect(bridge.length - bridge.leave.length).toBeGreaterThanOrEqual(3);
+      expect(bridge.length - bridge.leave.length).toBeGreaterThanOrEqual(2);
+      expect(bridge.length - bridge.leave.length).toBeGreaterThan(bridge.leave.length - 1);
     }
-    // Lowering the bar admits the marginal ones rather than hiding them behind a hard rule.
-    expect(findBridges(from, to, ALL_GROUPS, { minFree: 2 }).length)
-      .toBeGreaterThan(findBridges(from, to, ALL_GROUPS).length);
+    // Raising the bar hides the marginal ones rather than being the only rule there is.
+    expect(findBridges(from, to, ALL_GROUPS, { minFree: 3 }).length)
+      .toBeLessThan(findBridges(from, to, ALL_GROUPS).length);
+  });
+
+  // The bug this floor was lowered for: Friday is the only weekly day off, so a single-day
+  // holiday beside one can hand over two free days at most. While the floor was three, no
+  // state holiday in 1405 could ever produce a run — the switch shaded the grid and changed
+  // this list by nothing, which reads as a broken switch rather than an empty answer.
+  it('lets a single state holiday next to a Friday produce a run', () => {
+    const { from, to } = year(1405);
+    const withState = findBridges(from, to, ALL_GROUPS).filter((bridge) =>
+      bridge.occasions.some((occasion) => occasion.category === 'state'));
+    expect(withState.length).toBeGreaterThan(0);
+    // 22 Bahman 1405 is a Thursday; the run that reaches it must exist and must be paid for.
+    const bahman = withState.find((bridge) => {
+      const start = toCalendar(bridge.start);
+      return start.month === 11;
+    });
+    expect(bahman, '22 Bahman produced no run').toBeDefined();
+    expect(bahman!.leave.length).toBeGreaterThan(0);
+  });
+
+  it('reports nothing from the state group when the switch is off', () => {
+    const { from, to } = year(1405);
+    for (const bridge of findBridges(from, to, { ...ALL_GROUPS, state: false })) {
+      expect(bridge.occasions.every((occasion) => occasion.category !== 'state')).toBe(true);
+    }
   });
 
   it('honours maxLeave and minLength', () => {

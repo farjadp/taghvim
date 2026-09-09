@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/bridges.ts
-// Version: 0.1.0 — 2026-09-09
+// Version: 0.2.0 — 2026-09-09
 // Why: Holiday bridges — the runs of days off you can reach by taking one or two
 //      work days as leave, plus the long weekends that need no leave at all.
 // Env / Deps: Reads days off through eventsForDate(date, groups), so a group the
@@ -35,10 +35,9 @@ export type Bridge = {
 export type BridgeOptions = {
   // Most leave days a bridge may cost. Above two it stops being a bridge and becomes a holiday.
   maxLeave?: number;
-  // Shortest run worth reporting. Three is a normal weekend plus one day; four is news.
+  // Shortest run worth reporting.
   minLength?: number;
   // Fewest days the run must hand over for free — its length minus the leave it costs.
-  // Two days off bought with two days of leave is not a bridge, it is a swap.
   minFree?: number;
 };
 
@@ -117,8 +116,18 @@ function dominated(candidate: Bridge, others: Bridge[]): boolean {
  */
 export function findBridges(from: Date, to: Date, groups: EventGroups, options: BridgeOptions = {}): Bridge[] {
   const maxLeave = options.maxLeave ?? 2;
-  const minLength = options.minLength ?? 4;
-  const minFree = options.minFree ?? 3;
+  // Three and two, not four and three. The old floor asked a run to hand over three days
+  // nobody paid for, and Friday is the only weekly day off — so a single-day holiday next
+  // to a Friday tops out at two free days and could never qualify, whatever the visitor
+  // switched on. Every state holiday in 1405 is exactly that shape (22 Bahman and 12
+  // Farvardin fall on a Thursday, 14 Khordad on a Friday, 15 Khordad on a Saturday), so
+  // the «دولتی» switch changed the list by nothing at all while the grid shaded those days
+  // red — which is how Farjad found this on 9 Sep.
+  // The old rule also framed it wrongly: four days off bought with two days of leave is
+  // not "two days off", it is a four-day break for two days of leave, which is the deal a
+  // person opens this tool to find.
+  const minLength = options.minLength ?? 3;
+  const minFree = options.minFree ?? 2;
   if (from.getTime() > to.getTime()) throw new RangeError('from must not be after to');
   if (maxLeave < 0 || minLength < 1) throw new RangeError('maxLeave and minLength must be positive');
 

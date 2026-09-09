@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.10.0 — 2026-09-09
+// Version: 0.9.27 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -38,8 +38,19 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.22',
+    at: '2026-09-09T15:17:16-04:00',
+    status: 'ready',
+    title: 'تعطیلات پیوسته، با تعطیلی‌های تک‌روزه',
+    changes: [
+      { kind: 'fixed', text: 'تعطیلی‌های تک‌روزه مثل ۲۲ بهمن در «تعطیلات پیوسته» هیچ‌وقت دیده نمی‌شدند، حتی وقتی کلیدشان روی تقویم روشن بود.' },
+      { kind: 'changed', text: 'بازه حالا از سه روز شروع می‌شود، نه چهار. فهرست یک سال از ۱۰ بازه به ۳۸ رسید.' },
+      { kind: 'fixed', text: 'تاریخ چهار انتشار امروز یک روز جلوتر نوشته شده بود.' },
+    ],
+  },
+  {
     version: '0.9.21',
-    at: '2026-09-09T20:10:00-04:00',
+    at: '2026-09-09T14:13:04-04:00',
     status: 'live',
     title: 'تصویر امروز',
     changes: [
@@ -51,7 +62,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.20',
-    at: '2026-09-09T19:15:00-04:00',
+    at: '2026-09-09T13:58:18-04:00',
     status: 'live',
     title: 'تاریخ‌های من، در ابزارها',
     changes: [
@@ -61,7 +72,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.19',
-    at: '2026-09-09T18:30:00-04:00',
+    at: '2026-09-09T13:45:02-04:00',
     status: 'live',
     title: 'حروف نام‌های یادبود',
     changes: [
@@ -70,7 +81,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.18',
-    at: '2026-09-09T17:40:00-04:00',
+    at: '2026-09-09T13:11:35-04:00',
     status: 'live',
     title: 'نهم اسفند',
     changes: [
@@ -79,7 +90,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.17',
-    at: '2026-09-09T16:20:00-04:00',
+    at: '2026-09-09T12:53:42-04:00',
     status: 'live',
     title: 'تاریخ‌های من',
     changes: [
