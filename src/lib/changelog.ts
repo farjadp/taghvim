@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.26 — 2026-09-09
+// Version: 0.9.27 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.16',
+    at: '2026-09-09T11:45:00-04:00',
+    status: 'ready',
+    title: 'پل‌های تعطیلات',
+    changes: [
+      { kind: 'added', text: 'ردیف «پل‌های تعطیلات» زیر تقویم: سه بازهٔ بعدی که با حداکثر دو روز مرخصی به دست‌کم چهار روز تعطیلی پیوسته می‌رسند، به‌علاوهٔ بازه‌های بدون مرخصی. هر روزِ بازه یک خانه است و روزهای مرخصی خط‌چین‌اند.' },
+      { kind: 'added', text: 'صفحهٔ «پل‌های تعطیلات» با همهٔ پل‌های امسال و سال بعد. ردیف زیر تقویم به آن پیوند می‌دهد.' },
+      { kind: 'changed', text: 'پل‌ها فقط از تعطیلات دسته‌های روشن ساخته می‌شوند، پس با پیش‌فرض بیشترشان نوروزند. پلی که روی یک تعطیلی قمری محاسباتی بنشیند، کنار خودش می‌گوید ممکن است یک روز جابه‌جا شود.' },
+    ],
+  },
   {
     version: '0.9.15',
     at: '2026-09-09T10:35:00-04:00',

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.9.2 — 2026-09-08
+// Version: 0.9.16 — 2026-09-09
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and independent event/panel visibility.
 // Env / Deps: lib/view guards taghvim-view persistence and legacy migration.
@@ -22,6 +22,7 @@ import { PrayerPanel } from "./prayer-panel";
 import { MemorialPanel } from "./memorial-panel";
 import { SettingsMenu } from "./settings-menu";
 import { SiteFooter } from "./site-footer";
+import { BridgesPanel } from "./bridges-panel";
 
 function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
@@ -113,6 +114,11 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
+        {/* A full-width row under the calendar. `order-first` matches the grid above it, so on
+            phones it stays directly under the calendar and events instead of dropping below the
+            hero — equal order values fall back to DOM order. Capped at three cards; the page
+            behind the link has the rest. */}
+        <BridgesPanel now={now} groups={preferences} moreHref="/bridges" className="order-first mt-7" />
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} />
         {/* Memorial visibility is independent; religious occasions also control prayer times. */}
         {preferences.memorial && <MemorialPanel person={person} />}

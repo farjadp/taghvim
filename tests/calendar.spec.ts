@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.16 — 2026-09-09
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -709,6 +709,46 @@ test("the download page states each method's real status", async ({ page }) => {
   await expect(page.locator("#home-screen")).toContainText("آفلاین");
   await expect(page.locator("#calendar-feed")).toContainText("قمری");
 
+  const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(audit.violations.map(({ id }) => id)).toEqual([]);
+});
+
+test("the bridges row sits under the calendar, shows at most three, and links to the full page", async ({ page }) => {
+  const row = page.getByRole("region", { name: "پل‌های تعطیلات" });
+  await expect(row).toBeVisible();
+  // Under the calendar on every viewport: the row starts below the month grid's end.
+  const grid = await page.locator("#calendar").boundingBox();
+  const box = await row.boundingBox();
+  expect(box!.y).toBeGreaterThan(grid!.y + grid!.height - 1);
+  // 6 Sep 2026 with the default groups: the next twelve months hold only the Nowruz runs.
+  const cards = row.getByTestId("bridge");
+  expect(await cards.count()).toBeGreaterThan(0);
+  expect(await cards.count()).toBeLessThanOrEqual(3);
+  await expect(cards.first()).toContainText("نوروز");
+  // Every leave day is marked as such, and only leave days are.
+  for (const card of await cards.all()) {
+    const leave = (await card.locator("li[aria-label*='مرخصی']").count());
+    const priced = /با (\S+) روز مرخصی/.exec((await card.textContent()) ?? "");
+    expect(leave).toBe(priced ? ["۱", "۲"].indexOf(priced[1]) + 1 : 0);
+  }
+  // Switching on the religious group adds runs, but never more than three are shown.
+  const before = await row.getByTestId("bridges-count").textContent();
+  await page.getByRole("switch", { name: "مذهبی" }).click();
+  await expect(row.getByTestId("bridges-count")).not.toHaveText(before!);
+  expect(await cards.count()).toBeLessThanOrEqual(3);
+  await expect(row.getByText("ممکن است یک روز جابه‌جا شود").first()).toBeVisible();
+
+  // The link carries the hidden count and lands on the full page, which reads the same switches.
+  const more = row.getByRole("link", { name: /پل دیگر|کل سال/ });
+  await more.click();
+  await expect(page).toHaveURL(/\/bridges$/);
+  await expect(page.getByRole("heading", { level: 1, name: "پل‌های تعطیلات" })).toBeVisible();
+  await expect(page.getByTestId("bridges-summary")).not.toContainText("مذهبی و دولتی خاموش");
+  const full = page.getByTestId("bridge");
+  expect(await full.count()).toBeGreaterThan(3);
+  await page.getByRole("button", { name: "۱۴۰۶" }).click();
+  await expect(page.getByRole("heading", { name: "سال ۱۴۰۶" })).toBeVisible();
+  expect(await full.count()).toBeGreaterThan(0);
   const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
