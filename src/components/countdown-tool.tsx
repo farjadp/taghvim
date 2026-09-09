@@ -10,7 +10,7 @@
 
 "use client";
 
-import { ArrowUpLeft, Info, TriangleAlert } from "lucide-react";
+import { Info, TriangleAlert } from "lucide-react";
 import { dayKey, fa, formatDate } from "@/lib/calendar";
 import { type EventGroups } from "@/lib/events";
 import { COUNTDOWN_NOTICE, nextAnchors, nextHolidays, type Occasion } from "@/lib/countdown";
@@ -54,12 +54,6 @@ export function CountdownTool({ now, groups }: { now: Date; groups: EventGroups 
           </li>
         ))}
       </ul>
-      {/* The visitor's own dates answer the same question this tab does, so this is where
-          they are reachable from; the tab strip stays at five. */}
-      <a href="/dates" className="mt-5 inline-flex items-center gap-1.5 text-sm font-medium text-forest hover:underline">
-        تولدها و سالگردهای خودت را هم اضافه کن
-        <ArrowUpLeft size={13} className="opacity-60" />
-      </a>
       <details className="mt-5 rounded-lg bg-paper p-3 text-[0.625rem] leading-6 text-muted">
         <summary className="flex cursor-pointer items-center gap-1.5"><Info size={13} />دربارهٔ این شمارش</summary>
         <p className="pt-2">{COUNTDOWN_NOTICE}</p>

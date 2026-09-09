@@ -15,7 +15,6 @@ export const ROUTES = [
   { path: '/', changeFrequency: 'daily', priority: 1 },
   { path: '/download', changeFrequency: 'monthly', priority: 0.8 },
   { path: '/bridges', changeFrequency: 'weekly', priority: 0.8 },
-  { path: '/dates', changeFrequency: 'yearly', priority: 0.5 },
   { path: '/help', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },

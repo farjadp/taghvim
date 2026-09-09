@@ -13,12 +13,12 @@ import Image from "next/image";
 import { ArrowLeftRight, CalendarDays, Hourglass, MapPin } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
-import { datesOn, readDates, type Anniversary } from "@/lib/dates";
+import { datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
 import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
 import { EventsPanel } from "./events-panel";
-import { DEFAULT_TOOL, ToolsPanel, type ToolTab } from "./tools-panel";
+import { DEFAULT_TOOL, TOOL_TABS, ToolsPanel, type ToolTab } from "./tools-panel";
 import { PrayerPanel } from "./prayer-panel";
 import { MemorialPanel } from "./memorial-panel";
 import { SettingsMenu } from "./settings-menu";
@@ -37,8 +37,30 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
   const [preferences, setPreferences] = useState<ViewPreferences>(DEFAULT_VIEW);
   // The visitor's own dates, read once after hydration like the preferences beside them.
   const [dates, setDates] = useState<Anniversary[]>([]);
+  const [datesReady, setDatesReady] = useState(false);
   const followingToday = useRef(true);
-  useEffect(() => { setPreferences(readView()); setDates(readDates()); }, []);
+  useEffect(() => { setPreferences(readView()); setDates(readDates()); setDatesReady(true); }, []);
+  // `/#dates` and friends open that tool directly. Without this the only way to link at a
+  // tool is to link at the page and describe where to click, which is how the personal
+  // dates ended up unreachable when they lived behind the countdown tab.
+  useEffect(() => {
+    function openFromHash() {
+      const key = window.location.hash.replace("#", "") as ToolTab;
+      if (!TOOL_TABS.includes(key)) return;
+      setTool(key);
+      document.getElementById("tools")?.scrollIntoView({ block: "start" });
+    }
+    openFromHash();
+    // Also on hashchange: arriving from another page is a soft navigation, so the mount
+    // effect does not run again and `/#dates` would silently land on the default tab.
+    window.addEventListener("hashchange", openFromHash);
+    return () => window.removeEventListener("hashchange", openFromHash);
+  }, []);
+  // One owner for the list: the tool edits it and the grid marks it, in the same render.
+  function commitDates(next: Anniversary[]) {
+    setDates(next);
+    saveDates(next);
+  }
   function toggleView(key: keyof ViewPreferences) {
     const next = { ...preferences, [key]: !preferences[key] };
     setPreferences(next);
@@ -116,7 +138,7 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date).length > 0 : undefined} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
-        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} />
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} dates={dates} datesReady={datesReady} onDatesChange={commitDates} />
         {/* Memorial visibility is independent; religious occasions also control prayer times. */}
         {preferences.memorial && <MemorialPanel person={person} />}
         {preferences.religious && <PrayerPanel now={now} />}

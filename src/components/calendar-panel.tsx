@@ -34,7 +34,7 @@ interface CalendarPanelProps {
   onNavigate: (delta: number) => void;
   onToday: () => void;
   onJump: (year: number, month: number) => void;
-  // Marks a cell carrying one of the visitor's own dates from /dates. Optional and inert
+  // Marks a cell carrying one of the visitor's own dates from the «تاریخ‌های من» tool. Optional and inert
   // when not passed — the extension has no such list, and neither does a visitor with none.
   marked?: (date: Date) => boolean;
 }

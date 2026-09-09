@@ -1,20 +1,20 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.1.0 — 2026-09-09
+// Version: 0.2.0 — 2026-09-09
 // Why: The visitor's own birthdays and anniversaries: add, list by nearness,
 //      remove, and export to their own calendar as an .ics.
-// Env / Deps: lib/dates owns the storage and the arithmetic. State is read
-//      after mount, never during render, so the server and the first paint
-//      agree. Nothing here reaches a network.
+// Env / Deps: lib/dates owns the arithmetic; the caller owns the list and its
+//      persistence, so the calendar grid and this tool always agree.
+//      Nothing here reaches a network.
 // ============================================================================
 
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Download, Info, Trash2 } from "lucide-react";
 import { fa, formatDate, MONTHS } from "@/lib/calendar";
 import {
-  addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, readDates, removeDate, saveDates,
+  addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
   upcomingDates, type Anniversary, type DateKind, type UpcomingDate,
 } from "@/lib/dates";
 
@@ -39,18 +39,22 @@ function yearsLabel(item: UpcomingDate): string | null {
   return `${fa(item.years)}مین سال`;
 }
 
-export function DatesTool({ now }: { now: Date }) {
-  // Server-rendered as empty, then filled from the browser: this list only exists there.
-  const [dates, setDates] = useState<Anniversary[]>([]);
-  const [ready, setReady] = useState(false);
+/**
+ * Controlled on purpose. The calendar grid marks the same days this tool edits, and when the
+ * tool owned the list privately the grid did not hear about an addition until a reload — which
+ * a separate page hid, and a tab beside the calendar does not.
+ */
+export function DatesTool({ now, dates, ready, onChange }: {
+  now: Date;
+  dates: Anniversary[];
+  // False until the browser's list has been read; an empty state before that would tell
+  // someone with ten dates that they have none.
+  ready: boolean;
+  onChange: (next: Anniversary[]) => void;
+}) {
   const [draft, setDraft] = useState(EMPTY);
   const [error, setError] = useState("");
-  useEffect(() => { setDates(readDates()); setReady(true); }, []);
-
-  function commit(next: Anniversary[]) {
-    setDates(next);
-    saveDates(next);
-  }
+  const commit = onChange;
 
   function submit(event: React.FormEvent) {
     event.preventDefault();

@@ -770,45 +770,48 @@ test("the tools box opens on continuous holidays, caps them at three, and links 
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
 
-test("personal dates are stored in the browser, marked on the calendar and exportable", async ({ page }) => {
+test("personal dates live in the tools box, are stored in the browser and mark the calendar", async ({ page }) => {
   // Nothing is written until something is entered: an untouched visitor stores no content.
   expect(await page.evaluate(() => window.localStorage.getItem("taghvim-dates"))).toBeNull();
   await expect(page.getByRole("region", { name: "تقویم ماهانه" }).getByText("تاریخ‌های من")).toHaveCount(0);
 
-  await page.getByRole("tab", { name: "روزشمار" }).click();
-  await page.locator("#tools").getByRole("link", { name: /تولدها و سالگردهای خودت/ }).click();
-  await expect(page).toHaveURL(/\/dates$/);
-  await expect(page.getByRole("heading", { level: 1, name: "تاریخ‌های من" })).toBeVisible();
+  // Reachable from the tab strip itself, not from inside another tab.
+  const tools = page.locator("#tools");
+  await page.getByRole("tab", { name: "تاریخ‌های من" }).click();
+  await expect(tools.getByLabel("عنوان")).toBeVisible();
 
-  await page.getByLabel("عنوان").fill("تولد مریم");
-  await page.getByLabel("روز", { exact: true }).fill("21");
-  await page.getByLabel("ماه", { exact: true }).selectOption("6");
-  await page.getByLabel("سال", { exact: true }).fill("1370");
-  await page.getByRole("button", { name: "افزودن", exact: true }).click();
-  await expect(page.getByRole("list").getByText("تولد مریم")).toBeVisible();
-  await expect(page.getByText("۳۵ ساله می‌شود")).toBeVisible();
+  await tools.getByLabel("عنوان").fill("تولد مریم");
+  await tools.getByLabel("روز", { exact: true }).fill("21");
+  await tools.getByLabel("ماه", { exact: true }).selectOption("6");
+  await tools.getByLabel("سال", { exact: true }).fill("1370");
+  await tools.getByRole("button", { name: "افزودن", exact: true }).click();
+  await expect(tools.getByText("تولد مریم")).toBeVisible();
+  await expect(tools.getByText("۳۵ ساله می‌شود")).toBeVisible();
 
   const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"));
   expect(stored).toHaveLength(1);
   expect(stored[0]).toMatchObject({ title: "تولد مریم", month: 6, day: 21, year: 1370, kind: "birthday" });
 
   // A bad date is refused in Persian and writes nothing.
-  await page.getByLabel("عنوان").fill("بد");
-  await page.getByLabel("روز", { exact: true }).fill("40");
-  await page.getByRole("button", { name: "افزودن", exact: true }).click();
-  // Scoped to main: Next's route announcer is also role="alert".
-  await expect(page.locator("main").getByRole("alert")).toContainText("تاریخ معتبر نیست");
+  await tools.getByLabel("عنوان").fill("بد");
+  await tools.getByLabel("روز", { exact: true }).fill("40");
+  await tools.getByRole("button", { name: "افزودن", exact: true }).click();
+  await expect(tools.getByRole("alert")).toContainText("تاریخ معتبر نیست");
   expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"))).toHaveLength(1);
 
-  const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
-  expect(audit.violations.map(({ id }) => id)).toEqual([]);
-
-  // Back on the calendar the day is marked, and the legend explains the mark.
-  await page.goto("/");
+  // The day is marked on the calendar, and the legend explains the mark.
   const calendar = page.getByRole("region", { name: "تقویم ماهانه" });
   await expect(calendar.getByText("تاریخ‌های من")).toBeVisible();
   await expect(calendar.getByRole("button", { name: "۲۱ شهریور ۱۴۰۵" }).locator("span.absolute.left-1\\.5")).toHaveCount(1);
   await expect(calendar.getByRole("button", { name: "۲۲ شهریور ۱۴۰۵" }).locator("span.absolute.left-1\\.5")).toHaveCount(0);
+
+  // A hash opens the tool directly, so a link can point at it.
+  await page.goto("/#dates");
+  await expect(page.getByRole("tab", { name: "تاریخ‌های من" })).toHaveAttribute("aria-selected", "true");
+  await expect(tools.getByText("تولد مریم")).toBeVisible();
+
+  const audit = await new AxeBuilder({ page }).include("#tools").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(audit.violations.map(({ id }) => id)).toEqual([]);
 });
 
 test("the state's own occasions carry the mark and not the country's name", async ({ page }) => {

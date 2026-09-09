@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.30 — 2026-09-09
+// Version: 0.9.31 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -34,6 +34,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.20',
+    at: '2026-09-09T19:15:00-04:00',
+    status: 'ready',
+    title: 'تاریخ‌های من، در ابزارها',
+    changes: [
+      { kind: 'fixed', text: '«تاریخ‌های من» پیدا نمی‌شد. صفحهٔ جدایی داشت که تنها راه رسیدن به آن، یک پیوند ته زبانهٔ «روزشمار» بود — یعنی سه قدم، همه پایین‌تر از دید اول. حالا خودش یکی از زبانه‌های «ابزارهای تاریخ» است و از همان نوار دیده می‌شود.' },
+      { kind: 'added', text: 'هر زبانهٔ ابزارها نشانی خودش را دارد؛ مثلاً «taghv.im/#dates» مستقیم همان زبانه را باز می‌کند.' },
+    ],
+  },
   {
     version: '0.9.19',
     at: '2026-09-09T18:30:00-04:00',

@@ -137,7 +137,7 @@ export default function AboutPage() {
                 lie of category: it is content, and the content is people's names. */}
             <p>
               و یک چیز که تنظیم نیست: اگر در{" "}
-              <Link href="/dates" className="font-medium text-forest underline">تاریخ‌های من</Link>{" "}
+              <Link href="/#dates" className="font-medium text-forest underline">تاریخ‌های من</Link>{" "}
               تولد یا سالگردی وارد کنی، عنوان و تاریخی که نوشته‌ای هم در همان حافظهٔ مرورگر
               ذخیره می‌شود. این تنها چیزی است که ذخیره می‌کنیم و <strong>محتوا</strong> است نه
               تنظیم، و ممکن است اسم آدم‌ها در آن باشد. باز هم به هیچ سروری نمی‌رسد، بین
