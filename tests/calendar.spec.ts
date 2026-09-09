@@ -825,3 +825,20 @@ test("the state's own occasions carry the mark and not the country's name", asyn
   // The glyph, not an emoji: it is an SVG that takes the theme's colour.
   await expect(selected.locator('svg[aria-label="جمهوری اسلامی"]')).toHaveCount(1);
 });
+
+test("the hero draws the day as an image, from what is actually on screen", async ({ page }) => {
+  const hero = page.getByRole("button", { name: "تصویر امروز" });
+  await expect(hero).toBeVisible();
+
+  // Rendered in the browser: no request leaves the page to produce it.
+  const requests: string[] = [];
+  page.on("request", (request) => { if (!request.url().startsWith("http://localhost") && !request.url().startsWith("http://127.0.0.1")) requests.push(request.url()); });
+
+  // Clicking saves a PNG named for the day, with no share sheet in a desktop browser.
+  const download = page.waitForEvent("download", { timeout: 15000 });
+  await hero.click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^taghvim-\d{4}-\d{2}-\d{2}\.png$/);
+  await expect(page.locator("main").getByRole("status").first()).toContainText("تصویر ذخیره شد");
+  expect(requests).toEqual([]);
+});

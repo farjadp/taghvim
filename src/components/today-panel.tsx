@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.21 — 2026-09-09
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
@@ -15,9 +15,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ArrowDownLeft, Copy, Check, Clock3 } from "lucide-react";
+import { ArrowDownLeft, Copy, Check, Clock3, ImageDown } from "lucide-react";
 import { dateNumbers, fa, formatDate, MONTHS, toCalendar } from "@/lib/calendar";
 import { ZODIAC_SHORT_NOTICE, signFor } from "@/lib/zodiac";
+import { type EventGroups } from "@/lib/events";
+import { shareDayCard } from "./day-card";
 import { WorldClocks } from "./world-clocks";
 import { ZodiacIcon } from "./zodiac-icon";
 
@@ -46,9 +48,12 @@ function SunDrawing() {
 }
 
 // The green card: weekday, date, copy button, Tehran clock and the second clocks.
-export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }) {
+export function TodayHero({ now, initialNow, groups }: { now: Date; initialNow: string; groups: EventGroups }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
+  // "" while idle; the status line below already exists and says one thing at a time.
+  const [cardNote, setCardNote] = useState("");
+  const [busy, setBusy] = useState(false);
   const persian = toCalendar(now);
   useEffect(() => {
     if (!copied) return;
@@ -65,6 +70,20 @@ export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }
       setCopyError(true);
     }
   }
+  // The image is drawn from the day the hero is showing, with the same switches the rest of
+  // the page obeys, so what is sent is what was on screen.
+  async function shareCard() {
+    setBusy(true);
+    try {
+      const result = await shareDayCard(now, groups);
+      setCardNote(result === "saved" ? "تصویر ذخیره شد." : result === "shared" ? "تصویر فرستاده شد." : "");
+    } catch {
+      setCardNote("ساختن تصویر ممکن نشد.");
+    } finally {
+      setBusy(false);
+    }
+  }
+
   return (
       <div className="relative isolate rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><SunDrawing /></div>
@@ -73,7 +92,10 @@ export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }
             <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
             <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
           </div>
-          <button onClick={copyDate} aria-label="کپی تاریخ امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10">{copied ? <Check size={17} /> : <Copy size={17} />}</button>
+          <div className="flex items-center gap-2">
+            <button onClick={shareCard} disabled={busy} aria-label="تصویر امروز" title="تصویر امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10 disabled:opacity-50"><ImageDown size={17} /></button>
+            <button onClick={copyDate} aria-label="کپی تاریخ امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10">{copied ? <Check size={17} /> : <Copy size={17} />}</button>
+          </div>
         </div>
         <div className="relative z-10 mt-8 flex flex-wrap items-end justify-between gap-4">
           <div className="flex items-center gap-3"><Clock3 size={19} className="text-[#d9e3cf]" /><span className="text-xs leading-6 text-[#d9e3cf]">ساعت ایران<br />تهران · UTC +۳:۳۰</span></div>
@@ -82,7 +104,7 @@ export function TodayHero({ now, initialNow }: { now: Date; initialNow: string }
         {/* Above the footnote below it: the city picker opens over that line, and
             equal z-index would let the paragraph swallow the clicks. */}
         <div className="relative z-20 mt-5"><WorldClocks now={now} /></div>
-        <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : "بر پایهٔ ساعت دستگاه شما"}</p>
+        <p className="relative z-10 mt-3 min-h-4 text-[0.625rem] text-[#d9e3cf]" role="status">{copyError ? "کپی در دسترس نیست؛ تاریخ را انتخاب و کپی کنید." : copied ? "تاریخ کپی شد." : cardNote || "بر پایهٔ ساعت دستگاه شما"}</p>
       </div>
   );
 }
@@ -104,10 +126,10 @@ export function OtherCalendars({ now }: { now: Date }) {
 }
 
 // What the site renders: both cards side by side on desktop, stacked on phones.
-export function TodayPanel({ now, initialNow, className = "" }: { now: Date; initialNow: string; className?: string }) {
+export function TodayPanel({ now, initialNow, groups, className = "" }: { now: Date; initialNow: string; groups: EventGroups; className?: string }) {
   return (
     <section aria-label="تاریخ و ساعت امروز" className={`grid gap-5 lg:grid-cols-[1.7fr_1fr] ${className}`}>
-      <TodayHero now={now} initialNow={initialNow} />
+      <TodayHero now={now} initialNow={initialNow} groups={groups} />
       <OtherCalendars now={now} />
     </section>
   );

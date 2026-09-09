@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.31 — 2026-09-09
+// Version: 0.9.32 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -34,6 +34,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.21',
+    at: '2026-09-09T20:10:00-04:00',
+    status: 'ready',
+    title: 'تصویر امروز',
+    changes: [
+      { kind: 'added', text: 'دکمهٔ «تصویر امروز» کنار دکمهٔ کپی، بالای صفحه: از روزی که می‌بینی یک تصویر مربع می‌سازد — تاریخ شمسی و میلادی و قمری، و مناسبت‌های همان روز. روی گوشی پنجرهٔ هم‌رسانی باز می‌شود تا مستقیم بفرستی‌اش، و روی کامپیوتر تصویر ذخیره می‌شود.' },
+      { kind: 'added', text: 'تصویر در مرورگر خودت ساخته می‌شود؛ نه جایی فرستاده می‌شود و نه سروری آن را می‌سازد. در تب جدید افزونه هم همین دکمه هست و همان‌جا هم بدون اینترنت کار می‌کند.' },
+      { kind: 'changed', text: 'تصویر همان چیزی را نشان می‌دهد که روی صفحه می‌بینی: دسته‌ای از مناسبت‌ها را که خاموش کرده باشی، روی تصویر هم نیست.' },
+    ],
+  },
   {
     version: '0.9.20',
     at: '2026-09-09T19:15:00-04:00',

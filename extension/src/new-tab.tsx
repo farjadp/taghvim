@@ -104,7 +104,7 @@ export function NewTab() {
           pushing the whole tab past the fold. */}
       <main id="main" className="mx-auto grid min-h-0 w-full max-w-[1400px] flex-1 gap-5 p-5 lg:grid-cols-[1fr_1.5fr]">
         <div className="flex min-h-0 flex-col gap-5">
-          <TodayHero now={now} initialNow={initialNow.current} />
+          <TodayHero now={now} initialNow={initialNow.current} groups={preferences} />
           <div className="min-h-0 flex-1 overflow-y-auto">
             <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
           </div>
