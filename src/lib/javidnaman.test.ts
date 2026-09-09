@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/javidnaman.test.ts
-// Version: 0.3.0 — 2026-09-07
+// Version: 0.4.0 — 2026-09-09
 // Why: Guards the memorial snapshot's shape and the random picker.
 // Env / Deps: Vitest.
 // ============================================================================
@@ -21,6 +21,13 @@ describe('javidnaman snapshot', () => {
       expect(person.age === null || Number.isInteger(person.age)).toBe(true);
     }
     expect(new Set(JAVIDNAMAN.people.map((person) => person.id)).size).toBe(JAVIDNAMAN.people.length);
+  });
+
+  // The source types some names with Arabic ي/ى/ك: wrong final form, and a
+  // Persian search for the same name never matches. sync-javidnaman folds them.
+  it('carries no Arabic letters where Persian ones belong', () => {
+    const arabic = JAVIDNAMAN.people.filter((person) => /[\u064a\u0649\u0643]/.test(person.name + (person.place ?? '')));
+    expect(arabic.map((person) => person.name)).toEqual([]);
   });
 
   it('picks deterministically for a given random source and covers both ends', () => {
