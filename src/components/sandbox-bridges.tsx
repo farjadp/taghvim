@@ -1,189 +1,145 @@
 // ============================================================================
 // Source: src/components/sandbox-bridges.tsx
-// Version: 0.1.0 — 2026-09-09
-// Why: SANDBOX. Three presentations of the holiday-bridges panel, side by side,
-//      each measured, so the layout is chosen off numbers rather than description.
-// Env / Deps: lib/bridges over the real event data. Delete this file and
-//      src/app/sandbox/bridges/page.tsx to drop the idea; nothing else imports them.
+// Version: 0.2.0 — 2026-09-09
+// Why: SANDBOX. Where the bridges panel goes: a full-width row under the
+//      calendar, in a replica of the real page, with every block's position
+//      measured so the mobile question is decided on numbers.
+// Env / Deps: The real panels and the real data; only `main`'s markup is copied
+//      from calendar-app.tsx. Delete this file and src/app/sandbox/bridges/page.tsx
+//      to drop the sandbox; bridges-panel.tsx and lib/bridges.ts stand alone.
 // ============================================================================
 
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CalendarRange, Info, TriangleAlert } from "lucide-react";
-import { dayKey, fa, formatDate, fromCalendar, MONTHS, toCalendar, WEEKDAYS, weekdayIndex } from "@/lib/calendar";
+import { fa, shiftMonth, toCalendar } from "@/lib/calendar";
 import { ALL_GROUPS, DEFAULT_GROUPS, type EventGroups } from "@/lib/events";
-import { BRIDGES_NOTICE, findBridges, type Bridge } from "@/lib/bridges";
+import { DEFAULT_VIEW, type ViewPreferences } from "@/lib/view";
+import { TodayPanel } from "./today-panel";
+import { CalendarPanel } from "./calendar-panel";
+import { EventsPanel } from "./events-panel";
+import { ToolsPanel, type ToolTab } from "./tools-panel";
+import { BridgesPanel } from "./bridges-panel";
 
-// Single letters, because slicing WEEKDAYS gives «سه‌» — a name cut mid zero-width joiner.
-const WEEKDAY_INITIALS = ["ش", "ی", "د", "س", "چ", "پ", "ج"];
-
-// «۸ روز» is the headline; the price is the second line, never the first.
-const lengthLabel = (bridge: Bridge) => `${fa(bridge.length)} روز پیوسته`;
-const priceLabel = (bridge: Bridge) => bridge.leave.length === 0
-  ? "بدون مرخصی"
-  : `با ${fa(bridge.leave.length)} روز مرخصی`;
-const rangeLabel = (bridge: Bridge) => `${formatDate(bridge.start)} تا ${formatDate(bridge.end)}`;
-const leaveLabel = (bridge: Bridge) => bridge.leave
-  .map((day) => `${WEEKDAYS[weekdayIndex(day)]} ${fa(toCalendar(day).day)} ${MONTHS[toCalendar(day).month - 1]}`)
-  .join(" و ");
-
-function Warning() {
-  return (
-    <span className="inline-flex items-center gap-1 text-[0.625rem] text-clay">
-      <TriangleAlert size={11} />ممکن است یک روز جابه‌جا شود
-    </span>
-  );
-}
-
-// الف · one line per bridge. The cheapest layout, and the only one that fits a sidebar.
-function VariantList({ bridges }: { bridges: Bridge[] }) {
-  return (
-    <div className="flex flex-col">
-      {bridges.map((bridge, index) => (
-        <div key={index} className="flex items-baseline gap-3 border-b border-line py-3 last:border-0">
-          <span className="min-w-14 text-xl leading-6 font-medium tabular-nums text-forest">{fa(bridge.length)}</span>
-          <span className="flex-1 text-xs leading-6">
-            <span className="font-medium">{rangeLabel(bridge)}</span>
-            <span className="text-muted"> · {priceLabel(bridge)}</span>
-            {bridge.leave.length > 0 && <span className="block text-[0.625rem] text-muted">مرخصی: {leaveLabel(bridge)}</span>}
-            <span className="block text-[0.625rem] text-muted">{bridge.titles.join(" · ")}</span>
-            {bridge.uncertain && <Warning />}
-          </span>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-// ب · one strip per bridge: every day drawn, so the shape of the run is visible and the
-// leave days sit where they actually fall.
-function VariantStrip({ bridges }: { bridges: Bridge[] }) {
-  return (
-    <div className="flex flex-col gap-4">
-      {bridges.map((bridge, index) => {
-        const days = Array.from({ length: bridge.length }, (_, offset) => {
-          const date = new Date(bridge.start.getTime() + offset * 86_400_000);
-          const isLeave = bridge.leave.some((day) => day.getTime() === date.getTime());
-          return { date, isLeave };
-        });
-        return (
-          <div key={index} className="rounded-2xl bg-paper p-4">
-            <p className="text-sm font-medium">{lengthLabel(bridge)} <span className="text-muted">· {priceLabel(bridge)}</span></p>
-            <div className="mt-3 flex gap-1" dir="rtl">
-              {days.map(({ date, isLeave }, dayIndex) => (
-                <span key={dayIndex} className={`flex h-11 flex-1 flex-col items-center justify-center rounded-lg text-[0.625rem] tabular-nums ${isLeave ? "border border-dashed border-clay text-clay" : "bg-leaf text-forest"}`}>
-                  <span className="text-xs font-medium">{fa(toCalendar(date).day)}</span>
-                  <span>{WEEKDAY_INITIALS[weekdayIndex(date)]}</span>
-                </span>
-              ))}
-            </div>
-            <p className="mt-3 text-[0.625rem] leading-5 text-muted">{bridge.titles.join(" · ")}</p>
-            {bridge.uncertain && <Warning />}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-// ج · only the next one, in full, with the rest folded away. The quietest option, and the
-// only one that cannot push the calendar down the page.
-function VariantNext({ bridges }: { bridges: Bridge[] }) {
-  const [next, ...rest] = bridges;
-  if (!next) return <p className="py-8 text-center text-xs text-muted">با تنظیمات فعلی پلی پیدا نشد.</p>;
-  return (
-    <div>
-      <p className="text-2xl font-medium text-forest">{lengthLabel(next)}</p>
-      <p className="mt-1 text-sm">{rangeLabel(next)}</p>
-      <p className="mt-1 text-xs text-muted">{priceLabel(next)}{next.leave.length > 0 && ` — ${leaveLabel(next)}`}</p>
-      <p className="mt-2 text-[0.625rem] leading-5 text-muted">{next.titles.join(" · ")}</p>
-      {next.uncertain && <Warning />}
-      {rest.length > 0 && (
-        <details className="mt-4 border-t border-line pt-3">
-          <summary className="cursor-pointer text-xs text-muted">{fa(rest.length)} پل دیگر تا پایان سال</summary>
-          <div className="pt-2"><VariantList bridges={rest} /></div>
-        </details>
-      )}
-    </div>
-  );
-}
-
-const VARIANTS = [
-  { key: "الف", title: "فهرست فشرده", note: "یک سطر برای هر پل. تنها گزینه‌ای که در ستون کناری جا می‌شود.", render: VariantList },
-  { key: "ب", title: "نوار روزها", note: "هر روزِ پل کشیده می‌شود؛ روز مرخصی با خط‌چین. شکل تعطیلی دیده می‌شود، ولی بلند است.", render: VariantStrip },
-  { key: "ج", title: "فقط پل بعدی", note: "یکی کامل، بقیه تاشده. کوتاه‌ترین، و تنها گزینه‌ای که تقویم را پایین نمی‌راند.", render: VariantNext },
+// The blocks whose position on the page is the actual question here.
+const BLOCKS = [
+  { key: "calendar", label: "تقویم ماهانه", selector: "#calendar" },
+  { key: "bridges", label: "پل‌های تعطیلات", selector: "[aria-labelledby='bridges-title']" },
+  { key: "hero", label: "هیرو (تاریخ و ساعت)", selector: "[aria-label='تاریخ و ساعت امروز']" },
+  { key: "tools", label: "ابزارهای تاریخ", selector: "#tools" },
 ] as const;
 
-// Measured after every render and again on every resize. A ResizeObserver would be the
-// obvious tool and is deliberately not used: it never fires in the headless browser these
-// numbers are read in, so it would report a confident zero.
-function Measured({ children, onHeight }: { children: React.ReactNode; onHeight: (value: number) => void }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const report = useRef(onHeight);
-  report.current = onHeight;
-  const measure = () => {
-    if (ref.current) report.current(Math.round(ref.current.getBoundingClientRect().height));
-  };
-  useEffect(measure);
-  useEffect(() => {
-    window.addEventListener('resize', measure);
-    return () => window.removeEventListener('resize', measure);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  return <div ref={ref}>{children}</div>;
-}
+type Placement = "under-calendar" | "after-hero";
+type Layout = "grid" | "rows";
 
-export function SandboxBridges() {
-  const today = new Date();
-  const year = toCalendar(today).year;
-  const [groups, setGroups] = useState<EventGroups>(DEFAULT_GROUPS);
-  const [heights, setHeights] = useState<Record<string, number>>({});
-  const bridges = findBridges(fromCalendar({ year, month: 1, day: 1 }), fromCalendar({ year, month: 12, day: 29 }), groups);
-  // Compared as civil days in Tehran: a run that ends today is still today's news, whatever
-  // the clock says.
-  const upcoming = bridges.filter((bridge) => dayKey(bridge.end) >= dayKey(today));
-
+function Choice<T extends string>({ label, value, options, onChange }: {
+  label: string; value: T; options: ReadonlyArray<readonly [T, string]>; onChange: (next: T) => void;
+}) {
   return (
-    <div className="mx-auto max-w-6xl px-6 py-10">
-      <h1 className="text-xl font-semibold">سندباکس · پل‌های تعطیلات</h1>
-      <p className="mt-2 text-xs leading-6 text-muted">
-        سه چیدمان، همان توکن‌ها و همان دادهٔ واقعی سال {fa(year)}. عدد زیر هر ستون قد اندازه‌گیری‌شدهٔ همان چیدمان است، نه تخمین.
-      </p>
-      <div className="mt-4 flex flex-wrap gap-2">
-        {([["پیش‌فرض", DEFAULT_GROUPS], ["همهٔ دسته‌ها", ALL_GROUPS]] as const).map(([label, value]) => (
-          <button key={label} aria-pressed={groups === value} onClick={() => setGroups(value)}
-            className={`rounded-lg px-3 py-1.5 text-[0.6875rem] ${groups === value ? "bg-leaf font-medium text-forest" : "text-muted hover:bg-paper"}`}>
-            {label}
+    <div className="flex items-center gap-2">
+      <span className="text-[0.6875rem] text-muted">{label}</span>
+      <div className="flex gap-1">
+        {options.map(([key, text]) => (
+          <button key={key} aria-pressed={value === key} onClick={() => onChange(key)}
+            className={`rounded-lg px-3 py-1.5 text-[0.6875rem] ${value === key ? "bg-leaf font-medium text-forest" : "text-muted hover:bg-paper"}`}>
+            {text}
           </button>
         ))}
       </div>
-      <p className="mt-3 text-xs text-muted">
-        {fa(bridges.length)} پل در کل سال · {fa(upcoming.length)} پل از امروز به بعد · از این‌ها {fa(upcoming.filter((bridge) => bridge.leave.length === 0).length)} تا بدون مرخصی
-      </p>
+    </div>
+  );
+}
 
-      <div className="mt-8 grid items-start gap-6 lg:grid-cols-3">
-        {VARIANTS.map(({ key, title, note, render: Render }) => (
-          <section key={key} className="flex min-w-0 flex-col rounded-[1.75rem] border border-line bg-surface">
-            <div className="flex items-center justify-between border-b border-line px-6 py-4">
-              <h2 className="text-sm font-semibold">{key} · {title}</h2>
-              <CalendarRange size={16} className="text-forest" />
-            </div>
-            <div className="px-6 py-4">
-              <Measured onHeight={(value) => setHeights((current) => (current[key] === value ? current : { ...current, [key]: value }))}>
-                <Render bridges={upcoming} />
-              </Measured>
-            </div>
-            <p className="border-t border-line px-6 py-3 text-[0.625rem] leading-5 text-muted">{note}</p>
-            <p className="px-6 pb-4 text-[0.625rem] text-clay">قد اندازه‌گیری‌شده: {fa(heights[key] ?? 0)} پیکسل</p>
-          </section>
-        ))}
+export function SandboxBridges({ initialNow }: { initialNow: string }) {
+  const now = new Date(initialNow);
+  const [selected, setSelected] = useState(now);
+  const [view, setView] = useState(() => toCalendar(now));
+  const [tool, setTool] = useState<ToolTab>("convert");
+  const [groups, setGroups] = useState<EventGroups>(DEFAULT_GROUPS);
+  const [placement, setPlacement] = useState<Placement>("under-calendar");
+  const [layout, setLayout] = useState<Layout>("grid");
+  const [measurements, setMeasurements] = useState<{ key: string; top: number; height: number }[]>([]);
+  const [width, setWidth] = useState(0);
+  const preferences: ViewPreferences = { ...DEFAULT_VIEW, ...groups };
+  const mainRef = useRef<HTMLElement>(null);
+
+  // Measured after every render and again on every resize. A ResizeObserver would be the
+  // obvious tool and is deliberately not used: it never fires in the headless browser these
+  // numbers get read in, so it would report a confident zero.
+  const measure = () => {
+    const main = mainRef.current;
+    if (!main) return;
+    const origin = main.getBoundingClientRect().top + window.scrollY;
+    const next = BLOCKS.map(({ key, selector }) => {
+      const node = main.querySelector(selector);
+      if (!node) return { key, top: -1, height: 0 };
+      const box = node.getBoundingClientRect();
+      return { key, top: Math.round(box.top + window.scrollY - origin), height: Math.round(box.height) };
+    });
+    setMeasurements((current) => (JSON.stringify(current) === JSON.stringify(next) ? current : next));
+    setWidth(window.innerWidth);
+  };
+  useEffect(measure);
+  useEffect(() => {
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // On phones the calendar row carries `order-first`. Giving the bridges row the same order
+  // keeps it directly under the calendar, because equal order values fall back to DOM order.
+  // Leaving it off drops the row to its natural place, under the hero.
+  const bridgesOrder = placement === "under-calendar" ? "order-first" : "";
+
+  return (
+    <div className="mx-auto max-w-[1240px] px-4 pb-16 sm:px-8">
+      <div className="sticky top-0 z-30 -mx-4 border-b border-line bg-surface px-4 py-4 sm:-mx-8 sm:px-8">
+        <h1 className="text-sm font-semibold">سندباکس · جای پنل پل‌ها</h1>
+        <p className="mt-1 text-[0.6875rem] leading-5 text-muted">
+          ساختار واقعی صفحهٔ اصلی با پنل‌های واقعی؛ فقط مارک‌آپ <code>main</code> از <code>calendar-app.tsx</code> کپی شده. عددها اندازه‌گیری‌شده‌اند، نه تخمین.
+        </p>
+        <div className="mt-3 flex flex-wrap items-center gap-x-6 gap-y-2">
+          <Choice label="جای ردیف در موبایل:" value={placement} onChange={setPlacement}
+            options={[["under-calendar", "زیر تقویم"], ["after-hero", "بعد از هیرو"]] as const} />
+          <Choice label="چیدمان کارت‌ها:" value={layout} onChange={setLayout}
+            options={[["grid", "سه‌ستونه"], ["rows", "ردیف‌های تمام‌عرض"]] as const} />
+          <Choice label="دسته‌ها:" value={groups === ALL_GROUPS ? "all" : "default"}
+            onChange={(next) => setGroups(next === "all" ? ALL_GROUPS : DEFAULT_GROUPS)}
+            options={[["default", "پیش‌فرض"], ["all", "همه"]] as const} />
+        </div>
+        <table className="mt-3 w-full max-w-md text-[0.625rem] tabular-nums">
+          <thead className="text-muted"><tr><th className="text-right font-normal">بلوک</th><th className="text-right font-normal">از پیکسل</th><th className="text-right font-normal">قد</th></tr></thead>
+          <tbody>
+            {BLOCKS.map(({ key, label }) => {
+              const found = measurements.find((item) => item.key === key);
+              return (
+                <tr key={key}>
+                  <td className="py-0.5">{label}</td>
+                  <td className={key === "bridges" ? "text-clay" : ""}>{fa(found?.top ?? 0)}</td>
+                  <td className="text-muted">{fa(found?.height ?? 0)}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <p className="mt-1 text-[0.625rem] text-muted">عرض پنجره: {fa(width)} پیکسل · زیر ۱۰۲۴ چیدمان موبایل است.</p>
       </div>
 
-      <details className="mt-8 rounded-lg bg-paper p-3 text-[0.625rem] leading-6 text-muted">
-        <summary className="flex cursor-pointer items-center gap-1.5"><Info size={13} />دربارهٔ محاسبهٔ پل‌ها</summary>
-        <p className="pt-2">{BRIDGES_NOTICE}</p>
-      </details>
+      {/* Copied from calendar-app.tsx: flex column on phones with the calendar row ordered
+          first, plain block from lg up. The bridges row is the only addition. */}
+      <main ref={mainRef} className="flex flex-col pt-8 pb-10 sm:pt-10 lg:block">
+        <TodayPanel now={now} initialNow={initialNow} className="max-lg:mt-7" />
+        <div className="order-first mt-7 grid items-stretch gap-5 max-lg:mt-0 lg:grid-cols-[1.7fr_1fr]">
+          <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences}
+            memorial={preferences.memorial} onToggleView={() => {}} onSelect={setSelected}
+            onNavigate={(delta) => setView({ ...shiftMonth(view.year, view.month, delta), day: 1 })}
+            onToday={() => { setSelected(now); setView(toCalendar(now)); }}
+            onJump={(year, month) => setView({ year, month, day: 1 })} />
+          <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={setSelected} />
+        </div>
+        <BridgesPanel now={now} groups={groups} layout={layout} className={`mt-7 ${bridgesOrder}`} />
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} />
+      </main>
     </div>
   );
 }
