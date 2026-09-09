@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.27 — 2026-09-09
+// Version: 0.9.28 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -44,7 +44,8 @@ export const RELEASES: Release[] = [
     title: 'تعطیلات پیوسته، با تعطیلی‌های تک‌روزه',
     changes: [
       { kind: 'fixed', text: 'تعطیلی‌های تک‌روزه مثل ۲۲ بهمن در «تعطیلات پیوسته» هیچ‌وقت دیده نمی‌شدند، حتی وقتی کلیدشان روی تقویم روشن بود.' },
-      { kind: 'changed', text: 'بازه حالا از سه روز شروع می‌شود، نه چهار. فهرست یک سال از ۱۰ بازه به ۳۸ رسید.' },
+      { kind: 'changed', text: 'بازه حالا از سه روز شروع می‌شود، نه چهار. یک سال با همهٔ کلیدها ۱۷ بازه دارد.' },
+      { kind: 'changed', text: 'هر بازه یک بار می‌آید، با ارزان‌ترین قیمتش. پیش‌تر یک آخر هفته دو بار نوشته می‌شد: «۵ روز با ۲ مرخصی» و «۴ روز با ۱ مرخصی».' },
       { kind: 'fixed', text: 'تاریخ چهار انتشار امروز یک روز جلوتر نوشته شده بود.' },
     ],
   },

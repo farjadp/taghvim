@@ -138,6 +138,23 @@ describe('holiday bridges', () => {
     expect(nowruz!.length).toBeGreaterThanOrEqual(5);
   });
 
+  // The list is capped at three in the tool, and before this it could spend two of those
+  // three on one weekend: «5 days for 2 leave» and «4 days for 1» are the same break.
+  it('reports each continuous break once, at its cheapest price', () => {
+    const { from, to } = year(1405);
+    const bridges = findBridges(from, to, ALL_GROUPS);
+    for (const bridge of bridges) {
+      const overlapping = bridges.filter((other) => other !== bridge
+        && dayKey(other.start) <= dayKey(bridge.end)
+        && dayKey(other.end) >= dayKey(bridge.start));
+      expect(overlapping, 'two rows describe one break').toHaveLength(0);
+    }
+    // Cheapest, not longest: Nowruz can be reached for nothing, so that is the row.
+    const nowruz = bridges.find((bridge) => bridge.occasions.some(({ title }) => title.includes('نوروز')));
+    expect(nowruz).toBeDefined();
+    expect(nowruz!.leave).toHaveLength(0);
+  });
+
   it('keeps no run that another overlapping one beats on both price and length', () => {
     const { from, to } = year(1405);
     const bridges = findBridges(from, to, ALL_GROUPS);

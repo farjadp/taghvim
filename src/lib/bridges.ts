@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/bridges.ts
-// Version: 0.2.0 — 2026-09-09
+// Version: 0.3.0 — 2026-09-09
 // Why: Holiday bridges — the runs of days off you can reach by taking one or two
 //      work days as leave, plus the long weekends that need no leave at all.
 // Env / Deps: Reads days off through eventsForDate(date, groups), so a group the
@@ -161,10 +161,45 @@ export function findBridges(from: Date, to: Date, groups: EventGroups, options: 
   // window is not this window's news.
   const window = { from: dayKey(from), to: dayKey(to) };
   const worthwhile = candidates.filter((bridge) => bridge.length - bridge.leave.length >= minFree);
-  return worthwhile
+  // Collapsed last, and only over what the window actually reports: a cheaper option lying
+  // wholly outside the asked window must not suppress the one inside it.
+  return cheapestPerRun(worthwhile
     .filter((bridge) => !dominated(bridge, worthwhile))
     .filter((bridge) => dayKey(bridge.end) >= window.from && dayKey(bridge.start) <= window.to)
-    .sort((a, b) => a.start.getTime() - b.start.getTime() || a.leave.length - b.leave.length);
+    .sort((a, b) => a.start.getTime() - b.start.getTime() || a.leave.length - b.leave.length));
+}
+
+// One row per continuous break, not one per price. The same holidays can be reached at
+// several prices — 5 days for 2 leave, 4 days for 1 — and listing every one filled a list
+// that is capped at three with two spellings of the same weekend. The cheapest is the one
+// worth showing: it is the smallest thing a person has to do to get a break, and the others
+// are obvious from it. Overlapping runs are one break by definition; a single run covering
+// two holidays continuously IS one break, so merging them is right rather than a side effect.
+function cheapestPerRun(bridges: Bridge[]): Bridge[] {
+  // Fewest leave days wins; then the longer run; then the earlier one, so the choice never
+  // depends on the order the windows happened to be built in.
+  const better = (item: Bridge, best: Bridge) =>
+    item.leave.length !== best.leave.length ? item.leave.length < best.leave.length
+      : item.length !== best.length ? item.length > best.length
+        : item.start.getTime() < best.start.getTime();
+
+  const chosen: Bridge[] = [];
+  let group: Bridge[] = [];
+  let groupEnd = -Infinity;
+  const flush = () => {
+    if (group.length) chosen.push(group.reduce((best, item) => (better(item, best) ? item : best)));
+    group = [];
+    groupEnd = -Infinity;
+  };
+  // `bridges` arrives sorted by start, so a run that opens after everything seen so far has
+  // ended cannot belong to the group being built.
+  for (const bridge of bridges) {
+    if (group.length && bridge.start.getTime() > groupEnd) flush();
+    group.push(bridge);
+    groupEnd = Math.max(groupEnd, bridge.end.getTime());
+  }
+  flush();
+  return chosen;
 }
 
 /** The first bridge that has not ended yet, or undefined when the window holds none. */
