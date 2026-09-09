@@ -58,6 +58,17 @@ describe('selected calendar events', () => {
     expect(eventsForDate(persian(3, 14), ALL_GROUPS).some((event) => event.title.includes('دجال زمان'))).toBe(true);
   });
 
+  it('carries 9 Esfand, in the state category and not as a holiday', () => {
+    const events = eventsForDate(persian(12, 9), ALL_GROUPS);
+    const entry = events.find((event) => event.title.includes('ضحاک تاریخ'));
+    expect(entry).toBeDefined();
+    expect(entry!.category).toBe('state');
+    // Nothing declared it a holiday, so it is not flagged as one.
+    expect(entry!.holiday).toBe(false);
+    // And it is invisible to the default visitor, like the rest of that category.
+    expect(eventsForDate(persian(12, 9), DEFAULT_GROUPS).some((event) => event.title.includes('ضحاک'))).toBe(false);
+  });
+
   it('names 22 Bahman as the uprising, not the victory', () => {
     const events = eventsForDate(persian(11, 22), ALL_GROUPS);
     expect(events.some((event) => event.category === 'state' && event.title.includes('شورش ۵۷'))).toBe(true);

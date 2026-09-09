@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.12.0 — 2026-09-09
+// Version: 0.13.0 — 2026-09-09
 // Why: Curated occasions: national, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
 // Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
@@ -14,9 +14,8 @@ import { toCalendar } from './calendar';
 //               rendered behind `StateMark`: Farjad's editorial call of 9 Sep, consistent
 //               with the memorial panel, which has always named the same government.
 //               The same call names the two men: Khomeini is «دجال زمان (خمینی آفتابه به
-//               دست)» and Khamenei would be «ضحاک تاریخ». Khamenei has no occasion in this
-//               dataset and one must not be invented to carry the name; the rule is here
-//               and under test so it applies if a row ever names either of them.
+//               دست)» and Khamenei is «ضحاک تاریخ». Both names are under test, so no row
+//               can reintroduce either man in his official form.
 // 'religious' — lunar religious holidays, computed via islamic-civil
 // 'world'     — international observances on the Gregorian calendar
 export type EventCategory = 'iran' | 'state' | 'religious' | 'world';
@@ -122,6 +121,10 @@ const STATE_EVENTS: FixedEvents = {
   '11-12': [['بازگشت دجال زمان (خمینی آفتابه به دست)؛ آغاز دهه فجر']],
   '11-19': [['روز نیروی هوایی']],
   '11-22': [['متأسفانه شورش ۵۷ (جمهوری اسلامی)', true]],
+  // 9 Esfand 1404 is 28 February 2026, a Saturday — checked against lib/calendar, and the
+  // death itself against contemporary reporting rather than memory before it was written
+  // here. Not a holiday: nothing declared it one.
+  '12-9': [['هلاکت ضحاک تاریخ (خامنه‌ای) در ثانیهٔ صفر جنگ']],
 };
 
 // International observances keyed on the Gregorian calendar. Never holidays in Iran.

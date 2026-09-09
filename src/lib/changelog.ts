@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.28 — 2026-09-09
+// Version: 0.9.29 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -28,6 +28,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.18',
+    at: '2026-09-09T17:40:00-04:00',
+    status: 'ready',
+    title: 'نهم اسفند',
+    changes: [
+      { kind: 'added', text: 'نهم اسفند به فهرست مناسبت‌ها اضافه شد: هلاکت ضحاک تاریخ (خامنه‌ای) در ثانیهٔ صفر جنگ. تاریخ میلادی‌اش ۲۸ فوریهٔ ۲۰۲۶ است و روزش شنبه بود. تعطیل ثبت نشده، چون هیچ‌کجا تعطیل اعلام نشده.' },
+      { kind: 'changed', text: 'این روز در دستهٔ «دولتی» است و مثل بقیهٔ آن دسته به‌صورت پیش‌فرض نمایش داده نمی‌شود؛ با کلید «دولتی» در راهنمای زیر تقویم روشن می‌شود.' },
+    ],
+  },
   {
     version: '0.9.17',
     at: '2026-09-09T16:20:00-04:00',
