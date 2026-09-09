@@ -1,8 +1,10 @@
 // ============================================================================
 // Source: src/app/changelog/page.tsx
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.21 — 2026-09-09
 // Why: Public release history — what changed, when, and what is being looked
 //      at next. Linked from the footer and the header of secondary pages.
+//      Only the newest few stand open; the rest are behind one fold, because the
+//      page is read on a phone and the full list is a scroll nobody finishes.
 // Env / Deps: Data from lib/changelog; dates rendered as Tehran civil time
 //      through lib/calendar, like everywhere else in the app.
 // ============================================================================
@@ -32,7 +34,47 @@ const KIND_CLASS: Record<ChangeKind, string> = {
   fixed: "bg-holiday text-clay",
 };
 
+// How many releases stand open. The rest are one fold away: this page is read on a phone,
+// and twenty-seven cards is a scroll nobody finishes.
+const OPEN_RELEASES = 5;
+
+function ReleaseCard({ release }: { release: (typeof RELEASES)[number] }) {
+  const date = new Date(release.at);
+  return (
+    <li className="rounded-2xl border border-line bg-surface p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
+        <div className="flex items-center gap-3">
+          <h2 className="text-lg font-semibold text-ink">{release.title}</h2>
+          <span className="rounded-md bg-paper px-2 py-1 text-[0.625rem] text-muted" dir="ltr">v{release.version}</span>
+        </div>
+        {/* 'ready' means committed and tested here, but not yet on taghv.im */}
+        {release.status === "ready" && (
+          <span className="flex items-center gap-1.5 rounded-md bg-sand px-2 py-1 text-[0.625rem] text-ink">
+            <CircleDot size={11} />
+            آمادهٔ انتشار
+          </span>
+        )}
+      </div>
+      <p className="mt-4 text-xs text-muted">
+        {formatDate(date, "persian", true)}
+        <span className="mx-2 text-line">·</span>
+        <time dateTime={release.at} className="tabular-nums">ساعت {clock.format(date)}</time>
+      </p>
+      <ul className="mt-4 space-y-3">
+        {release.changes.map((change, index) => (
+          <li key={index} className="flex flex-wrap items-start gap-2.5">
+            <span className={`mt-0.5 shrink-0 rounded-md px-2 py-1 text-[0.625rem] ${KIND_CLASS[change.kind]}`}>{CHANGE_LABELS[change.kind]}</span>
+            <span className="flex-1 text-sm leading-7 text-muted">{change.text}</span>
+          </li>
+        ))}
+      </ul>
+    </li>
+  );
+}
+
 export default function ChangelogPage() {
+  const recent = RELEASES.slice(0, OPEN_RELEASES);
+  const older = RELEASES.slice(OPEN_RELEASES);
   return (
     <>
       <SiteHeader active="changelog" />
@@ -41,46 +83,25 @@ export default function ChangelogPage() {
         <div className="mb-10">
           <h1 className="text-3xl font-extrabold text-forest sm:text-4xl">تغییرات</h1>
           <p className="mt-3 text-sm leading-7 text-muted">
-            فهرست تغییرهای تقویم، تازه‌ترین بالا. پایین‌تر هم کارهایی که در دست بررسی‌اند.
-            ساعت‌ها به وقت ایران است.
+            تازه‌ترین بالا، و نسخه‌های قدیمی‌تر یک کلیک پایین‌تر. آخر صفحه هم کارهایی که در
+            دست بررسی‌اند. ساعت‌ها به وقت ایران است.
           </p>
         </div>
 
         <ol className="space-y-8">
-          {RELEASES.map((release) => {
-            const date = new Date(release.at);
-            return (
-              <li key={release.version} className="rounded-2xl border border-line bg-surface p-6">
-                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
-                  <div className="flex items-center gap-3">
-                    <h2 className="text-lg font-semibold text-ink">{release.title}</h2>
-                    <span className="rounded-md bg-paper px-2 py-1 text-[0.625rem] text-muted" dir="ltr">v{release.version}</span>
-                  </div>
-                  {/* 'ready' means committed and tested here, but not yet on taghv.im */}
-                  {release.status === "ready" && (
-                    <span className="flex items-center gap-1.5 rounded-md bg-sand px-2 py-1 text-[0.625rem] text-ink">
-                      <CircleDot size={11} />
-                      آمادهٔ انتشار
-                    </span>
-                  )}
-                </div>
-                <p className="mt-4 text-xs text-muted">
-                  {formatDate(date, "persian", true)}
-                  <span className="mx-2 text-line">·</span>
-                  <time dateTime={release.at} className="tabular-nums">ساعت {clock.format(date)}</time>
-                </p>
-                <ul className="mt-4 space-y-3">
-                  {release.changes.map((change, index) => (
-                    <li key={index} className="flex flex-wrap items-start gap-2.5">
-                      <span className={`mt-0.5 shrink-0 rounded-md px-2 py-1 text-[0.625rem] ${KIND_CLASS[change.kind]}`}>{CHANGE_LABELS[change.kind]}</span>
-                      <span className="flex-1 text-sm leading-7 text-muted">{change.text}</span>
-                    </li>
-                  ))}
-                </ul>
-              </li>
-            );
-          })}
+          {recent.map((release) => <ReleaseCard key={release.version} release={release} />)}
         </ol>
+
+        {older.length > 0 && (
+          <details className="mt-8 rounded-2xl border border-line bg-surface px-6 py-4">
+            <summary className="cursor-pointer text-sm font-medium text-forest">
+              {fa(older.length)} نسخهٔ قدیمی‌تر
+            </summary>
+            <ol className="mt-6 space-y-8">
+              {older.map((release) => <ReleaseCard key={release.version} release={release} />)}
+            </ol>
+          </details>
+        )}
 
         <section className="mt-12 rounded-2xl bg-leaf px-6 py-7">
           <h2 id="upcoming" className="flex scroll-mt-24 items-center gap-2 text-lg font-semibold text-forest"><Compass size={19} />در راه</h2>

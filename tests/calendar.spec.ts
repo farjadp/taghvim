@@ -858,3 +858,29 @@ test("every tool says what it answers, in one line", async ({ page }) => {
   }
   expect(seen.size).toBe(6);
 });
+
+test("the changelog opens short, with the rest one fold away", async ({ page }) => {
+  await page.goto("/changelog");
+  // Only the newest few stand open; the page is read on a phone.
+  const open = page.locator("main > ol > li");
+  await expect(open).toHaveCount(5);
+  const fold = page.locator("main details");
+  await expect(fold).toHaveCount(1);
+  // A closed <details> keeps its children in the DOM; they are hidden, not absent.
+  await expect(fold.locator("li").first()).not.toBeVisible();
+  const closed = await page.evaluate(() => document.documentElement.scrollHeight);
+
+  await fold.locator("summary").click();
+  await expect(fold.locator("li").first()).toBeVisible();
+  const expanded = await page.evaluate(() => document.documentElement.scrollHeight);
+  expect(expanded).toBeGreaterThan(closed * 2);
+
+  // Every release is reachable, none was silently dropped from the page.
+  const shown = await page.locator("main li span[dir=ltr]").count();
+  expect(shown).toBe(await page.locator("main li h2").count());
+
+  // No entry is a paragraph: this page says what changed, not why.
+  for (const text of await page.locator("main li ul li span:last-child").allTextContents()) {
+    expect(text.trim().length).toBeLessThanOrEqual(150);
+  }
+});
