@@ -62,8 +62,8 @@ export function cardOccasions(card: DayCard, limit = MAX_OCCASIONS): { lines: st
  * A filename that sorts by date and says what it is. Latin digits and ASCII only: Persian
  * digits in a filename survive the browser but not every place the file is then sent.
  */
-export function cardFilename(date: Date): string {
+export function cardFilename(date: Date, extension = 'png'): string {
   const { year, month, day } = toCalendar(date);
   const pad = (value: number) => String(value).padStart(2, '0');
-  return `taghvim-${year}-${pad(month)}-${pad(day)}.png`;
+  return `taghvim-${year}-${pad(month)}-${pad(day)}.${extension}`;
 }

@@ -8,11 +8,12 @@
 
 import { CalendarApp } from "@/components/calendar-app";
 import { pickPerson } from "@/lib/javidnaman";
+import { listBackgrounds } from "@/lib/backgrounds";
 
 // Never statically cache: the initial timestamp must be the request time.
 export const dynamic = "force-dynamic";
 
 export default function Page() {
   // Picked per request on the server: the memorial shows a different name on every load
-  return <CalendarApp initialNow={new Date().toISOString()} person={pickPerson()} />;
+  return <CalendarApp initialNow={new Date().toISOString()} person={pickPerson()} backgrounds={listBackgrounds()} />;
 }

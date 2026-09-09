@@ -14,6 +14,7 @@ import { ArrowLeftRight, CalendarDays, Hourglass, MapPin } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
 import { datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
+import { DEFAULT_CARD_STYLE, readCardStyle, type Background, type CardStyle } from "@/lib/card-style";
 import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
@@ -28,7 +29,7 @@ function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
 }
 
-export function CalendarApp({ initialNow, person }: { initialNow: string; person: Person }) {
+export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: string; person: Person; backgrounds: Background[] }) {
   const [now, setNow] = useState(new Date(initialNow));
   const [selected, setSelected] = useState(new Date(initialNow));
   const [view, setView] = useState(() => toCalendar(new Date(initialNow)));
@@ -38,8 +39,9 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
   // The visitor's own dates, read once after hydration like the preferences beside them.
   const [dates, setDates] = useState<Anniversary[]>([]);
   const [datesReady, setDatesReady] = useState(false);
+  const [cardStyle, setCardStyle] = useState<CardStyle>(DEFAULT_CARD_STYLE);
   const followingToday = useRef(true);
-  useEffect(() => { setPreferences(readView()); setDates(readDates()); setDatesReady(true); }, []);
+  useEffect(() => { setPreferences(readView()); setDates(readDates()); setDatesReady(true); setCardStyle(readCardStyle()); }, []);
   // `/#dates` and friends open that tool directly. Without this the only way to link at a
   // tool is to link at the page and describe where to click, which is how the personal
   // dates ended up unreachable when they lived behind the countdown tab.
@@ -133,7 +135,7 @@ export function CalendarApp({ initialNow, person }: { initialNow: string; person
           the default order 0 — any positive number here would have put them
           above everything instead. */}
       <main id="main" className="mx-auto flex max-w-[1240px] flex-col px-4 pt-8 pb-10 sm:px-8 sm:pt-10 lg:block">
-        <TodayPanel now={now} initialNow={initialNow} groups={preferences} className="max-lg:mt-7" />
+        <TodayPanel now={now} initialNow={initialNow} groups={preferences} cardStyle={cardStyle} backgrounds={backgrounds} className="max-lg:mt-7" />
         <div className="order-first mt-7 grid items-stretch gap-5 max-lg:mt-0 lg:grid-cols-[1.7fr_1fr]">
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date).length > 0 : undefined} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />

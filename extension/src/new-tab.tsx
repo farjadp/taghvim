@@ -18,6 +18,7 @@ import { CalendarPanel } from "@/components/calendar-panel";
 import { EventsPanel } from "@/components/events-panel";
 import { SettingsMenu } from "@/components/settings-menu";
 import { TodayHero } from "@/components/today-panel";
+import { DEFAULT_CARD_STYLE } from "@/lib/card-style";
 
 export function NewTab() {
   const [now, setNow] = useState(() => new Date());
@@ -104,7 +105,10 @@ export function NewTab() {
           pushing the whole tab past the fold. */}
       <main id="main" className="mx-auto grid min-h-0 w-full max-w-[1400px] flex-1 gap-5 p-5 lg:grid-cols-[1fr_1.5fr]">
         <div className="flex min-h-0 flex-col gap-5">
-          <TodayHero now={now} initialNow={initialNow.current} groups={preferences} />
+          {/* The extension ships no photographs — they live in the site's public folder and
+              fetching one would break the zero-request rule — so its card is the plain
+              palette and the picker is not offered here. */}
+          <TodayHero now={now} initialNow={initialNow.current} groups={preferences} cardStyle={DEFAULT_CARD_STYLE} backgrounds={[]} />
           <div className="min-h-0 flex-1 overflow-y-auto">
             <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
           </div>

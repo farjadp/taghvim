@@ -19,6 +19,7 @@ import { ArrowDownLeft, Copy, Check, Clock3, ImageDown } from "lucide-react";
 import { dateNumbers, fa, formatDate, MONTHS, toCalendar } from "@/lib/calendar";
 import { ZODIAC_SHORT_NOTICE, signFor } from "@/lib/zodiac";
 import { type EventGroups } from "@/lib/events";
+import { type Background, type CardStyle } from "@/lib/card-style";
 import { shareDayCard } from "./day-card";
 import { WorldClocks } from "./world-clocks";
 import { ZodiacIcon } from "./zodiac-icon";
@@ -48,7 +49,7 @@ function SunDrawing() {
 }
 
 // The green card: weekday, date, copy button, Tehran clock and the second clocks.
-export function TodayHero({ now, initialNow, groups }: { now: Date; initialNow: string; groups: EventGroups }) {
+export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: { now: Date; initialNow: string; groups: EventGroups; cardStyle: CardStyle; backgrounds: Background[] }) {
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   // "" while idle; the status line below already exists and says one thing at a time.
@@ -75,7 +76,7 @@ export function TodayHero({ now, initialNow, groups }: { now: Date; initialNow: 
   async function shareCard() {
     setBusy(true);
     try {
-      const result = await shareDayCard(now, groups);
+      const result = await shareDayCard(now, groups, cardStyle, backgrounds);
       setCardNote(result === "saved" ? "تصویر ذخیره شد." : result === "shared" ? "تصویر فرستاده شد." : "");
     } catch {
       setCardNote("ساختن تصویر ممکن نشد.");
@@ -126,10 +127,10 @@ export function OtherCalendars({ now }: { now: Date }) {
 }
 
 // What the site renders: both cards side by side on desktop, stacked on phones.
-export function TodayPanel({ now, initialNow, groups, className = "" }: { now: Date; initialNow: string; groups: EventGroups; className?: string }) {
+export function TodayPanel({ now, initialNow, groups, cardStyle, backgrounds, className = "" }: { now: Date; initialNow: string; groups: EventGroups; cardStyle: CardStyle; backgrounds: Background[]; className?: string }) {
   return (
     <section aria-label="تاریخ و ساعت امروز" className={`grid gap-5 lg:grid-cols-[1.7fr_1fr] ${className}`}>
-      <TodayHero now={now} initialNow={initialNow} groups={groups} />
+      <TodayHero now={now} initialNow={initialNow} groups={groups} cardStyle={cardStyle} backgrounds={backgrounds} />
       <OtherCalendars now={now} />
     </section>
   );
