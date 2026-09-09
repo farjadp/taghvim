@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.28 — 2026-09-09
+// Version: 0.9.29 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.22',
     at: '2026-09-09T15:17:16-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'تعطیلات پیوسته، با تعطیلی‌های تک‌روزه',
     changes: [
       { kind: 'fixed', text: 'تعطیلی‌های تک‌روزه مثل ۲۲ بهمن در «تعطیلات پیوسته» هیچ‌وقت دیده نمی‌شدند، حتی وقتی کلیدشان روی تقویم روشن بود.' },
