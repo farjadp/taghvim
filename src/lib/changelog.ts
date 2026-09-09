@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.22 — 2026-09-09
+// Version: 0.9.23 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 // Env / Deps: Instants are ISO strings with a real offset and are displayed as
@@ -31,7 +31,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.14',
     at: '2026-09-09T10:10:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'انتشار افزونه، و راهی برای گزارش',
     changes: [
       { kind: 'added', text: 'افزونهٔ کروم در فروشگاه کروم منتشر شد. صفحهٔ «دریافت تقویم» حالا دکمهٔ نصب دارد و دیگر نمی‌گوید در بازبینی است؛ انتشار افزونه هم از فهرست «در راه» برداشته شد، چون دیگر در راه نیست.' },
