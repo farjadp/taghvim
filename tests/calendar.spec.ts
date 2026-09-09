@@ -649,6 +649,39 @@ test("the privacy section is reachable and names the one external request", asyn
   await expect.poll(() => section.evaluate((el) => el.getBoundingClientRect().top < window.innerHeight)).toBe(true);
 });
 
+// The only channel there is. If the buttons stop being real mailto links, or
+// the address stops being printed for machines with no mail client, a report
+// simply never arrives and nothing here would otherwise notice.
+test("the help page offers a working way to report a bug or ask for a feature", async ({ page }) => {
+  await page.getByRole("contentinfo").getByRole("link", { name: "گزارش اشکال یا پیشنهاد" }).click();
+  await expect(page).toHaveURL(/\/help#feedback$/);
+  const section = page.locator("#feedback");
+  await expect(section).toBeVisible();
+
+  const bug = section.getByRole("link", { name: "گزارش اشکال" });
+  const idea = section.getByRole("link", { name: "پیشنهاد یک قابلیت" });
+  const href = async (link: typeof bug) => (await link.getAttribute("href")) ?? "";
+
+  // Both open a mail app rather than posting anywhere: no form, no endpoint
+  for (const link of [bug, idea]) expect(await href(link)).toMatch(/^mailto:[^?]+\?/);
+  await expect(page.locator("form")).toHaveCount(0);
+
+  // The bug report carries the page and the browser; the feature request does not
+  const bugBody = new URLSearchParams((await href(bug)).split("?")[1]).get("body") ?? "";
+  expect(bugBody).toContain("صفحه: /help");
+  expect(bugBody).toContain("مرورگر: ");
+  expect(bugBody).toContain("نسخه: ");
+  const ideaBody = new URLSearchParams((await href(idea)).split("?")[1]).get("body") ?? "";
+  expect(ideaBody).not.toContain("مرورگر: ");
+
+  // A mailto button does nothing without a configured mail client, so the
+  // address is printed as text beside it
+  await expect(section).toContainText("farjad@ashavid.ca");
+
+  const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+  expect(audit.violations.map(({ id }) => id)).toEqual([]);
+});
+
 // The page exists to tell people how to get the calendar, and its whole value
 // is that it does not claim something that is not built.
 test("the download page states each method's real status", async ({ page }) => {

@@ -54,9 +54,12 @@ const code = js.map((name) => read(join('assets', name))).join('\n');
 for (const token of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'WebSocket(', 'EventSource(', 'importScripts(', 'eval(', 'new Function(']) {
   if (code.includes(token)) fail(`bundle contains ${token}`);
 }
+// taghv.im may carry a path now that the header links to /help#feedback, but
+// still only taghv.im: any other host in the bundle is a network request
+// waiting to happen and fails the build.
 // URL strings are allowed only as XML namespaces, React's error-page prefix,
 // and the one link a person can click. Anything else is a request waiting.
-const allowed = [/^http:\/\/www\.w3\.org\//, /^https:\/\/react\.dev\/errors\//, /^https:\/\/taghv\.im$/];
+const allowed = [/^http:\/\/www\.w3\.org\//, /^https:\/\/react\.dev\/errors\//, /^https:\/\/taghv\.im(\/[^\s]*)?$/];
 for (const [url] of code.matchAll(/https?:\/\/[^\s"'`)\\<>]+/g)) {
   if (!allowed.some((pattern) => pattern.test(url))) fail(`unexpected URL in bundle: ${url}`);
 }

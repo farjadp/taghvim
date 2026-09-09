@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/help/page.tsx
-// Version: 0.9.5 — 2026-09-08
+// Version: 0.9.14 — 2026-09-09
 // Why: One page that answers "how do I do X" for everything the app actually
 //      does. Every control it names is quoted from the interface verbatim, so
 //      a renamed button is a documentation bug, not a wording preference.
@@ -15,6 +15,8 @@ import Link from "next/link";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { FEED_NAME } from "@/lib/ics";
+import { RELEASES } from "@/lib/changelog";
+import { FeedbackPanel } from "@/components/feedback-panel";
 
 export const metadata: Metadata = pageMetadata({
   title: "راهنما | تقویم",
@@ -108,6 +110,15 @@ const SECTIONS = [
       "اگر نمی‌خواهی این بخش را ببینی، کلید «یادبود» را در راهنمای زیر تقویم خاموش کن.",
     ],
   },
+  {
+    id: "feedback",
+    title: "گزارش اشکال یا پیشنهاد",
+    steps: [
+      "یکی از دو دکمهٔ زیر را بزن؛ برنامهٔ ایمیلت با سؤال‌های آماده باز می‌شود و تو فقط جواب می‌دهی.",
+      "برای گزارش اشکال، نسخه و نشانی صفحه و مرورگرت هم پایین نامه نوشته شده تا لازم نباشد دنبالشان بگردی. اگر نمی‌خواهی بفرستی، همان چند خط را پاک کن.",
+      "فرمی روی سایت نیست: ایمیل مستقیم به خودمان می‌رسد و از هیچ سرویس واسطه‌ای رد نمی‌شود.",
+    ],
+  },
 ] as const;
 
 export default function HelpPage() {
@@ -140,6 +151,11 @@ export default function HelpPage() {
                     <li key={step} className="text-sm leading-7 text-muted">{step}</li>
                   ))}
                 </ol>
+                {section.id === "feedback" && (
+                  <div className="mt-5">
+                    <FeedbackPanel version={RELEASES[0].version} />
+                  </div>
+                )}
                 {section.id === "subscribe" && (
                   <div className="mt-4 space-y-3">
                     <p className="rounded-xl border border-line bg-paper px-4 py-3 text-sm font-medium break-all text-ink">
@@ -160,8 +176,10 @@ export default function HelpPage() {
               <h2 className="text-base font-semibold text-forest">چیزی را پیدا نکردی؟</h2>
               <p className="mt-2 text-sm leading-7 text-ink">
                 اگر جوابت اینجا نبود یا جایی از کار افتاده،{" "}
-                <Link href="/contact" className="font-medium text-forest underline">به ما بگو</Link>. آنچه
-                تا امروز ساخته و عوض شده هم در{" "}
+                <a href="#feedback" className="font-medium text-forest underline">همین‌جا گزارشش کن</a>. راه‌های
+                دیگر ارتباط در{" "}
+                <Link href="/contact" className="font-medium text-forest underline">صفحهٔ تماس</Link> است، و آنچه
+                تا امروز ساخته و عوض شده در{" "}
                 <Link href="/changelog" className="font-medium text-forest underline">صفحهٔ تغییرات</Link> فهرست شده است.
               </p>
             </section>

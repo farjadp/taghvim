@@ -1,11 +1,13 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.9.12 — 2026-09-08
+// Version: 0.9.14 — 2026-09-09
 // Why: Shared footer. Deliberately short: the brand line with the link to why
-//      the calendar is built this way, the three pages, and four things a
-//      visitor might actually be looking for. Who built it, the company, the
-//      repository and the contact details all live on /about — a footer that
-//      lists every link is a sitemap, not navigation.
+//      the calendar is built this way, the three pages, and five things a
+//      visitor might actually be looking for. The fifth — reporting a bug —
+//      is Farjad's explicit call on 9 Sep against the four-shortcut rule: a
+//      way to report that nobody can find is a report nobody files. Who built
+//      it, the company, the repository and the contact details all live on
+//      /about — a footer that lists every link is a sitemap, not navigation.
 // Env / Deps: Server component used by every page.
 // ============================================================================
 
@@ -26,6 +28,7 @@ const SHORTCUTS = [
   { href: "/#tools", label: "تبدیل تاریخ" },
   { href: "/#prayer", label: "اوقات شرعی" },
   { href: "/help#subscribe", label: "افزودن به تقویم گوگل و اپل" },
+  { href: "/help#feedback", label: "گزارش اشکال یا پیشنهاد" },
 ];
 
 export function SiteFooter() {

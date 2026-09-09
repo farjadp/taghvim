@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/src/new-tab.tsx
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.14 — 2026-09-09
 // Why: The new-tab shell: today, the month grid and the day's occasions on
 //      one screen. Every panel is the site's own component imported from
 //      ../../src; only this arrangement is the extension's. The clock,
@@ -83,7 +83,13 @@ export function NewTab() {
             <span className="text-xl font-extrabold">تقویم<span className="mr-1 text-clay">.</span></span>
           </span>
           <nav aria-label="پیوندها" className="flex items-center gap-5 text-xs">
-            {/* A link the person clicks, not a request the page makes */}
+            {/* Links the person clicks, not requests the page makes. The
+                report link goes to the site rather than opening a mail app
+                from here: the new tab is not where someone wants a compose
+                window, and /help#feedback explains the options first. */}
+            <a href="https://taghv.im/help#feedback" className="text-muted hover:text-forest">
+              گزارش اشکال
+            </a>
             <a href="https://taghv.im" className="flex items-center gap-1 text-muted hover:text-forest">
               taghv.im
               <ArrowUpLeft size={12} className="opacity-60" />

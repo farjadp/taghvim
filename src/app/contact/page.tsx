@@ -1,12 +1,16 @@
 // ============================================================================
 // Source: src/app/contact/page.tsx
-// Version: 0.2.0 — 2026-09-07
-// Why: Static contact page: AshaVid and personal links.
-// Env / Deps: Server component; no form, no backend.
+// Version: 0.9.14 — 2026-09-09
+// Why: Static contact page: bug reports and feature requests first, then the
+//      AshaVid and personal links. Still no form — see lib/feedback for why.
+// Env / Deps: FeedbackPanel is the only client island; the rest is static.
 // ============================================================================
 
 import type { Metadata } from "next";
 import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
+import { FEEDBACK_EMAIL } from "@/lib/feedback";
+import { FeedbackPanel } from "@/components/feedback-panel";
+import { RELEASES } from "@/lib/changelog";
 import { StructuredData } from "@/components/structured-data";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
@@ -32,10 +36,20 @@ export default function ContactPage() {
           </p>
         </div>
 
+        {/* First, because it is the thing most people arrive here to do */}
+        <section id="feedback" className="mb-12 scroll-mt-24 rounded-2xl border border-line bg-surface p-6 sm:p-7">
+          <h2 className="mb-2 text-lg font-semibold text-ink">گزارش اشکال یا پیشنهاد</h2>
+          <p className="mb-5 text-sm leading-7 text-muted">
+            چیزی درست کار نمی‌کند، یا قابلیتی هست که جایش خالی است؟ یکی از دو دکمه را بزن؛
+            ایمیلت با سؤال‌های آماده باز می‌شود.
+          </p>
+          <FeedbackPanel version={RELEASES[0].version} />
+        </section>
+
         <section className="mb-12">
           <h2 className="mb-5 text-lg font-semibold text-ink">راه‌های ارتباطی</h2>
           <div className="grid gap-4 sm:grid-cols-2">
-            <ContactCard icon={<Mail size={20} />} title="ایمیل" href="mailto:farjad@ashavid.ca" label="farjad@ashavid.ca" />
+            <ContactCard icon={<Mail size={20} />} title="ایمیل" href={`mailto:${FEEDBACK_EMAIL}`} label={FEEDBACK_EMAIL} />
             <ContactCard icon={<Phone size={20} />} title="تلفن / واتساپ" href="tel:+14376611674" label="+1 (437) 661-1674" ltr />
             <ContactCard icon={<MapPin size={20} />} title="موقعیت" label="تورنتو، کانادا" />
             <ContactCard
