@@ -884,3 +884,41 @@ test("the changelog opens short, with the rest one fold away", async ({ page }) 
     expect(text.trim().length).toBeLessThanOrEqual(150);
   }
 });
+
+test("the day card's background is chosen from the settings menu and remembered", async ({ page }) => {
+  const gear = page.getByRole("banner").getByRole("button", { name: "تنظیمات نمایش" });
+  await gear.click();
+  const picker = page.getByRole("group", { name: "پس‌زمینهٔ تصویر روز" });
+  await expect(picker).toBeVisible();
+
+  // The current green is the default, and it is what is selected before anyone touches it.
+  await expect(picker.getByRole("button", { name: "سبز" })).toHaveAttribute("aria-pressed", "true");
+  expect(await page.evaluate(() => window.localStorage.getItem("taghvim-card"))).toBeNull();
+
+  await picker.getByRole("button", { name: "شب" }).click();
+  await expect(picker.getByRole("button", { name: "شب" })).toHaveAttribute("aria-pressed", "true");
+  expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-card") ?? "{}")))
+    .toMatchObject({ kind: "palette", id: "night" });
+
+  // A photograph, if the folder has any, and it survives a reload.
+  const photo = picker.getByRole("button", { name: /^عکس / }).first();
+  if (await photo.count()) {
+    await photo.click();
+    const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-card") ?? "{}"));
+    expect(stored.kind).toBe("photo");
+    await page.reload();
+    await gear.click();
+    await expect(page.getByRole("group", { name: "پس‌زمینهٔ تصویر روز" }).getByRole("button", { name: /^عکس / }).first())
+      .toHaveAttribute("aria-pressed", "true");
+  }
+
+  // The card still builds, and still leaves the page alone while it does.
+  const requests: string[] = [];
+  page.on("request", (request) => { if (!/^https?:\/\/(localhost|127\.0\.0\.1)/.test(request.url())) requests.push(request.url()); });
+  const download = page.waitForEvent("download", { timeout: 15000 });
+  await page.keyboard.press("Escape");
+  await page.getByRole("button", { name: "تصویر امروز" }).click();
+  const file = await download;
+  expect(file.suggestedFilename()).toMatch(/^taghvim-\d{4}-\d{2}-\d{2}\.(png|jpg)$/);
+  expect(requests).toEqual([]);
+});

@@ -14,7 +14,7 @@ import { ArrowLeftRight, CalendarDays, Hourglass, MapPin } from "lucide-react";
 import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
 import { datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
-import { DEFAULT_CARD_STYLE, readCardStyle, type Background, type CardStyle } from "@/lib/card-style";
+import { DEFAULT_CARD_STYLE, readCardStyle, saveCardStyle, type Background, type CardStyle } from "@/lib/card-style";
 import type { Person } from "@/lib/javidnaman";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
@@ -62,6 +62,10 @@ export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: s
   function commitDates(next: Anniversary[]) {
     setDates(next);
     saveDates(next);
+  }
+  function chooseCard(next: CardStyle) {
+    setCardStyle(next);
+    saveCardStyle(next);
   }
   function toggleView(key: keyof ViewPreferences) {
     const next = { ...preferences, [key]: !preferences[key] };
@@ -122,7 +126,7 @@ export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: s
             <button onClick={() => openTool("distance")} className="flex shrink-0 items-center gap-1.5 text-muted hover:text-forest"><Hourglass size={16} />فاصلهٔ تاریخ‌ها</button>
             {preferences.religious && <a href="#prayer" className="flex shrink-0 items-center gap-1.5 text-muted hover:text-forest"><MapPin size={16} />اوقات شرعی</a>}
           </nav>
-          <SettingsMenu />
+          <SettingsMenu card={{ style: cardStyle, backgrounds, onChange: chooseCard }} />
         </div>
       </header>
       {/* On phones the month grid comes first and the hero follows it: measured in

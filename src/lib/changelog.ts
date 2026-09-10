@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.9.29 — 2026-09-09
+// Version: 0.11.0 — 2026-09-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.23',
+    at: '2026-09-09T22:05:00-04:00',
+    status: 'ready',
+    title: 'پس‌زمینه برای تصویر روز',
+    changes: [
+      { kind: 'added', text: 'تصویر روز حالا پس‌زمینه می‌گیرد: پنج رنگ، یا یکی از عکس‌ها. از چرخ‌دندهٔ بالای صفحه انتخابش کن.' },
+      { kind: 'added', text: 'عکس‌ها خیلی محو می‌شوند تا تاریخ و مناسبت‌ها خوانا بمانند. انتخابت در همین مرورگر ذخیره می‌شود.' },
+    ],
+  },
   {
     version: '0.9.22',
     at: '2026-09-09T15:17:16-04:00',
