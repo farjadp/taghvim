@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.0 — 2026-09-09
+// Version: 0.11.1 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.24',
+    at: '2026-09-10T18:02:53-04:00',
+    status: 'ready',
+    title: 'ردیف قلم در تنظیمات',
+    changes: [
+      { kind: 'fixed', text: 'ردیف قلم در تنظیمات از کادر بیرون می‌زد و آخرین قلم کامل دیده نمی‌شد. حالا برچسب بالا می‌آید و هر پنج قلم داخل کادر جا می‌شود.' },
+    ],
+  },
   {
     version: '0.9.23',
     at: '2026-09-09T22:05:00-04:00',

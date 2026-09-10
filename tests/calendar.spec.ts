@@ -272,6 +272,37 @@ test("display settings apply immediately and survive reload", async ({ page }) =
   await expect(html).toHaveAttribute("data-font", "shabnam");
 });
 
+test("nothing in the settings panel paints outside its card", async ({ page }) => {
+  // 0.9.23 shipped the font row 48px outside the card's left edge: w-72 leaves
+  // 256px of content, ~210px once a label sits beside the control, and the five
+  // font names need 272px. Reported by email and by @SepehrHashemi.
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  const panel = page.locator("#display-settings");
+  await expect(panel).toBeVisible();
+  await page.evaluate(() => document.fonts.ready);
+  const spill = await panel.evaluate((el) => {
+    const box = el.getBoundingClientRect();
+    const style = getComputedStyle(el);
+    const left = box.left + parseFloat(style.paddingLeft);
+    const right = box.right - parseFloat(style.paddingRight);
+    let worst = 0;
+    for (const chip of el.querySelectorAll("button")) {
+      const r = chip.getBoundingClientRect();
+      worst = Math.max(worst, left - r.left, r.right - right);
+    }
+    return { worst: Math.round(worst), overflow: Math.round(el.scrollWidth - el.clientWidth) };
+  });
+  expect(spill.worst).toBeLessThanOrEqual(0);
+  expect(spill.overflow).toBe(0);
+  // And every font is reachable, which is what the spill cost the reader
+  // "قلم" alone also matches «اندازهٔ قلم», hence exact
+  const fonts = page.getByRole("group", { name: "قلم", exact: true }).getByRole("button");
+  await expect(fonts).toHaveCount(5);
+  for (const name of ["وزیرمتن", "شبنم", "ساحل", "ایران‌سنس", "ایران‌یکان"]) {
+    await expect(fonts.filter({ hasText: name })).toBeVisible();
+  }
+});
+
 test("secondary pages carry the same settings menu", async ({ page }) => {
   await page.goto("/about");
   await expect(page.getByRole("button", { name: "تنظیمات نمایش" })).toBeVisible();
