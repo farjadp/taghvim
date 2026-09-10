@@ -303,6 +303,29 @@ test("nothing in the settings panel paints outside its card", async ({ page }) =
   }
 });
 
+test("the font sizes scale with the reader's own browser setting", async ({ page }) => {
+  // 0.9.23 pinned the root to hard px, so a reader who had enlarged fonts in
+  // Chrome got a SMALLER page the moment they picked «بزرگ»: 24px default, 18px
+  // large. #17 on Twitter. Percentages multiply that default instead.
+  // Only CDP can change the browser's own font size; every project here is
+  // Chromium, so this is safe.
+  const cdp = await page.context().newCDPSession(page);
+  const rootSizeAt = async (standard: number) => {
+    await cdp.send("Page.setFontSizes", { fontSizes: { standard, fixed: standard } });
+    await page.reload();
+    const html = page.locator("html");
+    const read = async (size: "md" | "sm" | "lg") => {
+      await html.evaluate((el, s) => s === "md" ? el.removeAttribute("data-size") : el.setAttribute("data-size", s), size);
+      return html.evaluate((el) => getComputedStyle(el).fontSize);
+    };
+    return { md: await read("md"), sm: await read("sm"), lg: await read("lg") };
+  };
+  // The default browser size must render exactly what it always did
+  expect(await rootSizeAt(16)).toEqual({ md: "16px", sm: "14px", lg: "18px" });
+  // And a reader who asked for bigger text must get bigger text at every setting
+  expect(await rootSizeAt(24)).toEqual({ md: "24px", sm: "21px", lg: "27px" });
+});
+
 test("secondary pages carry the same settings menu", async ({ page }) => {
   await page.goto("/about");
   await expect(page.getByRole("button", { name: "تنظیمات نمایش" })).toBeVisible();

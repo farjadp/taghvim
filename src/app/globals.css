@@ -1,6 +1,6 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.9.3 — 2026-09-08
+   Version: 0.9.24 — 2026-09-10
    Why: Visual system: colour tokens, the five font faces, base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
    ============================================================================ */
@@ -108,9 +108,13 @@
       --color-scrollbar: #3a4a42;
     }
   }
-  /* Font size: everything is in rem, so the root size scales the whole page */
-  html[data-size="sm"] { font-size: 14px; }
-  html[data-size="lg"] { font-size: 18px; }
+  /* Font size: everything is in rem, so the root size scales the whole page.
+     Percentages, not px: a percentage on the root multiplies the size the
+     READER set in their browser, where px overwrote it — pick «بزرگ» after
+     enlarging fonts in Chrome and the page used to get smaller. At the 16px
+     default these still compute to exactly 14px and 18px. */
+  html[data-size="sm"] { font-size: 87.5%; }
+  html[data-size="lg"] { font-size: 112.5%; }
   /* Font family: the Tailwind font-sans utility reads this variable */
   html[data-font="shabnam"] { --font-sans: "Shabnam", "Vazirmatn", sans-serif; }
   html[data-font="sahel"] { --font-sans: "Sahel", "Vazirmatn", sans-serif; }
