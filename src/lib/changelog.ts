@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.1 — 2026-09-10
+// Version: 0.11.2 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -38,11 +38,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
-    version: '0.9.24',
-    at: '2026-09-10T18:02:53-04:00',
+    version: '0.9.25',
+    at: '2026-09-10T18:45:00-04:00',
     status: 'ready',
-    title: 'دو اصلاح در تنظیمات نمایش',
+    title: 'تاریخ‌های شخصی: دسته و تکرار',
     changes: [
+      { kind: 'added', text: 'هر تاریخ حالا یک دسته دارد، با رنگ و نشان خودش: تولد، عاشقانه‌ها، جاویدنامان، پریود، قسط، خرید، سفر، قرار کاری و چند تای دیگر.' },
+      { kind: 'added', text: 'تکرار هم انتخابی شد: هر سال، هر ماه، یا فقط یک بار. قسط را ماهانه بگذار و خودش هر ماه می‌آید.' },
+      { kind: 'changed', text: 'خروجی تقویم هم همین را می‌فهمد: دو سال از هر مورد ماهانه، و یک تاریخ یک‌باره فقط یک بار.' },
+      { kind: 'changed', text: 'تاریخ‌هایی که قبلاً ذخیره کرده بودی سر جایشان‌اند و خودشان به دستهٔ درست منتقل شدند.' },
       { kind: 'fixed', text: 'ردیف قلم در تنظیمات از کادر بیرون می‌زد و آخرین قلم کامل دیده نمی‌شد. حالا برچسب بالا می‌آید و هر پنج قلم داخل کادر جا می‌شود.' },
       { kind: 'fixed', text: 'اگر اندازهٔ قلم را در خود مرورگر بزرگ کرده بودی، انتخاب «بزرگ» صفحه را کوچک‌تر می‌کرد. حالا هر سه اندازه روی تنظیم مرورگرت ضرب می‌شوند.' },
     ],

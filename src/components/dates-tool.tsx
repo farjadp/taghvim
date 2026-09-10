@@ -1,8 +1,8 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.3.0 — 2026-09-09
-// Why: The visitor's own birthdays and anniversaries: add, list by nearness,
-//      remove, and export to their own calendar as an .ics.
+// Version: 0.4.0 — 2026-09-10
+// Why: The visitor's own dates: add under one of fourteen categories and one of
+//      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
 //      Persian and Arabic-Indic digits work; the caller owns the list and its
 //      persistence, so the calendar grid and this tool always agree.
@@ -17,15 +17,22 @@ import { fa, formatDate, MONTHS } from "@/lib/calendar";
 import { parseNumericInput } from "@/lib/date-tools";
 import {
   addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
-  upcomingDates, type Anniversary, type DateKind, type UpcomingDate,
+  upcomingDates, type Anniversary, type UpcomingDate,
 } from "@/lib/dates";
+import {
+  CATEGORIES, categoryOf, DEFAULT_CATEGORY, REPEATS,
+  type CategoryId, type Repeat,
+} from "@/lib/date-categories";
+import { CategoryIcon, categoryStyle } from "./date-category-icon";
 
-const KINDS: { value: DateKind; label: string }[] = [
-  { value: "birthday", label: "تولد" },
-  { value: "anniversary", label: "سالگرد" },
-];
-
-const EMPTY = { title: "", kind: "birthday" as DateKind, day: "", month: "1", year: "" };
+const EMPTY = {
+  title: "",
+  category: DEFAULT_CATEGORY as CategoryId,
+  repeat: "yearly" as Repeat,
+  day: "",
+  month: "1",
+  year: "",
+};
 
 // «فردا» and «امروز» read better than «۱ روز» and «۰ روز», and only there.
 function whenLabel(item: UpcomingDate): string {
@@ -34,10 +41,14 @@ function whenLabel(item: UpcomingDate): string {
   return `${fa(item.days)} روز دیگر`;
 }
 
-// «۳۵ ساله می‌شود» for a person, «۳۵مین سال» for an event. Same arithmetic, different sentence.
+// «۳۵ ساله می‌شود» for a person, «۳۵مین سال» for a date being marked, nothing at all for an
+// instalment — the category decides, because a sentence about an age it does not have reads
+// as a bug. lib/date-categories owns that rule; the .ics export reads the same one.
 function yearsLabel(item: UpcomingDate): string | null {
   if (item.years === null) return null;
-  if (item.entry.kind === "birthday") return item.days === 0 ? `${fa(item.years)} ساله شد` : `${fa(item.years)} ساله می‌شود`;
+  const age = categoryOf(item.entry.category).age;
+  if (age === "none") return null;
+  if (age === "age") return item.days === 0 ? `${fa(item.years)} ساله شد` : `${fa(item.years)} ساله می‌شود`;
   return `${fa(item.years)}مین سال`;
 }
 
@@ -63,14 +74,17 @@ export function DatesTool({ now, dates, ready, onChange }: {
     try {
       // parseNumericInput, not Number: people type Persian digits, and `Number("۱۳")` is NaN.
       // Every other tool in this box already parses input this way.
+      const monthly = draft.repeat === "monthly";
       commit(addDate(dates, {
         title: draft.title,
-        kind: draft.kind,
-        month: parseNumericInput(draft.month),
+        category: draft.category,
+        repeat: draft.repeat,
+        // A monthly thing has no month and no year: it happens on a day, every month.
+        month: monthly ? null : parseNumericInput(draft.month),
         day: parseNumericInput(draft.day),
-        year: draft.year.trim() === "" ? null : parseNumericInput(draft.year),
+        year: monthly || draft.year.trim() === "" ? null : parseNumericInput(draft.year),
       }));
-      setDraft({ ...EMPTY, kind: draft.kind });
+      setDraft({ ...EMPTY, category: draft.category, repeat: draft.repeat });
       setError("");
     } catch (thrown) {
       setError(thrown instanceof RangeError ? thrown.message : "ذخیره نشد.");
@@ -99,28 +113,56 @@ export function DatesTool({ now, dates, ready, onChange }: {
             onChange={(event) => { setDraft({ ...draft, title: event.target.value }); setError(""); }}
             placeholder="تولد مریم" className="field" />
         </label>
-        <div className="mt-4 grid grid-cols-[.8fr_1.35fr_1fr] gap-3">
+        <div className={`mt-4 grid gap-3 ${draft.repeat === "monthly" ? "grid-cols-1" : "grid-cols-[.8fr_1.35fr_1fr]"}`}>
           <label className="block text-xs text-muted"><span className="mb-2 block">روز</span>
             <input aria-label="روز" inputMode="numeric" autoComplete="off" maxLength={2} value={draft.day}
               onChange={(event) => { setDraft({ ...draft, day: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
-          <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span>
-            <select aria-label="ماه" value={draft.month} onChange={(event) => { setDraft({ ...draft, month: event.target.value }); setError(""); }} className="field">
-              {MONTHS.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
-            </select></label>
-          <label className="block text-xs text-muted"><span className="mb-2 block">سال (اختیاری)</span>
-            <input aria-label="سال" inputMode="numeric" autoComplete="off" maxLength={4} value={draft.year}
-              onChange={(event) => { setDraft({ ...draft, year: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
+          {draft.repeat !== "monthly" && <>
+            <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span>
+              <select aria-label="ماه" value={draft.month} onChange={(event) => { setDraft({ ...draft, month: event.target.value }); setError(""); }} className="field">
+                {MONTHS.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
+              </select></label>
+            <label className="block text-xs text-muted"><span className="mb-2 block">{draft.repeat === "once" ? "سال" : "سال (اختیاری)"}</span>
+              <input aria-label="سال" inputMode="numeric" autoComplete="off" maxLength={4} value={draft.year}
+                onChange={(event) => { setDraft({ ...draft, year: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
+          </>}
         </div>
-        <div className="mt-4 flex gap-1" role="group" aria-label="نوع">
-          {KINDS.map(({ value, label }) => (
-            <button key={value} type="button" aria-pressed={draft.kind === value} onClick={() => setDraft({ ...draft, kind: value })}
-              className={`rounded-lg px-3 py-1.5 text-[0.6875rem] transition-colors ${draft.kind === value ? "bg-leaf font-medium text-forest" : "text-muted hover:bg-paper"}`}>
+        <label className="mt-4 block text-xs text-muted">
+          <span className="mb-2 block">دسته</span>
+          {/* A select, not a row of chips: fourteen of them would run out of the box, which
+              is exactly the bug 0.9.24 fixed one row above this one. */}
+          <select aria-label="دسته" value={draft.category} className="field"
+            onChange={(event) => {
+              const category = categoryOf(event.target.value);
+              // Changing the category moves the rhythm with it — an instalment is monthly,
+              // a flight happens once — and the visitor can still override it below.
+              setDraft({ ...draft, category: category.id, repeat: category.repeat });
+              setError("");
+            }}>
+            {CATEGORIES.map((category) => <option key={category.id} value={category.id}>{category.label}</option>)}
+          </select>
+        </label>
+        <p className="mt-2 flex items-center gap-2 text-[0.625rem] leading-5 text-muted">
+          <span className="flex size-6 shrink-0 items-center justify-center rounded-md" style={categoryStyle(draft.category)}>
+            <CategoryIcon id={draft.category} size={13} />
+          </span>
+          {categoryOf(draft.category).hint}
+        </p>
+        <div className="mt-4 flex flex-wrap gap-1" role="group" aria-label="تکرار">
+          {REPEATS.map(({ value, label, hint }) => (
+            <button key={value} type="button" title={hint} aria-pressed={draft.repeat === value}
+              onClick={() => { setDraft({ ...draft, repeat: value }); setError(""); }}
+              className={`shrink-0 rounded-lg px-3 py-1.5 text-[0.6875rem] transition-colors ${draft.repeat === value ? "bg-leaf font-medium text-forest" : "text-muted hover:bg-paper"}`}>
               {label}
             </button>
           ))}
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
-          <p className="text-[0.625rem] text-muted">سال را ندانی هم اشکالی ندارد؛ فقط سن نشان داده نمی‌شود.</p>
+          <p className="text-[0.625rem] leading-5 text-muted">
+            {draft.repeat === "monthly" ? "فقط روز لازم است؛ ماهی که کمتر از آن روز دارد، به آخرین روزش می‌افتد."
+              : draft.repeat === "once" ? "سال هم لازم است — این تاریخ فقط یک بار می‌آید."
+              : "سال را ندانی هم اشکالی ندارد؛ فقط سن نشان داده نمی‌شود."}
+          </p>
           <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest-deep px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">افزودن<ArrowLeft size={16} /></button>
         </div>
         {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
@@ -147,6 +189,10 @@ export function DatesTool({ now, dates, ready, onChange }: {
             {upcoming.map((item) => (
               <li key={item.entry.id} className="flex items-baseline gap-3 border-b border-line py-3.5 last:border-0">
                 <span className="min-w-20 text-sm leading-6 font-medium tabular-nums text-forest">{whenLabel(item)}</span>
+                <span className="mt-0.5 flex size-6 shrink-0 items-center justify-center self-start rounded-md"
+                  style={categoryStyle(item.entry.category)} title={categoryOf(item.entry.category).label}>
+                  <CategoryIcon id={item.entry.category} size={13} />
+                </span>
                 <span className="flex-1 text-xs leading-6">
                   <span className="font-medium">{item.entry.title}</span>
                   {/* The full date of the next occurrence says the day and the month already;
@@ -154,6 +200,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
                       screen reader. */}
                   <span className="block text-[0.625rem] text-muted">
                     {formatDate(item.date, "persian", true)}
+                    {item.entry.repeat === "monthly" && <> · هر ماه</>}
                     {yearsLabel(item) && <> · {yearsLabel(item)}</>}
                   </span>
                 </span>

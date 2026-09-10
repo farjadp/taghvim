@@ -272,6 +272,36 @@ test("display settings apply immediately and survive reload", async ({ page }) =
   await expect(html).toHaveAttribute("data-font", "shabnam");
 });
 
+test("a monthly date asks for a day only, and a one-off insists on a year", async ({ page }) => {
+  const tools = page.locator("#tools");
+  await page.getByRole("tab", { name: "تاریخ‌های من" }).click();
+
+  // Picking a category moves the rhythm with it: an instalment is a monthly thing
+  await tools.getByLabel("دسته").selectOption("instalment");
+  await expect(tools.getByRole("group", { name: "تکرار" }).getByRole("button", { name: "هر ماه" })).toHaveAttribute("aria-pressed", "true");
+  // …and a monthly thing has no month and no year to ask about
+  await expect(tools.getByLabel("ماه", { exact: true })).toHaveCount(0);
+  await expect(tools.getByLabel("سال", { exact: true })).toHaveCount(0);
+
+  await tools.getByLabel("عنوان").fill("قسط وام");
+  await tools.getByLabel("روز", { exact: true }).fill("۵");
+  await tools.getByRole("button", { name: "افزودن", exact: true }).click();
+  await expect(tools.getByText("قسط وام")).toBeVisible();
+  await expect(tools.getByText("هر ماه", { exact: false }).first()).toBeVisible();
+
+  const monthly = await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"));
+  expect(monthly[0]).toMatchObject({ category: "instalment", repeat: "monthly", month: null, day: 5, year: null });
+
+  // A one-off cannot be placed without a year, and says so rather than guessing one
+  await tools.getByLabel("دسته").selectOption("work");
+  await expect(tools.getByRole("group", { name: "تکرار" }).getByRole("button", { name: "یک‌بار" })).toHaveAttribute("aria-pressed", "true");
+  await tools.getByLabel("عنوان").fill("جلسه");
+  await tools.getByLabel("روز", { exact: true }).fill("۲");
+  await tools.getByRole("button", { name: "افزودن", exact: true }).click();
+  await expect(tools.getByRole("alert")).toContainText("سال هم لازم است");
+  expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"))).toHaveLength(1);
+});
+
 test("nothing in the settings panel paints outside its card", async ({ page }) => {
   // 0.9.23 shipped the font row 48px outside the card's left edge: w-72 leaves
   // 256px of content, ~210px once a label sits beside the control, and the five
@@ -844,7 +874,7 @@ test("personal dates live in the tools box, are stored in the browser and mark t
 
   const stored = await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"));
   expect(stored).toHaveLength(1);
-  expect(stored[0]).toMatchObject({ title: "تولد مریم", month: 6, day: 21, year: 1370, kind: "birthday" });
+  expect(stored[0]).toMatchObject({ title: "تولد مریم", month: 6, day: 21, year: 1370, category: "birthday", repeat: "yearly" });
 
   // A bad date is refused in Persian and writes nothing.
   await tools.getByLabel("عنوان").fill("بد");

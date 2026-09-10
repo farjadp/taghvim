@@ -58,6 +58,38 @@
   --color-memorial-muted: #b7c7bd;
   --color-memorial-line: #35493f;
   --color-scrollbar: #bcc8bb;
+  /* The thirteen personal-date categories: an ink and a tint each. Every pair was
+     measured, not chosen by eye — label on tint clears 4.5:1 and the icon on the
+     surface clears 3:1, in both themes. Add a category and its two tokens go in
+     all three blocks below, or it renders transparent in one theme. */
+  --color-cat-birthday: #8a5a12;
+  --color-cat-birthday-tint: #fdf1dc;
+  --color-cat-love: #a9435c;
+  --color-cat-love-tint: #fce7ec;
+  --color-cat-anniversary: #7a5a4a;
+  --color-cat-anniversary-tint: #f2e9e4;
+  --color-cat-memorial: #3d5a4e;
+  --color-cat-memorial-tint: #e6ece8;
+  --color-cat-joy: #5f6d1a;
+  --color-cat-joy-tint: #eff2dc;
+  --color-cat-period: #a03a3a;
+  --color-cat-period-tint: #fbe6e6;
+  --color-cat-instalment: #8a5230;
+  --color-cat-instalment-tint: #f7e9df;
+  --color-cat-shopping: #1f6b6b;
+  --color-cat-shopping-tint: #e0f0ef;
+  --color-cat-work: #3a5480;
+  --color-cat-work-tint: #e6ecf7;
+  --color-cat-travel: #2b6591;
+  --color-cat-travel-tint: #e2eef7;
+  --color-cat-health: #2f6b45;
+  --color-cat-health-tint: #e3f0e7;
+  --color-cat-study: #6a4a8c;
+  --color-cat-study-tint: #efe8f7;
+  --color-cat-sport: #96541f;
+  --color-cat-sport-tint: #fbeadb;
+  --color-cat-home: #5c6a61;
+  --color-cat-home-tint: #eceeea;
 }
 
 /* Dark palette: applied by explicit choice (data-theme="dark") or by the OS
@@ -86,6 +118,34 @@
     --color-memorial-muted: #9fb0a6;
     --color-memorial-line: #2c3a33;
     --color-scrollbar: #3a4a42;
+    --color-cat-birthday: #e8bd77;
+    --color-cat-birthday-tint: #33290f;
+    --color-cat-love: #f0a0b4;
+    --color-cat-love-tint: #3a1f27;
+    --color-cat-anniversary: #d6b3a3;
+    --color-cat-anniversary-tint: #2e2521;
+    --color-cat-memorial: #a9c4b6;
+    --color-cat-memorial-tint: #24312b;
+    --color-cat-joy: #c2d17a;
+    --color-cat-joy-tint: #262c12;
+    --color-cat-period: #ef9c9c;
+    --color-cat-period-tint: #38201f;
+    --color-cat-instalment: #e0a880;
+    --color-cat-instalment-tint: #33251b;
+    --color-cat-shopping: #7fc9c4;
+    --color-cat-shopping-tint: #14312f;
+    --color-cat-work: #9db6e0;
+    --color-cat-work-tint: #1e2838;
+    --color-cat-travel: #90c1e4;
+    --color-cat-travel-tint: #172a38;
+    --color-cat-health: #8ecfa5;
+    --color-cat-health-tint: #17301f;
+    --color-cat-study: #bfa4dd;
+    --color-cat-study-tint: #2a2136;
+    --color-cat-sport: #e6ac77;
+    --color-cat-sport-tint: #35261a;
+    --color-cat-home: #b0bfb6;
+    --color-cat-home-tint: #262e29;
   }
   @media (prefers-color-scheme: dark) {
     html:not([data-theme="light"]) {
@@ -106,6 +166,34 @@
       --color-memorial-muted: #9fb0a6;
       --color-memorial-line: #2c3a33;
       --color-scrollbar: #3a4a42;
+    --color-cat-birthday: #e8bd77;
+    --color-cat-birthday-tint: #33290f;
+    --color-cat-love: #f0a0b4;
+    --color-cat-love-tint: #3a1f27;
+    --color-cat-anniversary: #d6b3a3;
+    --color-cat-anniversary-tint: #2e2521;
+    --color-cat-memorial: #a9c4b6;
+    --color-cat-memorial-tint: #24312b;
+    --color-cat-joy: #c2d17a;
+    --color-cat-joy-tint: #262c12;
+    --color-cat-period: #ef9c9c;
+    --color-cat-period-tint: #38201f;
+    --color-cat-instalment: #e0a880;
+    --color-cat-instalment-tint: #33251b;
+    --color-cat-shopping: #7fc9c4;
+    --color-cat-shopping-tint: #14312f;
+    --color-cat-work: #9db6e0;
+    --color-cat-work-tint: #1e2838;
+    --color-cat-travel: #90c1e4;
+    --color-cat-travel-tint: #172a38;
+    --color-cat-health: #8ecfa5;
+    --color-cat-health-tint: #17301f;
+    --color-cat-study: #bfa4dd;
+    --color-cat-study-tint: #2a2136;
+    --color-cat-sport: #e6ac77;
+    --color-cat-sport-tint: #35261a;
+    --color-cat-home: #b0bfb6;
+    --color-cat-home-tint: #262e29;
     }
   }
   /* Font size: everything is in rem, so the root size scales the whole page.
