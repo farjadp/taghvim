@@ -39,8 +39,8 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 export const RELEASES: Release[] = [
   {
     version: '0.9.25',
-    at: '2026-09-10T18:45:00-04:00',
-    status: 'ready',
+    at: '2026-09-10T19:05:00-04:00',
+    status: 'live',
     title: 'تاریخ‌های شخصی: دسته و تکرار',
     changes: [
       { kind: 'added', text: 'هر تاریخ حالا یک دسته دارد، با رنگ و نشان خودش: تولد، عاشقانه‌ها، جاویدنامان، پریود، قسط، خرید، سفر، قرار کاری و چند تای دیگر.' },
