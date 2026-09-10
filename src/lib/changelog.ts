@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.23',
     at: '2026-09-09T22:05:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'پس‌زمینه برای تصویر روز',
     changes: [
       { kind: 'added', text: 'تصویر روز حالا پس‌زمینه می‌گیرد: پنج رنگ، یا یکی از عکس‌ها. از چرخ‌دندهٔ بالای صفحه انتخابش کن.' },
