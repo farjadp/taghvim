@@ -64,6 +64,23 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.clock.install({ time: new Date("2026-09-06T10:30:00Z") });
 });
 
+test("keeps the whole month on the first screen, with the tools below it", async ({ page }) => {
+  // Adding the tools box inside the pinned viewport block split the height with the
+  // calendar and cut the month off half way down — visible in the store screenshot
+  // before anyone reported it. The first screen has to stay what it always was.
+  await page.setViewportSize({ width: 1280, height: 800 });
+  await page.goto(`${origin}/newtab.html`);
+  const cells = page.locator('button[aria-label*="۱۴۰۵"]');
+  await expect(cells).toHaveCount(35);
+  const offscreen = await cells.evaluateAll((nodes, height) =>
+    nodes.filter((node) => node.getBoundingClientRect().bottom > height + 0.5).length, 800);
+  expect(offscreen).toBe(0);
+  // …and the tools box is real, just below the fold
+  await expect(page.locator("#tools")).toHaveCount(1);
+  const scrollable = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
+  expect(scrollable).toBeGreaterThan(0);
+});
+
 test("carries the same tools box, with its own separate list of dates", async ({ page }) => {
   await page.goto(`${origin}/newtab.html`);
   const tabs = page.getByRole("tab");
@@ -125,8 +142,12 @@ test("paints the Tehran date from its own files with every other origin blocked"
   await expect(page.getByTestId("view-controls").getByRole("switch")).toHaveCount(3);
   expect(foreign, "the page reached outside its own origin").toEqual([]);
 
-  // The whole point of a new tab: no page scroll at a common laptop size
-  expect(await page.evaluate(() => document.documentElement.scrollHeight <= window.innerHeight)).toBe(true);
+  // The FIRST SCREEN must still hold everything a new tab is for, at a common laptop
+  // size. It used to be the whole page and never scrolled; since 0.9.28 the tools box
+  // Farjad asked for lives below it, so the page scrolls to reach the tools and the
+  // test asserts the month instead: «keeps the whole month on the first screen».
+  const main = await page.locator("#main").boundingBox();
+  expect(main && main.y + main.height <= 800 + 0.5, "the pinned first screen runs past the fold").toBe(true);
 });
 
 test("applies a stored dark theme before React runs", async ({ page }) => {

@@ -91,7 +91,12 @@ export function NewTab() {
 
   return (
     <MonthNamesProvider avestan={preferences.avestan}>
-    <div className="flex h-full flex-col">
+    {/* Two blocks. The first is pinned to the viewport and composes exactly what the
+          new tab always showed — header, today, occasions, the whole month. The tools
+          box is the second and lives BELOW the fold: inside the pinned block it split
+          the height with the calendar and cut the month off half way down. */}
+    <div className="flex min-h-full flex-col">
+      <div className="flex h-screen flex-col">
       <header className="border-b border-line bg-surface/80">
         <div className="mx-auto flex min-h-14 max-w-[1400px] items-center justify-between gap-4 px-5">
           <span className="flex items-center gap-2.5 text-forest">
@@ -143,17 +148,17 @@ export function NewTab() {
           onToday={today}
           onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }}
         />
-        {/* The same tools box the site carries: nothing here touches a network, and the
-            bridges link is the only thing that leaves, to taghv.im by an absolute URL.
-            It spans BOTH columns. Dropped into the narrow one it got 324px for a tab
-            strip that needs 726, and four of the six tabs sat behind a scroll with
-            nothing on screen to say so. */}
-        <div className="lg:col-span-2">
-          <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
-            dates={dates} datesReady={datesReady} onDatesChange={commitDates}
-            bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
-        </div>
       </main>
+      </div>
+      {/* The same tools box the site carries: nothing here touches a network, and the
+          bridges link is the only thing that leaves, to taghv.im by an absolute URL.
+          OUTSIDE the grid on purpose — in the narrow column its tab strip got 324px
+          for the 726 it needs, and as a second grid row it halved the calendar. */}
+      <div className="mx-auto w-full max-w-[1400px] px-5 pb-5">
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
+          dates={dates} datesReady={datesReady} onDatesChange={commitDates}
+          bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
+      </div>
       {/* Which build this is. Farjad asked for it: the store rolls updates out over
           hours, so «am I on the new one» is otherwise unanswerable from the page. */}
       <footer className="pb-6 text-center text-[0.625rem] text-muted/70">
