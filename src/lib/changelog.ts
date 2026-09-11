@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.34',
     at: '2026-09-11T12:16:16-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'برنامهٔ اندروید',
     changes: [
       { kind: 'added', text: 'برنامهٔ اندروید منتشر شد: از صفحهٔ دریافت، با دو ویجت صفحهٔ خانه و بدون مجوز اینترنت.' },
