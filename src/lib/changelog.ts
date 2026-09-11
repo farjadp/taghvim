@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.4 — 2026-09-10
+// Version: 0.11.5 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.28',
+    at: '2026-09-10T22:20:00-04:00',
+    status: 'ready',
+    title: 'جای ابزارها در افزونه',
+    changes: [
+      { kind: 'fixed', text: 'جعبهٔ ابزار در افزونه توی ستون باریک افتاده بود و چهار تب از شش تب پشت اسکرول پنهان می‌شد. حالا کل عرض را می‌گیرد.' },
+    ],
+  },
   {
     version: '0.9.27',
     at: '2026-09-10T21:55:00-04:00',

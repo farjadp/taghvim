@@ -72,6 +72,17 @@ test("carries the same tools box, with its own separate list of dates", async ({
     await expect(page.getByRole("tab", { name })).toBeVisible();
   }
 
+  // …and every one of them reachable without scrolling. Dropped into the narrow
+  // column the strip got 324px for the 726 it needs, and four tabs sat behind a
+  // scroll with nothing on screen to say so.
+  const hidden = await page.locator('[role="tablist"]').evaluate((list) => {
+    const box = list.getBoundingClientRect();
+    return [...list.querySelectorAll('[role="tab"]')]
+      .filter((tab) => { const r = tab.getBoundingClientRect(); return r.left < box.left - 0.5 || r.right > box.right + 0.5; })
+      .map((tab) => tab.textContent?.trim());
+  });
+  expect(hidden).toEqual([]);
+
   // A tool that only computes: no network, so it works here exactly as on the site
   await page.getByRole("tab", { name: "محاسبهٔ سن" }).click();
   await expect(page.locator("#tools")).toBeVisible();

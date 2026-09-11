@@ -144,10 +144,15 @@ export function NewTab() {
           onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }}
         />
         {/* The same tools box the site carries: nothing here touches a network, and the
-            bridges link is the only thing that leaves, to taghv.im by an absolute URL. */}
-        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
-          dates={dates} datesReady={datesReady} onDatesChange={commitDates}
-          bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
+            bridges link is the only thing that leaves, to taghv.im by an absolute URL.
+            It spans BOTH columns. Dropped into the narrow one it got 324px for a tab
+            strip that needs 726, and four of the six tabs sat behind a scroll with
+            nothing on screen to say so. */}
+        <div className="lg:col-span-2">
+          <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
+            dates={dates} datesReady={datesReady} onDatesChange={commitDates}
+            bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
+        </div>
       </main>
       {/* Which build this is. Farjad asked for it: the store rolls updates out over
           hours, so «am I on the new one» is otherwise unanswerable from the page. */}
