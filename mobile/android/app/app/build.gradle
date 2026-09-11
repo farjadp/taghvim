@@ -39,10 +39,28 @@ android {
             assets.srcDirs += [widgetAssets]
         }
     }
+    // The release key never enters this repository (it is public). Its path and
+    // passwords come from the environment of whoever builds a release:
+    //   TAGHVIM_KEYSTORE, TAGHVIM_KEYSTORE_PASSWORD, TAGHVIM_KEY_ALIAS, TAGHVIM_KEY_PASSWORD
+    // Without them a release build is left unsigned rather than signed with
+    // anything else — the one key must sign every channel, Play and taghv.im
+    // alike, so an install from one can update from the other.
+    def releaseKeystore = System.getenv('TAGHVIM_KEYSTORE')
+    signingConfigs {
+        if (releaseKeystore) {
+            release {
+                storeFile file(releaseKeystore)
+                storePassword System.getenv('TAGHVIM_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('TAGHVIM_KEY_ALIAS') ?: 'taghvim'
+                keyPassword System.getenv('TAGHVIM_KEY_PASSWORD') ?: System.getenv('TAGHVIM_KEYSTORE_PASSWORD')
+            }
+        }
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (releaseKeystore) signingConfig signingConfigs.release
         }
     }
 }

@@ -44,6 +44,23 @@ Nowruz preview, and a reinstall on the emulator showed «یکشنبه ۱ فرو�
 on a Friday in Shahrivar. `widget_loading.xml` is the card and the mark only;
 the dated Nowruz layouts are `previewLayout`, for the picker.
 
+## Signing a release
+
+One key signs every channel — Google Play (uploaded there once, with a
+separate upload key) and the APK on taghv.im — so an install from one source
+updates from the other. The keystore is `~/taghvim-keys/taghvim-release.jks`,
+outside this public repository, readable by its owner only. The build reads it
+from the environment and signs nothing without it:
+
+```bash
+read -s "TAGHVIM_KEYSTORE_PASSWORD?Keystore password: " && export TAGHVIM_KEYSTORE_PASSWORD TAGHVIM_KEYSTORE=~/taghvim-keys/taghvim-release.jks && cd mobile/android/app && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew assembleRelease
+```
+
+`read -s` keeps the password off the screen and out of the shell history.
+Unset it after (`unset TAGHVIM_KEYSTORE_PASSWORD`). Minification is off: R8 in
+AGP 8.13 does not yet read Kotlin 2.4's metadata, which is harmless unminified
+and must be solved (newer AGP, or Kotlin 2.2) before `minifyEnabled true`.
+
 ## Icon and splash
 
 One source, `src/app/icon.svg`. The adaptive icon's foreground is
