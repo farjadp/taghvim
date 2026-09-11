@@ -42,7 +42,10 @@ describe('next holidays', () => {
   });
 
   it('follows the visitor\'s groups: the default visitor sees no religious holiday', () => {
-    const all = nextHolidays(persian(1405, 6, 18), ALL_GROUPS, 3);
+    // Five, not three: since 22 Aban was pinned on 10 Sep, the first three religious
+    // holidays from here — Fatima, Ali, Mab'ath — are all official dates, and the first
+    // computed (uncertain) one is 15 Sha'ban on 4 Bahman, fourth in line.
+    const all = nextHolidays(persian(1405, 6, 18), ALL_GROUPS, 5);
     const defaults = nextHolidays(persian(1405, 6, 18), DEFAULT_GROUPS, 3);
     expect(all.some((item) => item.uncertain)).toBe(true);
     expect(defaults.every((item) => !item.uncertain)).toBe(true);

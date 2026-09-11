@@ -3,7 +3,7 @@
 // Version: 0.13.0 — 2026-09-09
 // Why: Curated occasions: national, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
-// Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (3 dates).
+// Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (4 dates).
 // ============================================================================
 
 import { toCalendar } from './calendar';
@@ -13,9 +13,10 @@ import { toCalendar } from './calendar';
 //               is deliberately not attached to any of them, and every one of them is
 //               rendered behind `StateMark`: Farjad's editorial call of 9 Sep, consistent
 //               with the memorial panel, which has always named the same government.
-//               The same call names the two men: Khomeini is «دجال زمان (خمینی آفتابه به
-//               دست)» and Khamenei is «ضحاک تاریخ». Both names are under test, so no row
-//               can reintroduce either man in his official form.
+//               The two men are named by name only — «خمینی», «خامنه‌ای» — with no
+//               prefix, suffix or description: Farjad's call of 10 Sep, replacing the
+//               epithets of 9 Sep. Both are under test, so no row can bring back an
+//               epithet or either man's official honorific.
 // 'religious' — lunar religious holidays, computed via islamic-civil
 // 'world'     — international observances on the Gregorian calendar
 export type EventCategory = 'iran' | 'state' | 'religious' | 'world';
@@ -106,7 +107,7 @@ const PERSIAN_EVENTS: FixedEvents = {
 const STATE_EVENTS: FixedEvents = {
   '1-12': [['روز جمهوری اسلامی', true]],
   '3-3': [['سالروز آزادسازی خرمشهر؛ روز مقاومت، ایثار و پیروزی']],
-  '3-14': [['رحلت دجال زمان (خمینی آفتابه به دست)', true]],
+  '3-14': [['رحلت خمینی', true]],
   '3-15': [['قیام پانزده خرداد', true]],
   '4-7': [['روز قوه قضائیه']],
   '6-2': [['آغاز هفته دولت']],
@@ -118,13 +119,13 @@ const STATE_EVENTS: FixedEvents = {
   '9-5': [['روز بسیج مستضعفین']],
   '9-7': [['روز نیروی دریایی']],
   '10-7': [['روز نهضت سوادآموزی']],
-  '11-12': [['بازگشت دجال زمان (خمینی آفتابه به دست)؛ آغاز دهه فجر']],
+  '11-12': [['بازگشت خمینی؛ آغاز دهه فجر']],
   '11-19': [['روز نیروی هوایی']],
   '11-22': [['متأسفانه شورش ۵۷ (جمهوری اسلامی)', true]],
   // 9 Esfand 1404 is 28 February 2026, a Saturday — checked against lib/calendar, and the
   // death itself against contemporary reporting rather than memory before it was written
   // here. Not a holiday: nothing declared it one.
-  '12-9': [['هلاکت ضحاک تاریخ (خامنه‌ای) در ثانیهٔ صفر جنگ']],
+  '12-9': [['هلاکت خامنه‌ای']],
 };
 
 // International observances keyed on the Gregorian calendar. Never holidays in Iran.
@@ -195,10 +196,13 @@ const LUNAR_HOLIDAYS: Record<string, string> = {
 };
 
 // Official Iranian dates that pin a lunar holiday to a Persian month-day for one year.
-// Only 1405 is covered, and only three dates — every other lunar holiday is computed.
+// Only 1405 is covered, and only four dates — every other lunar holiday is computed.
+// 22 Aban was added on 10 Sep: islamic-civil put Fatima on 23 Aban, a day after the
+// official date (the sandbox/official-lunar comparison found it, ISNA's list has it).
 const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
   1405: {
     '6-8': 'میلاد پیامبر اکرم (ص) و امام جعفر صادق (ع)',
+    '8-22': 'شهادت حضرت فاطمه (س)',
     '10-2': 'میلاد امام علی (ع) — روز پدر',
     '10-16': 'مبعث پیامبر اکرم (ص)',
   },

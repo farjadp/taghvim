@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.7 — 2026-09-10
+// Version: 0.11.9 — 2026-09-11
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.32',
+    at: '2026-09-11T00:20:00-04:00',
+    status: 'ready',
+    title: 'شهادت حضرت فاطمه، و دو نام',
+    changes: [
+      { kind: 'fixed', text: 'شهادت حضرت فاطمه در ۱۴۰۵ روی ۲۳ آبان نشان داده می‌شد؛ تاریخ رسمی ۲۲ آبان است و حالا همان‌جاست.' },
+      { kind: 'changed', text: 'در مناسبت‌های دستهٔ «دولتی»، خمینی و خامنه‌ای فقط با نامشان آمده‌اند.' },
+    ],
+  },
   {
     version: '0.9.31',
     at: '2026-09-10T22:55:47-04:00',
@@ -172,7 +182,7 @@ export const RELEASES: Release[] = [
     status: 'live',
     title: 'نهم اسفند',
     changes: [
-      { kind: 'added', text: 'نهم اسفند اضافه شد: هلاکت ضحاک تاریخ (خامنه‌ای) در ثانیهٔ صفر جنگ. در دستهٔ «دولتی» است و پیش‌فرض نمایش داده نمی‌شود.' },
+      { kind: 'added', text: 'نهم اسفند اضافه شد: هلاکت خامنه‌ای. در دستهٔ «دولتی» است و پیش‌فرض نمایش داده نمی‌شود.' },
     ],
   },
   {

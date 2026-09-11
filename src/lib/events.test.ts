@@ -50,23 +50,25 @@ describe('selected calendar events', () => {
         try { events = eventsForDate(persian(month, day), ALL_GROUPS); } catch { continue; }
         for (const { title } of events) {
           expect(title).not.toContain('امام خمینی');
-          if (title.includes('خمینی')) expect(title).toContain('دجال زمان');
-          if (title.includes('خامنه')) expect(title).toContain('ضحاک تاریخ');
+          // By name only since 10 Sep: no epithet, no honorific, no description
+          if (title.includes('خمینی') || title.includes('خامنه')) {
+            for (const word of ['دجال', 'آفتابه', 'ضحاک', 'امام', 'آیت‌الله', 'رهبر']) expect(title).not.toContain(word);
+          }
         }
       }
     }
-    expect(eventsForDate(persian(3, 14), ALL_GROUPS).some((event) => event.title.includes('دجال زمان'))).toBe(true);
+    expect(eventsForDate(persian(3, 14), ALL_GROUPS).some((event) => event.title === 'رحلت خمینی')).toBe(true);
   });
 
   it('carries 9 Esfand, in the state category and not as a holiday', () => {
     const events = eventsForDate(persian(12, 9), ALL_GROUPS);
-    const entry = events.find((event) => event.title.includes('ضحاک تاریخ'));
+    const entry = events.find((event) => event.title === 'هلاکت خامنه‌ای');
     expect(entry).toBeDefined();
     expect(entry!.category).toBe('state');
     // Nothing declared it a holiday, so it is not flagged as one.
     expect(entry!.holiday).toBe(false);
     // And it is invisible to the default visitor, like the rest of that category.
-    expect(eventsForDate(persian(12, 9), DEFAULT_GROUPS).some((event) => event.title.includes('ضحاک'))).toBe(false);
+    expect(eventsForDate(persian(12, 9), DEFAULT_GROUPS).some((event) => event.title.includes('خامنه'))).toBe(false);
   });
 
   it('names 22 Bahman as the uprising, not the victory', () => {
