@@ -1,33 +1,48 @@
 // ============================================================================
 // Source: src/lib/preferences.test.ts
-// Version: 0.4.0 — 2026-09-07
-// Why: Guards preference validation and the attribute mapping.
+// Version: 0.5.0 — 2026-09-11
+// Why: Guards preference validation, the attribute mapping, and that every
+//      accent has its three CSS blocks.
 // Env / Deps: Vitest; a minimal fake element stands in for <html>.
 // ============================================================================
 
+import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { DEFAULT_PREFERENCES, FONTS, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
+import { ACCENTS, DEFAULT_PREFERENCES, FONTS, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
 
 const store = (values: Record<string, string>) => (key: string) => values[key] ?? null;
 
 describe("preferences", () => {
   it("falls back to defaults for missing or unknown values", () => {
     expect(parsePreferences(() => null)).toEqual(DEFAULT_PREFERENCES);
-    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "neon", [PREFERENCE_KEYS.size]: "xl", [PREFERENCE_KEYS.font]: "comic" }))).toEqual(DEFAULT_PREFERENCES);
+    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "neon", [PREFERENCE_KEYS.accent]: "peach", [PREFERENCE_KEYS.size]: "xl", [PREFERENCE_KEYS.font]: "comic" }))).toEqual(DEFAULT_PREFERENCES);
   });
 
   it("accepts every listed option", () => {
-    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "dark", [PREFERENCE_KEYS.size]: "lg", [PREFERENCE_KEYS.font]: "sahel" }))).toEqual({ theme: "dark", size: "lg", font: "sahel" });
+    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "dark", [PREFERENCE_KEYS.accent]: "lapis", [PREFERENCE_KEYS.size]: "lg", [PREFERENCE_KEYS.font]: "sahel" }))).toEqual({ theme: "dark", accent: "lapis", size: "lg", font: "sahel" });
   });
 
-  it("maps preferences to html attributes and drops the theme attribute for auto", () => {
+  it("maps preferences to html attributes and drops the theme and accent attributes for their defaults", () => {
     const attrs = new Map<string, string>();
     const root = { setAttribute: (k: string, v: string) => attrs.set(k, v), removeAttribute: (k: string) => attrs.delete(k) } as unknown as HTMLElement;
-    applyPreferences(root, { theme: "dark", size: "sm", font: "shabnam" });
-    expect(Object.fromEntries(attrs)).toEqual({ "data-theme": "dark", "data-size": "sm", "data-font": "shabnam" });
+    applyPreferences(root, { theme: "dark", accent: "pink", size: "sm", font: "shabnam" });
+    expect(Object.fromEntries(attrs)).toEqual({ "data-theme": "dark", "data-accent": "pink", "data-size": "sm", "data-font": "shabnam" });
     applyPreferences(root, DEFAULT_PREFERENCES);
     expect(attrs.has("data-theme")).toBe(false);
+    expect(attrs.has("data-accent")).toBe(false);
     expect(attrs.get("data-size")).toBe("md");
+  });
+
+  // An accent missing a block renders in green in that mode, silently.
+  it("gives every non-default accent a light, a dark and an OS-dark block, and names it in the boot script", () => {
+    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    for (const accent of ACCENTS) {
+      if (accent.value === DEFAULT_PREFERENCES.accent) continue;
+      expect(css).toContain(`html[data-accent="${accent.value}"] {`);
+      expect(css).toContain(`html[data-accent="${accent.value}"][data-theme="dark"] {`);
+      expect(css).toContain(`html[data-accent="${accent.value}"]:not([data-theme="light"]) {`);
+      expect(PREFERENCES_BOOT_SCRIPT).toContain(`"${accent.value}"`);
+    }
   });
 
   // The boot script is hand-written JS; make sure it references the real keys and stays guarded

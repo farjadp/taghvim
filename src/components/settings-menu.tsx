@@ -1,7 +1,7 @@
 // ============================================================================
 // Source: src/components/settings-menu.tsx
-// Version: 0.9.26 — 2026-09-10
-// Why: Gear button + popover for theme, font size, font family, the month names
+// Version: 0.9.37 — 2026-09-11
+// Why: Gear button + popover for theme, accent colour, font size, font family, the month names
 //      and the day card's background. Applies the choice immediately and remembers it.
 // Env / Deps: lib/preferences and lib/card-style. Lives in both headers, and in
 //      the extension's — so NO next/* imports here, ever. The card section only
@@ -13,7 +13,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Settings2 } from "lucide-react";
-import { DEFAULT_PREFERENCES, FONTS, PREFERENCE_KEYS, SIZES, THEMES, applyPreferences, parsePreferences, type Preferences } from "@/lib/preferences";
+import { ACCENTS, DEFAULT_PREFERENCES, FONTS, PREFERENCE_KEYS, SIZES, THEMES, applyPreferences, parsePreferences, type Accent, type Preferences } from "@/lib/preferences";
 import { fa } from "@/lib/calendar";
 import { PALETTES, type Background, type CardStyle } from "@/lib/card-style";
 
@@ -43,6 +43,21 @@ function Choice<T extends string>({ label, options, value, onChange, stacked, sa
   return <div role="group" aria-label={label} className="flex items-center justify-between gap-4">
     <span className="shrink-0 text-xs text-muted">{label}</span>
     {control}
+  </div>;
+}
+
+// The accent row: a name with a dot of its colour. The dot is the light accent in
+// both themes — it names the colour, it is not a preview of the current theme.
+function AccentChoice({ value, onChange }: { value: Accent; onChange: (value: Accent) => void }) {
+  return <div role="group" aria-label="رنگ" className="space-y-1.5">
+    <span className="block text-xs text-muted">رنگ</span>
+    <div className="flex min-w-0 flex-wrap gap-0.5 rounded-lg bg-paper p-0.5">
+      {ACCENTS.map((accent) => <button key={accent.value} type="button" aria-pressed={value === accent.value} onClick={() => onChange(accent.value)}
+        className={`inline-flex shrink-0 items-center gap-1.5 rounded-md px-2.5 py-1 text-[0.6875rem] transition-colors ${value === accent.value ? "bg-surface font-medium text-forest shadow-sm" : "text-muted hover:text-ink"}`}>
+        <span aria-hidden className="size-2.5 rounded-full" style={{ backgroundColor: accent.swatch }} />
+        {accent.label}
+      </button>)}
+    </div>
   </div>;
 }
 
@@ -110,6 +125,7 @@ export function SettingsMenu({ card, months }: {
     {/* Phones pin the panel to the viewport so a large root font cannot push it off-screen */}
     {open && <div id="display-settings" className="z-40 space-y-3 rounded-2xl border border-line bg-surface p-4 shadow-lg max-sm:fixed max-sm:inset-x-4 max-sm:top-20 sm:absolute sm:left-0 sm:top-11 sm:w-72">
       <Choice label="پوسته" options={THEMES} value={prefs.theme} onChange={(value) => update("theme", value)} />
+      <AccentChoice value={prefs.accent} onChange={(value) => update("accent", value)} />
       <Choice label="اندازهٔ قلم" options={SIZES} value={prefs.size} onChange={(value) => update("size", value)} />
       <Choice label="قلم" options={FONTS} value={prefs.font} onChange={(value) => update("font", value)} stacked sample />
       {months && <Choice label="نام ماه‌ها" options={MONTH_NAME_CHOICES} value={months.avestan ? "avestan" : "modern"}

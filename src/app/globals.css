@@ -1,7 +1,8 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.9.24 — 2026-09-10
-   Why: Visual system: colour tokens, the five font faces, base element styles.
+   Version: 0.9.37 — 2026-09-11
+   Why: Visual system: colour tokens, the accent palettes, the five font faces,
+        base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
    ============================================================================ */
 
@@ -203,6 +204,61 @@
     --color-cat-sport-tint: #35261a;
     --color-cat-home: #b0bfb6;
     --color-cat-home-tint: #262e29;
+    }
+  }
+  /* Accent colours (data-accent), chosen in /sandbox/colors on 11 Sep. Green is the
+     base palette above and has no block. Each accent recolours the brand and the
+     neutrals only; the holiday red and the fourteen category pairs are shared.
+     Measured: every text pair here clears 4.5:1, and each accent sits ≥35° of hue
+     from the holiday red (peach, at 4°, was dropped for that).
+     Three blocks per accent, like the base: light, explicit dark, and OS dark
+     when no theme is chosen. The dark selectors carry two attributes so they beat
+     both the light accent block and the base dark block. */
+  html[data-accent="pink"] {
+    --color-paper: #fbf6f8; --color-surface: #ffffff; --color-ink: #4a2436; --color-muted: #735a66;
+    --color-line: #efe3e8; --color-forest: #a3345f; --color-forest-deep: #a3345f; --color-leaf: #f8e6ee;
+    --color-scrollbar: #d9bfcb;
+  }
+  html[data-accent="turquoise"] {
+    --color-paper: #f3f8f8; --color-surface: #ffffff; --color-ink: #173d40; --color-muted: #56696a;
+    --color-line: #dfeaea; --color-forest: #0f6b6e; --color-forest-deep: #0f6b6e; --color-leaf: #dcefee;
+    --color-scrollbar: #b3cfcf;
+  }
+  html[data-accent="lapis"] {
+    --color-paper: #f5f6fa; --color-surface: #ffffff; --color-ink: #1f2a4a; --color-muted: #5a6278;
+    --color-line: #e3e6ef; --color-forest: #26418f; --color-forest-deep: #26418f; --color-leaf: #e5e9f6;
+    --color-scrollbar: #bcc4dc;
+  }
+  html[data-accent="pink"][data-theme="dark"] {
+    --color-paper: #1a1216; --color-surface: #241a1f; --color-ink: #f1e6ea; --color-muted: #b8a0ab;
+    --color-line: #3a2a31; --color-forest: #f0a3c0; --color-forest-deep: #6b2442; --color-leaf: #2e1f26;
+    --color-scrollbar: #4a3640;
+  }
+  html[data-accent="turquoise"][data-theme="dark"] {
+    --color-paper: #0f1a1a; --color-surface: #152323; --color-ink: #e3eeee; --color-muted: #9bb3b3;
+    --color-line: #26393a; --color-forest: #7fd0cf; --color-forest-deep: #145456; --color-leaf: #1a2e2e;
+    --color-scrollbar: #33494a;
+  }
+  html[data-accent="lapis"][data-theme="dark"] {
+    --color-paper: #11141d; --color-surface: #181c28; --color-ink: #e6e9f2; --color-muted: #a0a7bd;
+    --color-line: #2a3042; --color-forest: #9fb4ee; --color-forest-deep: #2a3f7f; --color-leaf: #1e2436;
+    --color-scrollbar: #394058;
+  }
+  @media (prefers-color-scheme: dark) {
+    html[data-accent="pink"]:not([data-theme="light"]) {
+      --color-paper: #1a1216; --color-surface: #241a1f; --color-ink: #f1e6ea; --color-muted: #b8a0ab;
+      --color-line: #3a2a31; --color-forest: #f0a3c0; --color-forest-deep: #6b2442; --color-leaf: #2e1f26;
+      --color-scrollbar: #4a3640;
+    }
+    html[data-accent="turquoise"]:not([data-theme="light"]) {
+      --color-paper: #0f1a1a; --color-surface: #152323; --color-ink: #e3eeee; --color-muted: #9bb3b3;
+      --color-line: #26393a; --color-forest: #7fd0cf; --color-forest-deep: #145456; --color-leaf: #1a2e2e;
+      --color-scrollbar: #33494a;
+    }
+    html[data-accent="lapis"]:not([data-theme="light"]) {
+      --color-paper: #11141d; --color-surface: #181c28; --color-ink: #e6e9f2; --color-muted: #a0a7bd;
+      --color-line: #2a3042; --color-forest: #9fb4ee; --color-forest-deep: #2a3f7f; --color-leaf: #1e2436;
+      --color-scrollbar: #394058;
     }
   }
   /* Font size: everything is in rem, so the root size scales the whole page.
