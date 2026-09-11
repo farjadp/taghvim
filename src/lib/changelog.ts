@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.38',
     at: '2026-09-11T15:26:50-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'برنامهٔ اندروید ۱٫۱',
     changes: [
       { kind: 'added', text: 'برنامهٔ اندروید ۱٫۱ روی صفحهٔ دریافت: رنگ‌ها، نقش‌های کارت امروز و تعطیلات قمری رسمی حالا در برنامه هم هست.' },
