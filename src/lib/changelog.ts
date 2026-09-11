@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.39',
     at: '2026-09-11T15:52:54-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'فایل‌های قابل سنجش',
     changes: [
       { kind: 'added', text: 'افزونه‌ها و برنامهٔ اندروید از این نسخه روی GitHub ساخته می‌شوند و هر کسی می‌تواند بسنجد هر فایل از کدام کد آمده؛ راهنمایش در VERIFY.md است.' },
