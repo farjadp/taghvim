@@ -14,7 +14,8 @@
 
 import { useState } from "react";
 import { ArrowLeft, ArrowLeftRight, CalendarHeart, CalendarRange, Cake, Hourglass, Timer } from "lucide-react";
-import { type CalendarKind, dateNumbers, daysBetween, fa, formatDate, fromCalendar, MONTHS, toCalendar } from "@/lib/calendar";
+import { type CalendarKind, dateNumbers, daysBetween, fa, formatDate, fromCalendar, toCalendar } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { elapsedAge, parseNumericInput } from "@/lib/date-tools";
 import { type EventGroups } from "@/lib/events";
 import { type Anniversary } from "@/lib/dates";
@@ -45,7 +46,8 @@ function parseDate(value: DateInput, kind: CalendarKind = "persian") {
 }
 
 function DateFields({ value, onChange, kind = "persian", prefix = "" }: { value: DateInput; onChange: (value: DateInput) => void; kind?: CalendarKind; prefix?: string }) {
-  const names = kind === "persian" ? MONTHS : kind === "gregorian" ? GREGORIAN_MONTHS : ISLAMIC_MONTHS;
+  const months = useMonthNames();
+  const names = kind === "persian" ? months : kind === "gregorian" ? GREGORIAN_MONTHS : ISLAMIC_MONTHS;
   return <div className="grid grid-cols-[.8fr_1.35fr_1fr] gap-3">
     <label className="block text-xs text-muted"><span className="mb-2 block">روز</span><input aria-label={`${prefix}روز`} inputMode="numeric" autoComplete="off" maxLength={2} value={value.day} onChange={(event) => onChange({ ...value, day: event.target.value })} className="field tabular-nums" /></label>
     <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span><select aria-label={`${prefix}ماه`} value={value.month} onChange={(event) => onChange({ ...value, month: event.target.value })} className="field">{names.map((name, i) => <option key={name} value={i + 1}>{name}</option>)}</select></label>

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/calendar.ts
-// Version: 0.3.0 — 2026-09-09
+// Version: 0.4.0 — 2026-09-10
 // Why: Calendar core: Jalali/Gregorian/Hijri conversion, formatting, month grids.
 //      Every instant is read as a civil day in Asia/Tehran and returned at UTC noon.
 //      weekdayIndex() is the shared Saturday-first weekday, used by formatDate and bridges.
@@ -240,9 +240,11 @@ export function weekdayIndex(date: Date): number {
   return (noon(tehranDay(date)).getUTCDay() + 1) % 7;
 }
 
-export function formatDate(date: Date, kind: CalendarKind = 'persian', withWeekday = false): string {
+// `months` overrides the Persian names only, for the visitor who asked for the older
+// forms; the lunar and Gregorian lists are not theirs to rename.
+export function formatDate(date: Date, kind: CalendarKind = 'persian', withWeekday = false, months: string[] = MONTHS): string {
   const value = toCalendar(date, kind);
-  const names = kind === 'persian' ? MONTHS : kind === 'islamic' ? ISLAMIC_MONTHS : GREGORIAN_MONTHS;
+  const names = kind === 'persian' ? months : kind === 'islamic' ? ISLAMIC_MONTHS : GREGORIAN_MONTHS;
   const label = kind === 'gregorian'
     ? `${value.day} ${names[value.month - 1]} ${value.year}`
     : `${fa(value.day)} ${names[value.month - 1]} ${fa(value.year)}`;

@@ -13,7 +13,8 @@
 
 import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Download, Info, Trash2 } from "lucide-react";
-import { fa, formatDate, MONTHS } from "@/lib/calendar";
+import { fa, formatDate } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { parseNumericInput } from "@/lib/date-tools";
 import {
   addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
@@ -65,6 +66,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
   ready: boolean;
   onChange: (next: Anniversary[]) => void;
 }) {
+  const months = useMonthNames();
   const [draft, setDraft] = useState(EMPTY);
   const [error, setError] = useState("");
   const commit = onChange;
@@ -120,7 +122,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
           {draft.repeat !== "monthly" && <>
             <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span>
               <select aria-label="ماه" value={draft.month} onChange={(event) => { setDraft({ ...draft, month: event.target.value }); setError(""); }} className="field">
-                {MONTHS.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
+                {months.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}
               </select></label>
             <label className="block text-xs text-muted"><span className="mb-2 block">{draft.repeat === "once" ? "سال" : "سال (اختیاری)"}</span>
               <input aria-label="سال" inputMode="numeric" autoComplete="off" maxLength={4} value={draft.year}

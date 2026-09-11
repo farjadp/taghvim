@@ -12,7 +12,8 @@
 "use client";
 
 import { ArrowUpLeft, Info, TriangleAlert } from "lucide-react";
-import { addDays, fa, formatDate, MONTHS, toCalendar, WEEKDAYS, weekdayIndex } from "@/lib/calendar";
+import { addDays, fa, formatDate, toCalendar, WEEKDAYS, weekdayIndex } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { type EventGroups } from "@/lib/events";
 import { BRIDGES_NOTICE, findBridges, type Bridge } from "@/lib/bridges";
 import { Occasions } from "./occasions";
@@ -32,9 +33,10 @@ const lengthLabel = (bridge: Bridge) => `${fa(bridge.length)} روز پیوست�
 const priceLabel = (bridge: Bridge) => bridge.leave.length === 0
   ? "بدون مرخصی"
   : `با ${fa(bridge.leave.length)} روز مرخصی`;
-const dayLabel = (date: Date) => `${WEEKDAYS[weekdayIndex(date)]} ${fa(toCalendar(date).day)} ${MONTHS[toCalendar(date).month - 1]}`;
+const dayLabel = (date: Date, months: string[]) => `${WEEKDAYS[weekdayIndex(date)]} ${fa(toCalendar(date).day)} ${months[toCalendar(date).month - 1]}`;
 
 export function BridgeCard({ bridge }: { bridge: Bridge }) {
+  const months = useMonthNames();
   const days = Array.from({ length: bridge.length }, (_, offset) => {
     const date = addDays(bridge.start, offset);
     const isLeave = bridge.leave.some((day) => day.getTime() === date.getTime());
@@ -51,7 +53,7 @@ export function BridgeCard({ bridge }: { bridge: Bridge }) {
       <ul className="mt-3 flex gap-1" aria-label="روزهای این بازه">
         {days.map(({ date, isLeave }, index) => (
           <li key={index}
-            aria-label={isLeave ? `${dayLabel(date)} — مرخصی` : dayLabel(date)}
+            aria-label={isLeave ? `${dayLabel(date, months)} — مرخصی` : dayLabel(date, months)}
             className={`flex h-11 flex-1 flex-col items-center justify-center rounded-lg text-[0.625rem] tabular-nums ${isLeave ? "border border-dashed border-clay text-clay" : "bg-leaf text-forest"}`}>
             <span className="text-xs font-medium">{fa(toCalendar(date).day)}</span>
             <span aria-hidden="true">{WEEKDAY_INITIALS[weekdayIndex(date)]}</span>
@@ -59,7 +61,7 @@ export function BridgeCard({ bridge }: { bridge: Bridge }) {
         ))}
       </ul>
       {bridge.leave.length > 0 && (
-        <p className="mt-3 text-[0.625rem] leading-5 text-muted">مرخصی: {bridge.leave.map(dayLabel).join(" و ")}</p>
+        <p className="mt-3 text-[0.625rem] leading-5 text-muted">مرخصی: {bridge.leave.map((date) => dayLabel(date, months)).join(" و ")}</p>
       )}
       <p className="mt-1 text-[0.625rem] leading-5 text-muted"><Occasions events={bridge.occasions} /></p>
       {bridge.uncertain && (

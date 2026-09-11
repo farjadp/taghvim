@@ -35,13 +35,13 @@ export const CARD_SOURCE = 'taghv.im';
 // remainder is counted rather than listed.
 export const MAX_OCCASIONS = 3;
 
-export function dayCard(date: Date, groups: EventGroups): DayCard {
+export function dayCard(date: Date, groups: EventGroups, months: string[] = MONTHS): DayCard {
   const persian = toCalendar(date);
   const occasions = eventsForDate(date, groups);
   return {
     weekday: WEEKDAYS[weekdayIndex(date)],
     day: fa(persian.day),
-    month: MONTHS[persian.month - 1],
+    month: months[persian.month - 1],
     year: fa(persian.year),
     gregorian: dateNumbers(date, 'gregorian'),
     islamic: formatDate(date, 'islamic'),

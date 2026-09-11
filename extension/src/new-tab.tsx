@@ -17,6 +17,7 @@ import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/vi
 import { CalendarPanel } from "@/components/calendar-panel";
 import { EventsPanel } from "@/components/events-panel";
 import { SettingsMenu } from "@/components/settings-menu";
+import { MonthNamesProvider } from "@/components/month-names-context";
 import { TodayHero } from "@/components/today-panel";
 import { DEFAULT_CARD_STYLE } from "@/lib/card-style";
 
@@ -76,6 +77,7 @@ export function NewTab() {
   }
 
   return (
+    <MonthNamesProvider avestan={preferences.avestan}>
     <div className="flex h-full flex-col">
       <header className="border-b border-line bg-surface/80">
         <div className="mx-auto flex min-h-14 max-w-[1400px] items-center justify-between gap-4 px-5">
@@ -95,7 +97,7 @@ export function NewTab() {
               taghv.im
               <ArrowUpLeft size={12} className="opacity-60" />
             </a>
-            <SettingsMenu />
+            <SettingsMenu months={{ avestan: preferences.avestan, onChange: () => toggleView("avestan") }} />
           </nav>
         </div>
       </header>
@@ -129,5 +131,6 @@ export function NewTab() {
         />
       </main>
     </div>
+    </MonthNamesProvider>
   );
 }

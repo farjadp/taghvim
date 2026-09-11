@@ -1,8 +1,8 @@
 // ============================================================================
 // Source: src/components/settings-menu.tsx
-// Version: 0.9.24 — 2026-09-10
-// Why: Gear button + popover for theme, font size, font family, and the day
-//      card's background. Applies the choice immediately and remembers it.
+// Version: 0.9.26 — 2026-09-10
+// Why: Gear button + popover for theme, font size, font family, the month names
+//      and the day card's background. Applies the choice immediately and remembers it.
 // Env / Deps: lib/preferences and lib/card-style. Lives in both headers, and in
 //      the extension's — so NO next/* imports here, ever. The card section only
 //      appears where a `card` prop is passed: secondary pages draw no card and
@@ -16,6 +16,11 @@ import { Settings2 } from "lucide-react";
 import { DEFAULT_PREFERENCES, FONTS, PREFERENCE_KEYS, SIZES, THEMES, applyPreferences, parsePreferences, type Preferences } from "@/lib/preferences";
 import { fa } from "@/lib/calendar";
 import { PALETTES, type Background, type CardStyle } from "@/lib/card-style";
+
+const MONTH_NAME_CHOICES: { value: "modern" | "avestan"; label: string }[] = [
+  { value: "modern", label: "امروزی" },
+  { value: "avestan", label: "اوستایی" },
+];
 
 // Nothing to choose between when there is one palette and no photographs.
 function backgroundsOrPalettes(card: { backgrounds: Background[] }): boolean {
@@ -69,7 +74,11 @@ function CardChoice({ style, backgrounds, onChange }: { style: CardStyle; backgr
   );
 }
 
-export function SettingsMenu({ card }: { card?: { style: CardStyle; backgrounds: Background[]; onChange: (next: CardStyle) => void } } = {}) {
+export function SettingsMenu({ card, months }: {
+  card?: { style: CardStyle; backgrounds: Background[]; onChange: (next: CardStyle) => void };
+  // Optional like `card`: a surface with no month names to rename passes nothing.
+  months?: { avestan: boolean; onChange: (next: boolean) => void };
+} = {}) {
   const [open, setOpen] = useState(false);
   const [prefs, setPrefs] = useState<Preferences>(DEFAULT_PREFERENCES);
   const [storageError, setStorageError] = useState(false);
@@ -100,6 +109,8 @@ export function SettingsMenu({ card }: { card?: { style: CardStyle; backgrounds:
       <Choice label="پوسته" options={THEMES} value={prefs.theme} onChange={(value) => update("theme", value)} />
       <Choice label="اندازهٔ قلم" options={SIZES} value={prefs.size} onChange={(value) => update("size", value)} />
       <Choice label="قلم" options={FONTS} value={prefs.font} onChange={(value) => update("font", value)} stacked />
+      {months && <Choice label="نام ماه‌ها" options={MONTH_NAME_CHOICES} value={months.avestan ? "avestan" : "modern"}
+        onChange={(value) => months.onChange(value === "avestan")} />}
       {card && backgroundsOrPalettes(card) && (
         <div className="border-t border-line pt-3">
           <CardChoice style={card.style} backgrounds={card.backgrounds} onChange={card.onChange} />

@@ -178,11 +178,12 @@ export function loadBackground(src: string): Promise<HTMLImageElement | undefine
  * which is what someone on a phone actually wants, since «send it to Telegram» is the point —
  * and a download everywhere else.
  */
-export async function shareDayCard(now: Date, groups: EventGroups, style: CardStyle, backgrounds: Background[]): Promise<"shared" | "saved" | "cancelled"> {
+export async function shareDayCard(now: Date, groups: EventGroups, style: CardStyle, backgrounds: Background[], months?: string[]): Promise<"shared" | "saved" | "cancelled"> {
   const { colours, photo } = resolveCardStyle(style, backgrounds);
   const [, image] = await Promise.all([loadCardFont(), photo ? loadBackground(photo.src) : undefined]);
   const canvas = document.createElement("canvas");
-  drawDayCard(canvas, dayCard(now, groups), { colours, photo: image });
+  // `months` is optional so a caller with no preference still gets the modern names.
+  drawDayCard(canvas, dayCard(now, groups, months), { colours, photo: image });
   const format = cardFormat(Boolean(image));
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, format.type, format.quality));
   if (!blob) throw new Error("card render failed");

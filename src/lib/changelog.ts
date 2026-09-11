@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.2 — 2026-09-10
+// Version: 0.11.3 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.26',
+    at: '2026-09-10T20:20:00-04:00',
+    status: 'ready',
+    title: 'نام ماه‌ها، به صورت کهن',
+    changes: [
+      { kind: 'added', text: 'در تنظیمات نمایش، کلید «نام ماه‌ها» را روی «اوستایی» بگذار تا «امرداد» و «سپندارمذ» جای «مرداد» و «اسفند» را بگیرند.' },
+      { kind: 'added', text: 'با روشن کردنش، فهرست ریشه و معنی هر دوازده ماه هم زیر تقویم می‌آید. ده نام دیگر همین حالا هم اوستایی‌اند و دست‌نخورده می‌مانند.' },
+    ],
+  },
   {
     version: '0.9.25',
     at: '2026-09-10T19:05:00-04:00',

@@ -52,10 +52,10 @@ export function signFor(date: Date): Sign {
 }
 
 // The Persian month the sign covers, as «۱ تا ۳۱ شهریور».
-export function signRange(date: Date): string {
+export function signRange(date: Date, months: string[] = MONTHS): string {
   const { year, month } = toCalendar(date);
   const digits = (value: number) => String(value).replace(/[0-9]/g, (d) => '۰۱۲۳۴۵۶۷۸۹'[Number(d)]);
-  return `${digits(1)} تا ${digits(monthLength(year, month))} ${MONTHS[month - 1]}`;
+  return `${digits(1)} تا ${digits(monthLength(year, month))} ${months[month - 1]}`;
 }
 
 // How far through the sign the date is, 0 to 1, for a progress indicator.

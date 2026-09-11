@@ -9,7 +9,8 @@
 "use client";
 
 import { ChevronLeft, ChevronRight, RotateCcw, CalendarDays } from "lucide-react";
-import { dayKey, fa, formatDate, fromCalendar, MONTHS, monthGrid, monthLength, toCalendar, WEEKDAYS } from "@/lib/calendar";
+import { dayKey, fa, formatDate, fromCalendar, monthGrid, monthLength, toCalendar, WEEKDAYS } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { eventsForDate, type EventGroups } from "@/lib/events";
 
 const VIEW_SWITCHES = [
@@ -40,6 +41,7 @@ interface CalendarPanelProps {
 }
 
 export function CalendarPanel({ year, month, today, selected, groups, memorial, showMemorialSwitch = true, onToggleView, onSelect, onNavigate, onToday, onJump, marked }: CalendarPanelProps) {
+  const months = useMonthNames();
   const grid = monthGrid(year, month);
   const selectedParts = toCalendar(selected);
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
@@ -49,12 +51,12 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
   return (
     <section id="calendar" aria-label="تقویم ماهانه" className="min-w-0 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 pb-5 sm:px-7">
-        <div className="flex items-center gap-3"><div className="flex gap-1"><button className="icon-button" aria-label="ماه قبل" disabled={year === 1200 && month === 1} onClick={() => onNavigate(-1)}><ChevronRight size={19} /></button><button className="icon-button" aria-label="ماه بعد" disabled={year === 1600 && month === 12} onClick={() => onNavigate(1)}><ChevronLeft size={19} /></button></div><div><h2 className="text-xl font-bold" aria-live="polite">{MONTHS[month - 1]} {fa(year)}</h2><p className="mt-1 text-[0.6875rem] text-muted" dir="ltr">{englishMonth(start)} – {englishMonth(end)} {toCalendar(end, "gregorian").year}</p></div></div>
+        <div className="flex items-center gap-3"><div className="flex gap-1"><button className="icon-button" aria-label="ماه قبل" disabled={year === 1200 && month === 1} onClick={() => onNavigate(-1)}><ChevronRight size={19} /></button><button className="icon-button" aria-label="ماه بعد" disabled={year === 1600 && month === 12} onClick={() => onNavigate(1)}><ChevronLeft size={19} /></button></div><div><h2 className="text-xl font-bold" aria-live="polite">{months[month - 1]} {fa(year)}</h2><p className="mt-1 text-[0.6875rem] text-muted" dir="ltr">{englishMonth(start)} – {englishMonth(end)} {toCalendar(end, "gregorian").year}</p></div></div>
         <button onClick={onToday} aria-label="برگشت به امروز" className="flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-xs font-medium transition-colors hover:bg-leaf"><RotateCcw size={14} />امروز</button>
       </div>
       <div className="flex items-center justify-between gap-3 border-y border-line bg-paper/70 px-5 py-2.5 sm:px-7">
         <div className="flex items-center gap-2 text-xs text-muted"><CalendarDays size={14} /><span>تقویم خورشیدی</span></div>
-        <div className="flex gap-2"><select aria-label="انتخاب ماه تقویم" value={month} onChange={(event) => onJump(year, Number(event.target.value))} className="max-w-24 bg-transparent text-xs text-ink">{MONTHS.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}</select><select aria-label="انتخاب سال تقویم" value={year} onChange={(event) => onJump(Number(event.target.value), month)} className="max-w-20 bg-transparent text-xs text-ink">{Array.from({ length: 401 }, (_, i) => i + 1200).map((value) => <option key={value} value={value}>{fa(value)}</option>)}</select></div>
+        <div className="flex gap-2"><select aria-label="انتخاب ماه تقویم" value={month} onChange={(event) => onJump(year, Number(event.target.value))} className="max-w-24 bg-transparent text-xs text-ink">{months.map((name, index) => <option key={name} value={index + 1}>{name}</option>)}</select><select aria-label="انتخاب سال تقویم" value={year} onChange={(event) => onJump(Number(event.target.value), month)} className="max-w-20 bg-transparent text-xs text-ink">{Array.from({ length: 401 }, (_, i) => i + 1200).map((value) => <option key={value} value={value}>{fa(value)}</option>)}</select></div>
       </div>
       <div className="px-2 pt-3 pb-4 sm:px-5">
         <div className="grid grid-cols-7">{WEEKDAYS.map((name, i) => <div key={name} className={`py-3 text-center text-[0.625rem] font-medium sm:text-xs ${i === 6 ? "text-clay" : "text-muted"}`}><span className="hidden min-[420px]:inline">{name}</span><span className="min-[420px]:hidden">{["ش", "ی", "د", "س", "چ", "پ", "ج"][i]}</span></div>)}</div>
@@ -80,7 +82,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
             // Friday is always a holiday; other holidays come from the (group-filtered) events
             const holiday = isFriday || events.some((event) => event.holiday);
             const nonFridayHoliday = holiday && !isFriday;
-            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${MONTHS[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-memorial-ink shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
+            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${months[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-memorial-ink shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
               <span className={`text-lg leading-6 tabular-nums sm:text-[1.375rem] ${holiday && !active ? "font-bold" : "font-medium"}`}>{fa(persian.day)}</span>
               <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-memorial-ink/80" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
               {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : holiday ? "bg-clay" : "bg-forest/60"}`} />}

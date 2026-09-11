@@ -9,7 +9,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { DEFAULT_VIEW, VIEW_KEY, readView, saveView, type ViewPreferences } from './view';
 
 const LEGACY_KEY = 'taghvim-scope';
-const custom: ViewPreferences = { religious: true, state: false, world: false, memorial: false };
+const custom: ViewPreferences = { religious: true, state: false, world: false, memorial: false, avestan: false };
 
 function storage(initial: Record<string, string> = {}) {
   const values = new Map(Object.entries(initial));
@@ -26,9 +26,9 @@ const denied = () => { throw new Error('Storage unavailable'); };
 afterEach(() => vi.unstubAllGlobals());
 
 describe('view preferences', () => {
-  it('exports the four defaults and stable key, with fresh fallback objects', () => {
+  it('exports the five defaults and stable key, with fresh fallback objects', () => {
     expect(VIEW_KEY).toBe('taghvim-view');
-    expect(DEFAULT_VIEW).toEqual({ religious: false, state: false, world: true, memorial: true });
+    expect(DEFAULT_VIEW).toEqual({ religious: false, state: false, world: true, memorial: true, avestan: false });
     const store = storage();
     const first = readView(() => store);
     expect(first).toEqual(DEFAULT_VIEW);
@@ -38,18 +38,32 @@ describe('view preferences', () => {
     expect(store.values.size).toBe(0);
   });
 
-  it.each(Array.from({ length: 16 }, (_, mask) => ({
-    religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4), memorial: Boolean(mask & 8),
-  })))('round trips every valid four-boolean record: %j', (view) => {
+  it.each(Array.from({ length: 32 }, (_, mask) => ({
+    religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4),
+    memorial: Boolean(mask & 8), avestan: Boolean(mask & 16),
+  })))('round trips every valid five-boolean record: %j', (view) => {
     const store = storage();
     saveView(view, () => store);
     expect(JSON.parse(store.values.get(VIEW_KEY)!)).toEqual(view);
     expect(readView(() => store)).toEqual(view);
   });
 
+  // `avestan` arrived on 10 Sep. Everyone who had ever set an event group already had a
+  // four-field record, and a strict key count would have called every one of them corrupt
+  // and reset it. The field is filled from the default; nothing else is touched.
+  it.each(Array.from({ length: 16 }, (_, mask) => ({
+    religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4), memorial: Boolean(mask & 8),
+  })))('keeps the choices in a record written before `avestan` existed: %j', (legacy) => {
+    const store = storage({ [VIEW_KEY]: JSON.stringify(legacy) });
+    expect(readView(() => store)).toEqual({ ...legacy, avestan: false });
+  });
+
   it.each([
     '', '{', 'null', '[]', '[true,false,true,true]', 'true', '1', '"all"', '{}',
-    ...Object.keys(custom).map((missing) => JSON.stringify(Object.fromEntries(Object.entries(custom).filter(([key]) => key !== missing)))),
+    // Only the four REQUIRED fields: a record missing `avestan` is a record written
+    // before it existed, and completing it is the whole point.
+    ...['religious', 'state', 'world', 'memorial'].map((missing) =>
+      JSON.stringify(Object.fromEntries(Object.entries(custom).filter(([key]) => key !== missing)))),
     JSON.stringify({ ...custom, extra: true }),
     JSON.stringify({ ...custom, scope: 'all' }),
     ...Object.keys(custom).flatMap((key) => [0, 1, 'true', null, [], {}].map((value) => JSON.stringify({ ...custom, [key]: value }))),
@@ -63,7 +77,7 @@ describe('view preferences', () => {
 
   it.each(['secular', 'all'])('migrates %s by writing the new record before removing legacy', (scope) => {
     const store = storage({ [LEGACY_KEY]: scope });
-    const expected = { religious: scope === 'all', state: scope === 'all', world: true, memorial: true };
+    const expected = { religious: scope === 'all', state: scope === 'all', world: true, memorial: true, avestan: false };
     expect(readView(() => store)).toEqual(expected);
     expect(JSON.parse(store.values.get(VIEW_KEY)!)).toEqual(expected);
     expect(store.values.has(LEGACY_KEY)).toBe(false);
@@ -107,8 +121,8 @@ describe('view preferences', () => {
     store.removeItem = denied;
     expect(readView(() => store)).toEqual(DEFAULT_VIEW);
     expect(store.values.get(LEGACY_KEY)).toBe('all');
-    expect(JSON.parse(store.values.get(VIEW_KEY)!)).toEqual({ religious: true, state: true, world: true, memorial: true });
-    expect(readView(() => store)).toEqual({ religious: true, state: true, world: true, memorial: true });
+    expect(JSON.parse(store.values.get(VIEW_KEY)!)).toEqual({ religious: true, state: true, world: true, memorial: true, avestan: false });
+    expect(readView(() => store)).toEqual({ religious: true, state: true, world: true, memorial: true, avestan: false });
   });
 
   it('guards injected storage acquisition for reads and saves', () => {

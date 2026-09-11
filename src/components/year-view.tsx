@@ -11,7 +11,8 @@
 
 "use client";
 
-import { dayKey, fa, MONTHS, monthGrid } from "@/lib/calendar";
+import { dayKey, fa, monthGrid } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { eventsForDate, type EventGroups } from "@/lib/events";
 import type { Bridge } from "@/lib/bridges";
 
@@ -40,6 +41,7 @@ export function YearView({ year, groups, bridges, today }: {
   bridges: Bridge[];
   today: Date;
 }) {
+  const months = useMonthNames();
   // Precomputed once: every day inside a bridge, and which of those are leave days.
   const leaveDays = new Set(bridges.flatMap((bridge) => bridge.leave.map(dayKey)));
   const bridgeDays = new Set<string>();
@@ -53,7 +55,7 @@ export function YearView({ year, groups, bridges, today }: {
   return (
     <div>
       <div className="grid grid-cols-2 gap-x-4 gap-y-6 px-6 pt-5 sm:grid-cols-3 lg:grid-cols-4">
-        {MONTHS.map((name, index) => {
+        {months.map((name, index) => {
           const month = index + 1;
           const cells = monthGrid(year, month);
           return (

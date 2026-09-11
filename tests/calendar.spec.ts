@@ -133,7 +133,7 @@ for (const legacy of ["secular", "all"]) {
     await expect(page.getByRole("switch", { name: "دولتی", exact: true })).toHaveAttribute("aria-checked", String(legacy === "all"));
     expect(await page.evaluate(() => localStorage.getItem("taghvim-scope"))).toBeNull();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("taghvim-view")!))).toEqual({
-      religious: legacy === "all", state: legacy === "all", world: true, memorial: true,
+      religious: legacy === "all", state: legacy === "all", world: true, memorial: true, avestan: false,
     });
   });
 }
@@ -300,6 +300,45 @@ test("a monthly date asks for a day only, and a one-off insists on a year", asyn
   await tools.getByRole("button", { name: "افزودن", exact: true }).click();
   await expect(tools.getByRole("alert")).toContainText("سال هم لازم است");
   expect(await page.evaluate(() => JSON.parse(window.localStorage.getItem("taghvim-dates") ?? "[]"))).toHaveLength(1);
+});
+
+test("the older month names rename two months and bring their own explanation", async ({ page }) => {
+  const monthSelect = page.getByLabel("انتخاب ماه تقویم");
+  await expect(monthSelect.locator("option").nth(4)).toHaveText("مرداد");
+  await expect(monthSelect.locator("option").nth(11)).toHaveText("اسفند");
+  await expect(page.locator("#month-names-title")).toHaveCount(0);
+
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  await page.getByRole("group", { name: "نام ماه‌ها" }).getByRole("button", { name: "اوستایی" }).click();
+  await page.keyboard.press("Escape");
+
+  // The alef is the negation: «امرداد» means undying, «مرداد» says the opposite
+  await expect(monthSelect.locator("option").nth(4)).toHaveText("امرداد");
+  await expect(monthSelect.locator("option").nth(11)).toHaveText("سپندارمذ");
+  // The other ten are already Avestan and must not move
+  await expect(monthSelect.locator("option").nth(5)).toHaveText("شهریور");
+  // Turning it on is what brings the list that says which two changed and why
+  await expect(page.locator("#month-names-title")).toBeVisible();
+  await expect(page.locator('section[aria-labelledby="month-names-title"] li')).toHaveCount(12);
+
+  await page.reload();
+  await expect(monthSelect.locator("option").nth(4)).toHaveText("امرداد");
+  await expect(page.locator("#month-names-title")).toBeVisible();
+});
+
+test("a view record written before the month names existed keeps every choice", async ({ page }) => {
+  // Adding a field to taghvim-view must not make every older record look corrupt:
+  // a strict key count would have reset the event groups of everyone who set one.
+  await page.evaluate(() => window.localStorage.setItem("taghvim-view",
+    JSON.stringify({ religious: true, state: true, world: false, memorial: false })));
+  await page.reload();
+  const controls = page.getByTestId("view-controls");
+  await expect(controls.getByRole("switch", { name: "مذهبی" })).toHaveAttribute("aria-checked", "true");
+  await expect(controls.getByRole("switch", { name: "دولتی" })).toHaveAttribute("aria-checked", "true");
+  await expect(controls.getByRole("switch", { name: "جهانی" })).toHaveAttribute("aria-checked", "false");
+  await expect(controls.getByRole("switch", { name: "یادبود" })).toHaveAttribute("aria-checked", "false");
+  // …and the field that was missing is simply filled from the default
+  await expect(page.locator("#month-names-title")).toHaveCount(0);
 });
 
 test("nothing in the settings panel paints outside its card", async ({ page }) => {

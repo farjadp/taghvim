@@ -16,7 +16,8 @@
 
 import { useEffect, useState } from "react";
 import { ArrowDownLeft, Copy, Check, Clock3, ImageDown } from "lucide-react";
-import { dateNumbers, fa, formatDate, MONTHS, toCalendar } from "@/lib/calendar";
+import { dateNumbers, fa, formatDate, toCalendar } from "@/lib/calendar";
+import { useMonthNames } from "./month-names-context";
 import { ZODIAC_SHORT_NOTICE, signFor } from "@/lib/zodiac";
 import { type EventGroups } from "@/lib/events";
 import { type Background, type CardStyle } from "@/lib/card-style";
@@ -50,6 +51,7 @@ function SunDrawing() {
 
 // The green card: weekday, date, copy button, Tehran clock and the second clocks.
 export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: { now: Date; initialNow: string; groups: EventGroups; cardStyle: CardStyle; backgrounds: Background[] }) {
+  const months = useMonthNames();
   const [copied, setCopied] = useState(false);
   const [copyError, setCopyError] = useState(false);
   // "" while idle; the status line below already exists and says one thing at a time.
@@ -76,7 +78,7 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
   async function shareCard() {
     setBusy(true);
     try {
-      const result = await shareDayCard(now, groups, cardStyle, backgrounds);
+      const result = await shareDayCard(now, groups, cardStyle, backgrounds, months);
       setCardNote(result === "saved" ? "تصویر ذخیره شد." : result === "shared" ? "تصویر فرستاده شد." : "");
     } catch {
       setCardNote("ساختن تصویر ممکن نشد.");
@@ -91,7 +93,7 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
           <div>
             <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
-            <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {MONTHS[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
+            <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {months[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
           </div>
           <div className="flex items-center gap-2">
             <button onClick={shareCard} disabled={busy} aria-label="تصویر امروز" title="تصویر امروز" className="flex size-10 items-center justify-center rounded-full border border-white/25 text-[#e2eadb] transition-colors hover:bg-white/10 disabled:opacity-50"><ImageDown size={17} /></button>
