@@ -884,8 +884,13 @@ test("the download page states each method's real status", async ({ page }) => {
   // it carries no link here. The footer is the only path from the home page.
   await page.getByRole("contentinfo").getByRole("link", { name: "دریافت تقویم" }).click();
   await expect(page).toHaveURL(/\/download$/);
-  // Secondary pages do get it in the header
+  // Secondary pages do get it in the header — in a row from sm up, and behind
+  // the «صفحه‌ها» button on a phone, where four links in a row did not fit.
+  if ((page.viewportSize()?.width ?? 1280) < 640) {
+    await page.getByRole("banner").getByText("صفحه‌ها").click();
+  }
   await expect(page.getByRole("banner").getByRole("link", { name: "دریافت", exact: true })).toBeVisible();
+  await expect(page.getByRole("banner").getByRole("link", { name: "دریافت", exact: true })).toHaveAttribute("aria-current", "page");
 
   const status = async (id: string) => (await page.locator(`#${id}`).locator("span").filter({ hasText: /آماده|بازبینی|ساخته نشده/ }).first().textContent())?.trim();
   expect(await status("home-screen")).toBe("آماده");
