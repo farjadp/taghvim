@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.10 — 2026-09-11
+// Version: 0.11.11 — 2026-09-11
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -39,12 +39,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 export const RELEASES: Release[] = [
   {
     version: '0.9.37',
-    at: '2026-09-11T15:04:25-04:00',
+    at: '2026-09-11T15:12:55-04:00',
     status: 'ready',
-    title: 'سه صفحهٔ تازه',
+    title: 'رنگ‌ها، نقش‌های ایران کهن و تعطیلات رسمی',
     changes: [
+      { kind: 'added', text: 'رنگ تازه در تنظیمات: سبز، صورتی، فیروزه‌ای یا لاجوردی، در حالت روشن و تیره.' },
+      { kind: 'added', text: 'نقش کارت امروز را می‌شود عوض کرد: خورشید، کنگرهٔ تخت جمشید، گل نیلوفر، قاب مروارید ساسانی یا سرو.' },
       { kind: 'added', text: 'سه صفحهٔ تازه، از پانویس هر صفحه: دیگر محصولات ما، حمایت از ما و خدمات ما.' },
       { kind: 'changed', text: 'تقویم ماهانه، تبدیل تاریخ و اوقات شرعی از دسترسی سریع پانویس برداشته شدند؛ هر سه در خود صفحهٔ اصلی‌اند.' },
+      { kind: 'fixed', text: 'تعطیلات قمری ۱۴۰۰ تا ۱۴۲۰ از تقویم رسمی آمده‌اند؛ تاسوعا، عاشورا و اربعین ۱۴۰۵ دیگر یک روز دیرتر نیستند و شهادت امام صادق اضافه شد.' },
     ],
   },
   {
