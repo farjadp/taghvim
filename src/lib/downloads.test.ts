@@ -31,6 +31,10 @@ describe('apps panel', () => {
     expect(android.action).toEqual({ label: 'دریافت فایل نصبی (APK)', href: URL, external: true });
     expect(android.fingerprint).toBe(ANDROID_CERT_SHA256);
     expect(android.points.join(' ')).toContain('بدون مجوز اینترنت');
+    // The way past Play Protect's «unknown developer» block, named by the exact
+    // labels the phone shows.
+    expect(android.points.join(' ')).toContain('«More details»');
+    expect(android.points.join(' ')).toContain('«Install anyway»');
     // The iPhone is untouched: still in development, still no date.
     expect(panel.platforms.find((p) => p.id === 'ios')!.status).toBe('building');
     expect(panel.timing).toContain('نسخهٔ آیفون');

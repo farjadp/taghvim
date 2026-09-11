@@ -916,6 +916,9 @@ test("the download page states each method's real status", async ({ page }) => {
   await expect(apk).toHaveAttribute("rel", /noopener/);
   await expect(android).toContainText("SHA-256");
   await expect(android).toContainText("2A:21:28:8E");
+  // Play Protect blocks an app from a developer Google does not know yet; the
+  // card says where the way through is.
+  await expect(android).toContainText("Install anyway");
   await expect(page.locator("#app-ios")).toContainText("در دست ساخت");
   await expect(apps).toContainText("زمان انتشار نسخهٔ آیفون هنوز معلوم نیست");
   const next = page.getByRole("region", { name: "بقیهٔ چیزهایی که در راه است" });

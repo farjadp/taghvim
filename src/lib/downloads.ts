@@ -160,6 +160,12 @@ export function appsPanel(apkUrl: string | null) {
             'ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن',
             'اندروید ۷ یا بالاتر، بدون مجوز اینترنت',
             'اندروید یک بار می‌پرسد اجازه می‌دهی مرورگر برنامه نصب کند؛ باید تأیید کنی.',
+            // Reported 11 Sep: a reader's phone showed «App blocked to protect your
+            // device — Play Protect hasn't seen an app from this developer before».
+            // It is about the developer being unknown to Google, not the file; the
+            // way through is under More details. Remove once the app and its key
+            // are registered with Google (developer verification / Play).
+            'چون برنامه هنوز در گوگل‌پلی نیست، ممکن است Play Protect بگوید سازنده‌اش را نمی‌شناسد. زیر «More details» گزینهٔ «Install anyway» را بزن.',
           ],
           action: { label: 'دریافت فایل نصبی (APK)', href: apkUrl, external: true },
           fingerprint: ANDROID_CERT_SHA256,
