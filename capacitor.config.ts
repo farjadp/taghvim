@@ -20,6 +20,12 @@ const config: CapacitorConfig = {
   // WebView's background from res/values*/splash_colors.xml so night mode gets
   // dark paper. Left white, the emulator flashed a white frame before the page.
   android: { path: "mobile/android/app" },
+  // Beside mobile/ios/TaghvimCore, the Swift package the widgets share.
+  // contentInset: the first iPhone build drew the page under the status bar —
+  // the clock and battery sat on the logo and the gear. «always» makes the
+  // WebView keep clear of the safe area, so neither the site nor the Android
+  // app changes.
+  ios: { path: "mobile/ios/app", contentInset: "always" },
 };
 
 export default config;

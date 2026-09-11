@@ -90,6 +90,52 @@ final class TodayTests: XCTestCase {
     }
 }
 
+final class WidgetDayTests: XCTestCase {
+    private var file: WidgetData!
+
+    override func setUpWithError() throws {
+        file = try WidgetData.load(Data(contentsOf: shared.appendingPathComponent("widget-data.json")))
+    }
+
+    func testNowruzIsADayOffWithItsOwnTitle() {
+        let day = WidgetDay.at(utc("2027-03-21T08:00:00Z"), data: file)
+        let expected = file.events(on: PersianDate(year: 1406, month: 1, day: 1), groups: .default).first { $0.category == .iran }
+        XCTAssertEqual(day.day, 1)
+        XCTAssertEqual(day.month, "فروردین")
+        XCTAssertEqual(day.weekday, "یکشنبه")
+        XCTAssertTrue(day.off)
+        XCTAssertEqual(day.occasion, expected?.title)
+        XCTAssertTrue(day.occasionIsHoliday)
+    }
+
+    func testAPlainFridayIsOffWithNoOccasion() {
+        // 3 Mehr 1405 = 25 Sep 2026, a Friday the file has no row for.
+        let day = WidgetDay.at(utc("2026-09-25T08:00:00Z"), data: file)
+        XCTAssertEqual(day.weekday, "جمعه")
+        XCTAssertTrue(day.off)
+        XCTAssertNil(day.occasion)
+        XCTAssertEqual(day.gregorian, "25 September 2026")
+    }
+
+    func testAThursdayIsNotOff() {
+        XCTAssertFalse(WidgetDay.at(utc("2026-09-10T08:00:00Z"), data: file).off)
+    }
+
+    func testBeyondTheFileTheDateIsStillRightAndNoOccasionIsClaimed() {
+        let day = WidgetDay.at(utc("2031-03-21T08:00:00Z"), data: file)
+        XCTAssertEqual(day.year, 1410)
+        XCTAssertEqual(day.day, 1)
+        XCTAssertNil(day.occasion)
+    }
+
+    func testOlderMonthNamesAndPersianDigits() {
+        let instant = utc("2026-08-01T08:00:00Z") // 10 Mordad 1405
+        XCTAssertEqual(WidgetDay.at(instant, data: file).month, "مرداد")
+        XCTAssertEqual(WidgetDay.at(instant, data: file, older: true).month, "امرداد")
+        XCTAssertEqual(fa(1406), "۱۴۰۶")
+    }
+}
+
 final class WidgetDataTests: XCTestCase {
     private var file: WidgetData!
 

@@ -49,7 +49,14 @@ for (const [density, size] of Object.entries(ANDROID_DENSITIES)) {
   TARGETS.push({ file: `${ANDROID_RES}/mipmap-${density}/ic_launcher_round.png`, size, round: true });
 }
 
-for (const { file, size, round } of TARGETS) {
+// The iPhone app: one 1024px icon (iOS draws every smaller size from it, and the
+// App Store rejects an icon with an alpha channel, so it is flattened), and the
+// launch image Capacitor's storyboard shows, as three identical files. Until
+// these were written the app carried Capacitor's own logo.
+const IOS_ASSETS = 'mobile/ios/app/App/App/Assets.xcassets';
+TARGETS.push({ file: `${IOS_ASSETS}/AppIcon.appiconset/AppIcon-512@2x.png`, size: 1024, opaque: true });
+
+for (const { file, size, round, opaque } of TARGETS) {
   const inner = Math.round(size * (1 - paddingFor(size) * 2));
   const mark = await sharp(source, { density: 512 }).resize(inner, inner).png().toBuffer();
   const out = join(root, file);
@@ -61,6 +68,22 @@ for (const { file, size, round } of TARGETS) {
     const circle = Buffer.from(`<svg width="${size}" height="${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}"/></svg>`);
     icon = sharp(await icon.png().toBuffer()).composite([{ input: circle, blend: 'dest-in' }]);
   }
+  if (opaque) icon = sharp(await icon.png().toBuffer()).flatten({ background: BACKGROUND }).removeAlpha();
   await icon.png().toFile(out);
   console.log(`wrote ${file} (${size}x${size})`);
+}
+
+// The iOS launch image: paper, with the mark at a sixth of the width in the middle
+// — the storyboard scales it to fill, so a large mark would be cropped on a phone.
+const SPLASH = 2732;
+const splashMark = await sharp(source, { density: 1024 }).resize(Math.round(SPLASH / 6)).png().toBuffer();
+const splash = await sharp({ create: { width: SPLASH, height: SPLASH, channels: 3, background: BACKGROUND } })
+  .composite([{ input: splashMark, gravity: 'centre' }])
+  .png()
+  .toBuffer();
+for (const name of ['splash-2732x2732.png', 'splash-2732x2732-1.png', 'splash-2732x2732-2.png']) {
+  const out = join(root, `${IOS_ASSETS}/Splash.imageset/${name}`);
+  await mkdir(dirname(out), { recursive: true });
+  await sharp(splash).toFile(out);
+  console.log(`wrote ${IOS_ASSETS}/Splash.imageset/${name} (${SPLASH}x${SPLASH})`);
 }

@@ -44,6 +44,50 @@ Nowruz preview, and a reinstall on the emulator showed «یکشنبه ۱ فرو�
 on a Friday in Shahrivar. `widget_loading.xml` is the card and the mark only;
 the dated Nowruz layouts are `previewLayout`, for the picker.
 
+## The iPhone app and widgets
+
+`mobile/ios/app` is the same page as Android — `mobile/web`, built by
+`npm run build:app`, which now syncs both platforms — in a Capacitor 8 shell,
+bundle id `im.taghv.app`, with **Swift Package Manager**, no CocoaPods.
+
+- **Widgets:** the `TaghvimWidgets` extension (iOS 16+, for the lock-screen
+  families): small **B** on the home screen, lock-screen **C** as rectangular
+  and inline. It links `mobile/ios/TaghvimCore` (where `WidgetDay` lives, the
+  twin of Android's, under `swift test`) and bundles `mobile/shared/widget-data.json`.
+  The target was added to the Xcode project by `ruby mobile/ios/add-widget-target.rb`
+  — already applied; it refuses to run twice. The gem's template left
+  `PRODUCT_NAME` empty on the first run («Multiple commands produce …/.appex»);
+  the script now sets it.
+- **Timeline:** one entry now and one a second past each of the next seven
+  Tehran midnights, then a fresh timeline. The placeholder carries no date.
+- **Settings:** `WidgetSyncPlugin` (Swift, registered in `MainViewController`)
+  has the same JS name as Android's, so `src/lib/widget-sync.ts` is unchanged.
+  It writes the four settings into the App Group `group.im.taghv.app`; the
+  widget reads them there.
+- **Status bar:** the first build drew the page under it; `ios.contentInset:
+  "always"` in `capacitor.config.ts` keeps the WebView clear of the safe area.
+- **Icon and launch image** come from `npm run build:icons` — the icon at
+  1024px with no alpha channel, which the App Store requires.
+
+Verified on the iOS 26.5 simulator, 11 Sep: the app opens the calendar offline
+with the Tehran day; the small widget sits on the home screen showing it
+(Friday 20 Shahrivar, numeral in clay); after launch the App Group holds the
+four settings the page sent; the lock-screen widget (C, rectangular) sits under
+the clock showing the same day — «۲۰ شهریور ۱۴۰۵» with «جمعه» under it. The
+inline form (the date line) is built but not yet placed on the simulator.
+Changing a setting while the app runs is verified on Android, not yet on iOS.
+
+Build for the simulator (no Apple account needed; devices and TestFlight are):
+
+```bash
+cd mobile/ios/app/App && xcodebuild -project App.xcodeproj -scheme App -sdk iphonesimulator -destination 'platform=iOS Simulator,name=Taghvim iPhone' CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual DEVELOPMENT_TEAM= build
+```
+
+Simulator traps: entitlements live in the binary there, so `codesign` shows no
+App Group — `xcrun simctl get_app_container <udid> im.taghv.app groups` is the
+proof. `simctl io … text` types ASCII only, and `simctl pbcopy` garbles Persian
+unless run with `LC_ALL=en_US.UTF-8`.
+
 ## Signing a release
 
 One key signs every channel — Google Play (uploaded there once, with a

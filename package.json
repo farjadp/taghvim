@@ -18,11 +18,12 @@
     "build:extension": "vite build --config extension/vite.config.ts && node scripts/check-extension.mjs extension/dist",
     "build:extension:firefox": "TARGET=firefox vite build --config extension/vite.config.ts && node scripts/check-extension.mjs extension/dist-firefox",
     "package:extension": "node scripts/package-extension.mjs",
-    "build:app": "TARGET=app vite build --config extension/vite.config.ts && cap sync android"
+    "build:app": "TARGET=app vite build --config extension/vite.config.ts && cap sync"
   },
   "dependencies": {
     "@capacitor/android": "8.5.1",
     "@capacitor/core": "8.5.1",
+    "@capacitor/ios": "8.5.1",
     "@capacitor/share": "8.0.1",
     "@fontsource/vazirmatn": "5.3.0",
     "adhan": "4.4.4",
