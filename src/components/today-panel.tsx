@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.21 — 2026-09-09
+// Version: 0.9.38 — 2026-09-11
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
@@ -9,7 +9,8 @@
 //      On phones this whole block sits BELOW the month grid; see calendar-app.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
 //      The hero cannot clip its own overflow, because the clock picker opens
-//      out of it, so the sun drawing is clipped by its own wrapper instead.
+//      out of it, so the drawing (components/hero-motifs) is clipped by its own
+//      wrapper instead.
 // ============================================================================
 
 "use client";
@@ -25,6 +26,7 @@ import { type Background, type CardStyle } from "@/lib/card-style";
 import { shareDayCard } from "./day-card";
 import { WorldClocks } from "./world-clocks";
 import { ZodiacIcon } from "./zodiac-icon";
+import { HeroMotifs } from "./hero-motifs";
 
 // Ticks every second on the client; the server-rendered value avoids a hydration flash
 function LiveClock({ initialNow }: { initialNow: string }) {
@@ -35,19 +37,6 @@ function LiveClock({ initialNow }: { initialNow: string }) {
     return () => clearInterval(timer);
   }, []);
   return <time className="text-[2.4rem] leading-none font-medium tracking-wide tabular-nums sm:text-5xl" dir="ltr">{new Intl.DateTimeFormat("fa-IR", { timeZone: "Asia/Tehran", hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false }).format(now)}</time>;
-}
-
-// Decorative line-art sunrise; aria-hidden, purely visual
-function SunDrawing() {
-  return (
-    <svg viewBox="0 0 250 240" fill="none" aria-hidden="true" className="pointer-events-none absolute -bottom-10 left-2 h-64 w-64 text-[#b7c7a6] opacity-35 sm:left-8">
-      <path d="M30 232V121a95 95 0 0 1 190 0v111M43 232V121a82 82 0 0 1 164 0v111M56 232V121a69 69 0 0 1 138 0v111" stroke="currentColor" strokeWidth=".8" />
-      <circle cx="125" cy="120" r="30" stroke="currentColor" />
-      <circle cx="125" cy="120" r="24" stroke="currentColor" strokeDasharray="1 4" />
-      {Array.from({ length: 16 }, (_, i) => <path key={i} d="M125 78v-12m-3 8 3 4 3-4" stroke="currentColor" strokeWidth=".8" transform={`rotate(${i * 22.5} 125 120)`} />)}
-      <path d="M18 176h214M18 185h214M18 194h214M80 219l45-19 45 19m-77 6 32-14 32 14" stroke="currentColor" strokeWidth=".8" />
-    </svg>
-  );
 }
 
 // The green card: weekday, date, copy button, Tehran clock and the second clocks.
@@ -107,7 +96,7 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
 
   return (
       <div className="relative isolate rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><SunDrawing /></div>
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><HeroMotifs /></div>
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
           <div>
             <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>

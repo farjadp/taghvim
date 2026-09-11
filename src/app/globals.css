@@ -1,7 +1,7 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.9.37 — 2026-09-11
-   Why: Visual system: colour tokens, the accent palettes, the five font faces,
+   Version: 0.9.38 — 2026-09-11
+   Why: Visual system: colour tokens, the accent palettes, the hero motif switch, the five font faces,
         base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
    ============================================================================ */
@@ -261,6 +261,15 @@
       --color-scrollbar: #394058;
     }
   }
+  /* Hero motif (data-motif): all five drawings are in the page, and this shows the
+     chosen one. No attribute means the sunrise. Add a motif and it needs a line
+     here, or it never shows — a unit test checks. */
+  [data-motif-art] { display: none; }
+  html:not([data-motif]) [data-motif-art="sun"],
+  html[data-motif="merlons"] [data-motif-art="merlons"],
+  html[data-motif="rosette"] [data-motif-art="rosette"],
+  html[data-motif="pearls"] [data-motif-art="pearls"],
+  html[data-motif="cypress"] [data-motif-art="cypress"] { display: block; }
   /* Font size: everything is in rem, so the root size scales the whole page.
      Percentages, not px: a percentage on the root multiplies the size the
      READER set in their browser, where px overwrote it — pick «بزرگ» after

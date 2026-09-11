@@ -8,7 +8,8 @@
 
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
-import { ACCENTS, DEFAULT_PREFERENCES, FONTS, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
+import { MOTIF_DRAWINGS } from "../components/hero-motifs";
+import { ACCENTS, DEFAULT_PREFERENCES, MOTIFS, FONTS, PREFERENCES_BOOT_SCRIPT, PREFERENCE_KEYS, applyPreferences, parsePreferences } from "./preferences";
 
 const store = (values: Record<string, string>) => (key: string) => values[key] ?? null;
 
@@ -19,17 +20,18 @@ describe("preferences", () => {
   });
 
   it("accepts every listed option", () => {
-    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "dark", [PREFERENCE_KEYS.accent]: "lapis", [PREFERENCE_KEYS.size]: "lg", [PREFERENCE_KEYS.font]: "sahel" }))).toEqual({ theme: "dark", accent: "lapis", size: "lg", font: "sahel" });
+    expect(parsePreferences(store({ [PREFERENCE_KEYS.theme]: "dark", [PREFERENCE_KEYS.accent]: "lapis", [PREFERENCE_KEYS.motif]: "cypress", [PREFERENCE_KEYS.size]: "lg", [PREFERENCE_KEYS.font]: "sahel" }))).toEqual({ theme: "dark", accent: "lapis", motif: "cypress", size: "lg", font: "sahel" });
   });
 
   it("maps preferences to html attributes and drops the theme and accent attributes for their defaults", () => {
     const attrs = new Map<string, string>();
     const root = { setAttribute: (k: string, v: string) => attrs.set(k, v), removeAttribute: (k: string) => attrs.delete(k) } as unknown as HTMLElement;
-    applyPreferences(root, { theme: "dark", accent: "pink", size: "sm", font: "shabnam" });
-    expect(Object.fromEntries(attrs)).toEqual({ "data-theme": "dark", "data-accent": "pink", "data-size": "sm", "data-font": "shabnam" });
+    applyPreferences(root, { theme: "dark", accent: "pink", motif: "rosette", size: "sm", font: "shabnam" });
+    expect(Object.fromEntries(attrs)).toEqual({ "data-theme": "dark", "data-accent": "pink", "data-motif": "rosette", "data-size": "sm", "data-font": "shabnam" });
     applyPreferences(root, DEFAULT_PREFERENCES);
     expect(attrs.has("data-theme")).toBe(false);
     expect(attrs.has("data-accent")).toBe(false);
+    expect(attrs.has("data-motif")).toBe(false);
     expect(attrs.get("data-size")).toBe("md");
   });
 
@@ -43,6 +45,20 @@ describe("preferences", () => {
       expect(css).toContain(`html[data-accent="${accent.value}"]:not([data-theme="light"]) {`);
       expect(PREFERENCES_BOOT_SCRIPT).toContain(`"${accent.value}"`);
     }
+  });
+
+  // A motif with no drawing or no CSS line would be offered in the menu and show nothing.
+  it("gives every motif a drawing and a CSS line, and names the non-default ones in the boot script", () => {
+    const css = readFileSync(new URL("../app/globals.css", import.meta.url), "utf8");
+    for (const motif of MOTIFS) {
+      expect(MOTIF_DRAWINGS[motif.value]).toBeTypeOf("function");
+      expect(css).toContain(`[data-motif-art="${motif.value}"]`);
+      if (motif.value !== DEFAULT_PREFERENCES.motif) {
+        expect(css).toContain(`html[data-motif="${motif.value}"] [data-motif-art="${motif.value}"]`);
+        expect(PREFERENCES_BOOT_SCRIPT).toContain(`"${motif.value}"`);
+      }
+    }
+    expect(Object.keys(MOTIF_DRAWINGS).sort()).toEqual(MOTIFS.map((motif) => motif.value).sort());
   });
 
   // The boot script is hand-written JS; make sure it references the real keys and stays guarded

@@ -1,7 +1,7 @@
 // ============================================================================
 // Source: src/components/settings-menu.tsx
-// Version: 0.9.37 — 2026-09-11
-// Why: Gear button + popover for theme, accent colour, font size, font family, the month names
+// Version: 0.9.38 — 2026-09-11
+// Why: Gear button + popover for theme, accent colour, hero motif, font size, font family, the month names
 //      and the day card's background. Applies the choice immediately and remembers it.
 // Env / Deps: lib/preferences and lib/card-style. Lives in both headers, and in
 //      the extension's — so NO next/* imports here, ever. The card section only
@@ -13,7 +13,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Settings2 } from "lucide-react";
-import { ACCENTS, DEFAULT_PREFERENCES, FONTS, PREFERENCE_KEYS, SIZES, THEMES, applyPreferences, parsePreferences, type Accent, type Preferences } from "@/lib/preferences";
+import { ACCENTS, DEFAULT_PREFERENCES, FONTS, MOTIFS, PREFERENCE_KEYS, SIZES, THEMES, applyPreferences, parsePreferences, type Accent, type Preferences } from "@/lib/preferences";
 import { fa } from "@/lib/calendar";
 import { PALETTES, type Background, type CardStyle } from "@/lib/card-style";
 
@@ -126,6 +126,7 @@ export function SettingsMenu({ card, months }: {
     {open && <div id="display-settings" className="z-40 space-y-3 rounded-2xl border border-line bg-surface p-4 shadow-lg max-sm:fixed max-sm:inset-x-4 max-sm:top-20 sm:absolute sm:left-0 sm:top-11 sm:w-72">
       <Choice label="پوسته" options={THEMES} value={prefs.theme} onChange={(value) => update("theme", value)} />
       <AccentChoice value={prefs.accent} onChange={(value) => update("accent", value)} />
+      <Choice label="نقش کارت امروز" options={MOTIFS} value={prefs.motif} onChange={(value) => update("motif", value)} stacked />
       <Choice label="اندازهٔ قلم" options={SIZES} value={prefs.size} onChange={(value) => update("size", value)} />
       <Choice label="قلم" options={FONTS} value={prefs.font} onChange={(value) => update("font", value)} stacked sample />
       {months && <Choice label="نام ماه‌ها" options={MONTH_NAME_CHOICES} value={months.avestan ? "avestan" : "modern"}
