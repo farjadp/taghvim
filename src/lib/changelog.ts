@@ -38,6 +38,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.34',
+    at: '2026-09-11T12:16:16-04:00',
+    status: 'ready',
+    title: 'برنامهٔ اندروید',
+    changes: [
+      { kind: 'added', text: 'برنامهٔ اندروید منتشر شد: از صفحهٔ دریافت، با دو ویجت صفحهٔ خانه و بدون مجوز اینترنت.' },
+      { kind: 'added', text: 'کنار دکمهٔ دانلود، اثر انگشت گواهی امضا نوشته شده تا بتوانی اصل بودن فایل را بسنجی.' },
+    ],
+  },
+  {
     version: '0.9.33',
     at: '2026-09-11T12:10:46-04:00',
     status: 'live',
@@ -420,7 +430,8 @@ export const RELEASES: Release[] = [
 // in plain terms, with the honest caveats attached. Order carries no meaning.
 // Its own constant so /download, which shows the apps as a panel of their own,
 // can list the rest without repeating them.
-export const UPCOMING_APP = 'برنامهٔ اندروید و آیفون، با ویجت صفحهٔ خانه و صفحهٔ قفل، در دست ساخت است. زمان انتشار هنوز معلوم نیست.';
+// Android shipped on 11 Sep (0.9.34); only the iPhone app is still coming.
+export const UPCOMING_APP = 'برنامهٔ آیفون، با ویجت صفحهٔ خانه و صفحهٔ قفل، در دست ساخت است. زمان انتشارش هنوز معلوم نیست.';
 
 export const UPCOMING: string[] = [
   'کارکرد آفلاین، تا تقویم بدون اینترنت هم باز شود. نصب روی صفحهٔ خانهٔ گوشی از نسخهٔ ۰.۹.۱ کار می‌کند و راهنمایش هست، ولی برای دیدن تقویم هنوز به اینترنت نیاز داری.',
