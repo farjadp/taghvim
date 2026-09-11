@@ -901,6 +901,13 @@ test("the download page states each method's real status", async ({ page }) => {
   await expect(apps.locator("[data-widget]")).toHaveCount(3);
   // No release date is claimed, because there is none yet
   await expect(apps).toContainText("زمان انتشار هنوز معلوم نیست");
+  // Until ANDROID_APK_URL is set there is no file to hand out: no APK link, and
+  // no fingerprint for a file nobody can download. Both states are unit-tested
+  // in lib/downloads.test.ts; this holds the page to the one it is in.
+  await expect(apps.locator('a[href*="/releases/"]')).toHaveCount(0);
+  await expect(apps).not.toContainText("SHA-256");
+  // Both apps are still in development, so the panel keeps its one label.
+  await expect(apps.getByText("در دست ساخت", { exact: true })).toHaveCount(1);
   const next = page.getByRole("region", { name: "بقیهٔ چیزهایی که در راه است" });
   await expect(next).toContainText("ربات تلگرام");
   await expect(next).not.toContainText("اندروید");

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.9 — 2026-09-11
+// Version: 0.11.10 — 2026-09-11
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.33',
+    at: '2026-09-11T12:10:46-04:00',
+    status: 'ready',
+    title: 'ویجت پهن روی گوشی',
+    changes: [
+      { kind: 'fixed', text: 'صفحهٔ دریافت: روی گوشی، نمونهٔ ویجت پهن از کادرش بیرون می‌زد؛ حالا در کادر جا می‌شود.' },
+    ],
+  },
   {
     version: '0.9.32',
     at: '2026-09-11T00:20:00-04:00',

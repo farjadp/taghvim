@@ -117,21 +117,68 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
   },
 ] as const;
 
+// Set this the day Farjad approves publishing the GitHub release android-v1.0.
+// Until then the Android card says «در دست ساخت» and offers no button — the same
+// rule CHROME_STORE_URL follows. A fixed per-version URL on purpose, never
+// releases/latest: any later release of anything else would silently repoint
+// «latest», and this page would hand out the wrong file.
+export const ANDROID_APK_URL: string | null = null;
+
+// The certificate every Taghvim APK is signed with (subject CN=Taghvim), so
+// anyone handed the file somewhere else can check it came from here. It is
+// public by nature — it is inside every APK — and it changes only if the key
+// does, which it must not: an APK signed with another key cannot update an
+// install signed with this one.
+export const ANDROID_CERT_SHA256 =
+  '2A:21:28:8E:2B:A9:A8:13:C2:19:84:83:D8:29:2D:9D:03:94:7D:19:C3:D8:71:7E:42:DA:8E:CF:6C:7B:68:6E';
+
+export type AppPlatform = {
+  id: 'android' | 'ios';
+  name: string;
+  status: DownloadStatus;
+  points: readonly string[];
+  action?: { label: string; href: string; external: true };
+  fingerprint?: string;
+};
+
 // The two apps, shown on /download as their own panel rather than one more card:
-// they are what most people asked for, and the widgets are why. Farjad, 10 Sep:
-// both are in development. Nothing here names a date — there is none yet.
-export const APPS = {
-  title: 'برنامهٔ اندروید و آیفون',
-  status: 'building' as DownloadStatus,
-  summary:
-    'هر دو برنامه در دست کدنویسی‌اند. همان تقویم، به‌علاوهٔ چیزی که فقط یک برنامهٔ نصبی می‌تواند داشته باشد: ویجت روی صفحهٔ خانه و صفحهٔ قفل.',
-  platforms: [
-    { id: 'android', name: 'اندروید', points: ['ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن'] },
-    { id: 'ios', name: 'آیفون', points: ['ویجت صفحهٔ خانه و صفحهٔ قفل'] },
-  ],
-  note: 'اپ‌استور اپل از داخل ایران در دسترس نیست.',
-  timing: 'زمان انتشار هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.',
-} as const;
+// they are what most people asked for, and the widgets are why. Built from the
+// APK URL so the page cannot claim a download that does not exist, and so both
+// states are testable without flipping the constant. Nothing names an iPhone
+// date — there is none yet.
+export function appsPanel(apkUrl: string | null) {
+  const android = apkUrl !== null;
+  const platforms: AppPlatform[] = [
+    android
+      ? {
+          id: 'android',
+          name: 'اندروید',
+          status: 'ready',
+          points: [
+            'ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن',
+            'اندروید ۷ یا بالاتر، بدون مجوز اینترنت',
+            'اندروید یک بار می‌پرسد اجازه می‌دهی مرورگر برنامه نصب کند؛ باید تأیید کنی.',
+          ],
+          action: { label: 'دریافت فایل نصبی (APK)', href: apkUrl, external: true },
+          fingerprint: ANDROID_CERT_SHA256,
+        }
+      : { id: 'android', name: 'اندروید', status: 'building', points: ['ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن'] },
+    { id: 'ios', name: 'آیفون', status: 'building', points: ['ویجت صفحهٔ خانه و صفحهٔ قفل'] },
+  ];
+  return {
+    title: 'برنامهٔ اندروید و آیفون',
+    summary: android
+      ? 'برنامهٔ اندروید آماده است: همان تقویم، به‌علاوهٔ ویجت روی صفحهٔ خانه. نسخهٔ آیفون، با ویجت صفحهٔ قفل، در دست ساخت است.'
+      : 'هر دو برنامه در دست کدنویسی‌اند. همان تقویم، به‌علاوهٔ چیزی که فقط یک برنامهٔ نصبی می‌تواند داشته باشد: ویجت روی صفحهٔ خانه و صفحهٔ قفل.',
+    platforms,
+    note: 'اپ‌استور اپل از داخل ایران در دسترس نیست.',
+    timing: android
+      ? 'زمان انتشار نسخهٔ آیفون هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.'
+      : 'زمان انتشار هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.',
+  };
+}
+
+export const APPS = appsPanel(ANDROID_APK_URL);
 
 // What each widget holds. The page draws them with a fixed date — Nowruz 1406,
 // labelled as an example — so a static page never shows a stale «today».

@@ -1,11 +1,13 @@
 // ============================================================================
 // Source: src/app/download/page.tsx
-// Version: 0.9.30 — 2026-09-10
+// Version: 0.9.33 — 2026-09-11
 // Why: One page for getting the calendar onto a device. Every method carries
 //      its real status, and each extension only offers a store button once
 //      lib/downloads has a store URL for it. The Android and iPhone apps get a
-//      panel of their own — in development, Farjad's word on 10 Sep — with the
-//      widgets drawn, since widgets are why most people asked for an app.
+//      panel of their own with the widgets drawn, since widgets are why most
+//      people asked for an app. Each platform has its own status; Android
+//      offers its APK and the signing certificate's fingerprint only once
+//      ANDROID_APK_URL is set, the day the GitHub release is published.
 // Env / Deps: lib/downloads for the data, lib/seo for metadata. Server
 //      component; no state, nothing client-side.
 // ============================================================================
@@ -104,7 +106,7 @@ function WidgetSmall() {
 
 function WidgetWide() {
   return (
-    <div className="flex h-[5.75rem] w-[19rem] max-w-full items-stretch overflow-hidden rounded-[1.4rem] bg-surface text-ink shadow-lg shadow-black/20">
+    <div className="flex h-[5.75rem] w-full items-stretch overflow-hidden rounded-[1.4rem] bg-surface text-ink shadow-lg shadow-black/20">
       {/* text-paper, not white: dark clay is a light salmon, and white on it is unreadable. */}
       <div className="flex w-[4.5rem] shrink-0 flex-col items-center justify-center bg-clay text-paper">
         <span className="text-[2rem] leading-none font-extrabold">۱</span>
@@ -135,24 +137,73 @@ function WidgetLock() {
 
 const WIDGET_DRAWINGS = { small: WidgetSmall, wide: WidgetWide, lock: WidgetLock } as const;
 
+function AppStatus({ status }: { status: DownloadStatus }) {
+  return (
+    <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[0.6875rem]">
+      {status === "ready" ? <Check size={12} /> : <Hammer size={12} />}{STATUS_LABELS[status]}
+    </span>
+  );
+}
+
 function AppsPanel() {
+  const first = APPS.platforms[0].status;
+  const shared = APPS.platforms.every((platform) => platform.status === first) ? first : null;
   return (
     <section id="apps" aria-labelledby="apps-title" className="relative isolate scroll-mt-24 overflow-hidden rounded-[1.75rem] bg-forest-deep px-6 py-8 text-white sm:px-9 sm:py-10">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <h2 id="apps-title" className="text-xl font-bold sm:text-2xl">{APPS.title}</h2>
-        <span className="flex shrink-0 items-center gap-1.5 rounded-full border border-white/30 bg-white/10 px-3 py-1 text-[0.6875rem]">
-          <Hammer size={12} />{STATUS_LABELS[APPS.status]}
-        </span>
+        {shared && <AppStatus status={shared} />}
       </div>
       <p className="mt-3 max-w-xl text-sm leading-7 text-[#d9e3cf]">{APPS.summary}</p>
 
+      {/* While both apps share a status the panel carries one label, as it always
+          has. Once Android is out and the iPhone is not, one label would be wrong
+          for one of them, so each platform carries its own. */}
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {APPS.platforms.map((platform) => (
-          <div key={platform.id} className="rounded-2xl border border-white/15 bg-white/5 p-4">
-            <p className="flex items-center gap-2 text-sm font-semibold"><Smartphone size={16} className="text-[#c8d4a8]" />{platform.name}</p>
+          <div key={platform.id} id={`app-${platform.id}`} className="flex flex-col rounded-2xl border border-white/15 bg-white/5 p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="flex items-center gap-2 text-sm font-semibold"><Smartphone size={16} className="text-[#c8d4a8]" />{platform.name}</p>
+              {!shared && <AppStatus status={platform.status} />}
+            </div>
             <ul className="mt-2 space-y-1">
               {platform.points.map((point) => <li key={point} className="text-xs leading-6 text-[#d9e3cf]">{point}</li>)}
             </ul>
+            {platform.action && (
+              <a
+                href={platform.action.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex w-fit items-center gap-1.5 rounded-full bg-white px-4 py-2 text-xs font-semibold text-forest-deep hover:bg-[#e8efe0]"
+              >
+                {platform.action.label}<ArrowUpLeft size={14} />
+              </a>
+            )}
+            {platform.fingerprint && (
+              <div className="mt-4 border-t border-white/15 pt-3">
+                <p className="text-[0.6875rem] font-medium">اثر انگشت گواهی امضا (SHA-256)</p>
+                <p className="mt-1 text-[0.625rem] leading-5 text-[#d9e3cf]">
+                  هر نسخهٔ تقویم با همین کلید امضا می‌شود. اگر فایل را از جای دیگری گرفته‌ای و اثر انگشتش این نیست، نصبش نکن.
+                </p>
+                {/* Two lines of sixteen bytes, which may break again only after a
+                    colon. break-all split a byte in half («…03:9» then «4:7D…»),
+                    the worst place for a string people compare by eye; a line that
+                    could not break at all fixed the card at 317px and pushed it off
+                    a 320 or 360px screen. <wbr> allows a break at byte edges only. */}
+                <p dir="ltr" className="mt-2 font-mono text-[0.625rem] leading-5 text-[#c8d4a8] [unicode-bidi:isolate]">
+                  {[0, 16].map((start) => {
+                    const bytes = platform.fingerprint!.split(":").slice(start, start + 16);
+                    return (
+                      <span key={start} className="block">
+                        {bytes.map((byte, i) => (
+                          <span key={i}>{byte}{i < bytes.length - 1 && <>:<wbr /></>}</span>
+                        ))}
+                      </span>
+                    );
+                  })}
+                </p>
+              </div>
+            )}
           </div>
         ))}
       </div>
@@ -164,7 +215,12 @@ function AppsPanel() {
           {WIDGETS.map((widget) => {
             const Drawing = WIDGET_DRAWINGS[widget.id];
             return (
-              <figure key={widget.id} className="flex flex-col items-center gap-2.5" data-widget={widget.id}>
+              // The wide drawing takes the row up to 19rem. It used to be a fixed
+              // 19rem inside a figure that grew to fit it, so its max-w-full had
+              // nothing to cap: measured on taghv.im it overran its box by 22px at
+              // 390px wide and ran off the screen at 360 and 320. (The page's
+              // sideways scroll at those widths is the header's nav, not this.)
+              <figure key={widget.id} className={`flex flex-col items-center gap-2.5 ${widget.id === "wide" ? "w-full max-w-[19rem]" : ""}`} data-widget={widget.id}>
                 <Drawing />
                 <figcaption className="text-center text-[0.6875rem] leading-5">
                   <span className="font-medium">{widget.name}{widget.size && <> · <span dir="ltr" className="tabular-nums [unicode-bidi:isolate]">{widget.size}</span></>}</span>
