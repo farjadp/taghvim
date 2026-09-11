@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.32',
     at: '2026-09-11T00:20:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'شهادت حضرت فاطمه، و دو نام',
     changes: [
       { kind: 'fixed', text: 'شهادت حضرت فاطمه در ۱۴۰۵ روی ۲۳ آبان نشان داده می‌شد؛ تاریخ رسمی ۲۲ آبان است و حالا همان‌جاست.' },
