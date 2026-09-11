@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/values/widget_colors.xml — the site's light tokens from
+  src/app/globals.css, copied because a widget cannot read CSS. Keep them
+  equal to the tokens they are named after; values-night holds the dark ones.
+-->
+<resources>
+    <color name="widget_surface">#ffffff</color> <!-- surface -->
+    <color name="widget_ink">#243e34</color> <!-- ink -->
+    <color name="widget_muted">#5c6a61</color> <!-- muted -->
+    <color name="widget_forest">#214f40</color> <!-- forest -->
+    <color name="widget_clay">#a9503b</color> <!-- clay -->
+    <color name="widget_paper">#f7f8f4</color> <!-- paper: text on the forest/clay block -->
+</resources>

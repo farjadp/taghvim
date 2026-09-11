@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/xml/widget_small_info.xml — one cell by default (targetCell* on
+  Android 12+, minWidth/minHeight below). updatePeriodMillis is the hourly
+  backstop for the midnight alarm; the docs allow nothing under 30 minutes.
+-->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_small_description"
+    android:initialLayout="@layout/widget_small"
+    android:minHeight="40dp"
+    android:minResizeHeight="40dp"
+    android:minResizeWidth="40dp"
+    android:minWidth="40dp"
+    android:previewLayout="@layout/widget_small"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellHeight="1"
+    android:targetCellWidth="1"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen" />

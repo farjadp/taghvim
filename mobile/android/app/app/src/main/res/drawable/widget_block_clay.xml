@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/drawable/widget_block_clay.xml — wide B's numeral block on a day off (holiday or Friday), as the site's grid paints it. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="rectangle">
+    <solid android:color="@color/widget_clay" />
+    <corners android:topRightRadius="@dimen/widget_radius" android:bottomRightRadius="@dimen/widget_radius" />
+</shape>

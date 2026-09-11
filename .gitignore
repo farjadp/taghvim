@@ -26,3 +26,6 @@ mobile/ios/**/.swiftpm/
 mobile/android/**/build/
 mobile/android/**/.gradle/
 mobile/android/**/.kotlin/
+
+# The app's web bundle (npm run build:app); Capacitor copies it into the native project
+mobile/web/

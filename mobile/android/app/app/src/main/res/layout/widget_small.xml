@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/layout/widget_small.xml — small B, tall form (1×1 portrait,
+  57×102dp): weekday, the day's numeral, the month. Forced RTL so an English-
+  locale phone lays it out the same. The texts here are the preview the widget
+  picker shows: Nowruz 1406, the example /download draws.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:gravity="center"
+    android:layoutDirection="rtl"
+    android:orientation="vertical"
+    android:padding="4dp">
+
+    <TextView
+        android:id="@+id/weekday"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:text="یکشنبه"
+        android:textColor="@color/widget_muted"
+        android:textSize="10sp" />
+
+    <TextView
+        android:id="@+id/day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:includeFontPadding="false"
+        android:text="۱"
+        android:textColor="@color/widget_clay"
+        android:textSize="30sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/month"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:ellipsize="end"
+        android:fontFamily="sans-serif-medium"
+        android:singleLine="true"
+        android:text="فروردین"
+        android:textColor="@color/widget_ink"
+        android:textSize="11sp" />
+</LinearLayout>

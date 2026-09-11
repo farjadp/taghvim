@@ -28,8 +28,11 @@ const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..");
 
 // Chrome is the default so an unset environment builds what it always built.
-const TARGET = process.env.TARGET === "firefox" ? "firefox" : "chrome";
-const outDir = resolve(here, TARGET === "firefox" ? "dist-firefox" : "dist");
+// `app` is the same page for the Capacitor shell (mobile/): no extension
+// manifest, and the page is index.html, which is what Capacitor loads.
+const TARGET = process.env.TARGET === "firefox" ? "firefox" : process.env.TARGET === "app" ? "app" : "chrome";
+const outDir =
+  TARGET === "app" ? resolve(repo, "mobile/web") : resolve(here, TARGET === "firefox" ? "dist-firefox" : "dist");
 
 // Stamped into the bundle so the new tab can say which build it is. Read from the
 // manifest rather than package.json, because the manifest is what the store serves
@@ -92,9 +95,19 @@ function extensionAssets(): Plugin {
         }
       }
       this.emitFile({ type: "asset", fileName: "boot.js", source: PREFERENCES_BOOT_SCRIPT });
+      // The header's mark, in every target — the app build once returned before
+      // this line and its header asked for an icon.svg that was not there.
+      this.emitFile({ type: "asset", fileName: "icon.svg", source: readFileSync(resolve(repo, "src/app/icon.svg")) });
+      if (TARGET === "app") {
+        // Capacitor serves index.html; an extension manifest in an app would be noise.
+        const page = bundle["newtab.html"];
+        if (page?.type !== "asset") throw new Error("newtab.html was not in the bundle to rename.");
+        this.emitFile({ type: "asset", fileName: "index.html", source: page.source });
+        delete bundle["newtab.html"];
+        return;
+      }
       const manifest = manifestFor(TARGET) as { icons: Record<string, string> };
       this.emitFile({ type: "asset", fileName: "manifest.json", source: `${JSON.stringify(manifest, null, 2)}\n` });
-      this.emitFile({ type: "asset", fileName: "icon.svg", source: readFileSync(resolve(repo, "src/app/icon.svg")) });
       // Every size the manifest names, read from the manifest so the two
       // cannot disagree — a missing icon fails the check script, not the browser.
       for (const file of new Set(Object.values(manifest.icons))) {

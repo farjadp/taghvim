@@ -1,0 +1,94 @@
+// ============================================================================
+// Source: mobile/android/app/app/build.gradle
+// Version: 0.1.0 — 2026-09-10
+// Why: The app module. Beyond Capacitor's template: Kotlin for the widgets;
+//      the shared im.taghv.core; java.time desugared, because minSdk is 24 and
+//      java.time arrived in 26 — the widget's Tehran midnight is java.time; and
+//      mobile/shared/widget-data.json copied into the assets at build time, so
+//      the widget reads the file the site's tests hold equal to eventsForDate.
+//      Only that one file is copied; the vectors are for tests, not the APK.
+// Env / Deps: AGP 8.13, Kotlin 2.4.0, desugar_jdk_libs 2.1.5.
+// ============================================================================
+
+apply plugin: 'com.android.application'
+apply plugin: 'org.jetbrains.kotlin.android'
+
+def widgetAssets = layout.buildDirectory.dir("generated/widget-assets").get().asFile
+
+android {
+    namespace = "im.taghv.app"
+    compileSdk = rootProject.ext.compileSdkVersion
+    defaultConfig {
+        applicationId "im.taghv.app"
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        aaptOptions {
+             // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
+             // Default: https://android.googlesource.com/platform/frameworks/base/+/282e181b58cf72b6ca770dc7ca5f91f135444502/tools/aapt/AaptAssets.cpp#61
+            ignoreAssetsPattern = '!.svn:!.git:!.ds_store:!*.scc:.*:!CVS:!thumbs.db:!picasa.ini:!*~'
+        }
+    }
+    compileOptions {
+        coreLibraryDesugaringEnabled true
+    }
+    sourceSets {
+        main {
+            assets.srcDirs += [widgetAssets]
+        }
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+kotlin {
+    // capacitor.build.gradle compiles Java for 21; Kotlin must target the same.
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_21
+    }
+}
+
+def copyWidgetData = tasks.register('copyWidgetData', Copy) {
+    from '../../../shared/widget-data.json'
+    into widgetAssets
+}
+preBuild.dependsOn(copyWidgetData)
+
+repositories {
+    flatDir{
+        dirs '../capacitor-cordova-android-plugins/src/main/libs', 'libs'
+    }
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "androidx.appcompat:appcompat:$androidxAppCompatVersion"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:$androidxCoordinatorLayoutVersion"
+    implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
+    implementation project(':capacitor-android')
+    implementation 'im.taghv:taghvim-core:0.1.0'
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+    testImplementation "junit:junit:$junitVersion"
+    // Android ships org.json in the framework; JVM unit tests need the real one.
+    testImplementation 'org.json:json:20240303'
+    androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
+    androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+    implementation project(':capacitor-cordova-android-plugins')
+}
+
+apply from: 'capacitor.build.gradle'
+
+try {
+    def servicesJSON = file('google-services.json')
+    if (servicesJSON.text) {
+        apply plugin: 'com.google.gms.google-services'
+    }
+} catch(Exception e) {
+    logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}

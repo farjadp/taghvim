@@ -1,0 +1,10 @@
+// Source: mobile/android/app/settings.gradle — Capacitor's, plus the shared
+// Kotlin core as a composite build, so the app compiles the same im.taghv.core
+// that ./gradlew test holds to the site's vectors.
+include ':app'
+include ':capacitor-cordova-android-plugins'
+project(':capacitor-cordova-android-plugins').projectDir = new File('./capacitor-cordova-android-plugins/')
+
+includeBuild('../core')
+
+apply from: 'capacitor.settings.gradle'

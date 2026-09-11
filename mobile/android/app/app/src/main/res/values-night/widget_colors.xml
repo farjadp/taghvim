@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/values-night/widget_colors.xml — the site's dark tokens. Paper is
+  dark here, which is what keeps the block readable: dark clay is a light
+  salmon, and white on it measured unreadable on /download (fixed in 0.9.31).
+-->
+<resources>
+    <color name="widget_surface">#1a2420</color>
+    <color name="widget_ink">#e6ece8</color>
+    <color name="widget_muted">#9fb0a6</color>
+    <color name="widget_forest">#8cc7ad</color>
+    <color name="widget_clay">#e39a85</color>
+    <color name="widget_paper">#121a16</color>
+</resources>

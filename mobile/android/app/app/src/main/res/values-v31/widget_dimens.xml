@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/values-v31/widget_dimens.xml — the radius the device maker or launcher chose (at most 28dp, per the Android docs). -->
+<resources>
+    <dimen name="widget_radius">@android:dimen/system_app_widget_background_radius</dimen>
+</resources>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/values/widget_strings.xml — names in the widget picker; the descriptions match what /download says each widget shows. -->
+<resources>
+    <string name="widget_small_label">تقویم — کوچک</string>
+    <string name="widget_wide_label">تقویم — پهن</string>
+    <string name="widget_small_description">روز هفته، روز و ماه</string>
+    <string name="widget_wide_description">تاریخ کامل، روز هفته و مناسبت</string>
+</resources>
