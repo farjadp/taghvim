@@ -31,6 +31,26 @@ deep Doze is not measured yet** — it needs a real phone.
 The groups are the site's defaults for now; the app's own settings do not reach
 the widget yet.
 
+**A widget's `initialLayout` never carries a date.** It is what shows before
+the first update and during every app update; the first build pointed it at the
+Nowruz preview, and a reinstall on the emulator showed «یکشنبه ۱ فروردین · نوروز»
+on a Friday in Shahrivar. `widget_loading.xml` is the card and the mark only;
+the dated Nowruz layouts are `previewLayout`, for the picker.
+
+## Icon and splash
+
+One source, `src/app/icon.svg`. The adaptive icon's foreground is
+`res/drawable/ic_launcher_foreground.xml`, the same two paths as a vector
+(keep them equal); `npm run build:icons` writes the Android 7 PNGs beside the
+site's icons. The splash and the WebView's background before the first paint
+are `splash_background`: light paper, dark paper in `values-night`, set on the
+WebView by `MainActivity` — measured on the emulator, every startup frame is
+exactly the paper colour of the mode it starts in, with no white frame.
+
+The header's links (taghv.im, «گزارش اشکال») open the system browser; tapping
+taghv.im on the emulator brought Chrome to the front. The app itself still makes
+no request.
+
 Both `shared/` files are **generated and committed**. After changing events,
 month names or `WIDGET_YEARS` in `src/lib/widget-data.ts`:
 

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/drawable/splash.xml — what shows between launch and the page's
+  first paint: paper, and the mark in the middle. Replaces Capacitor's nine
+  template PNGs (its own logo), one XML for every density and orientation.
+-->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/splash_background" />
+    <item
+        android:width="144dp"
+        android:height="144dp"
+        android:drawable="@drawable/ic_launcher_foreground"
+        android:gravity="center" />
+</layer-list>

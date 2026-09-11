@@ -6,7 +6,7 @@
 -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_small_description"
-    android:initialLayout="@layout/widget_small"
+    android:initialLayout="@layout/widget_loading"
     android:minHeight="40dp"
     android:minResizeHeight="40dp"
     android:minResizeWidth="40dp"

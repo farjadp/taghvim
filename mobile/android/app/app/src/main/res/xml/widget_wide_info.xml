@@ -2,7 +2,7 @@
 <!-- Source: res/xml/widget_wide_info.xml — four cells by one; resizable down to where the block and one line still fit. -->
 <appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
     android:description="@string/widget_wide_description"
-    android:initialLayout="@layout/widget_wide"
+    android:initialLayout="@layout/widget_loading"
     android:minHeight="40dp"
     android:minResizeHeight="40dp"
     android:minResizeWidth="180dp"

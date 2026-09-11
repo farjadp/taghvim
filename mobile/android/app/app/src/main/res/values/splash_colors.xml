@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/values/splash_colors.xml. What the screen shows from launch to the
+  page's first paint: the splash, then the WebView's own background. The site's
+  paper colour; values-night holds the dark paper, so a phone in night mode is
+  not flashed with a light frame before a dark calendar.
+-->
+<resources>
+    <color name="splash_background">#f7f8f4</color>
+</resources>

@@ -39,14 +39,28 @@ const TARGETS = [
   { file: 'public/icon-128.png', size: 128 },
 ];
 
-for (const { file, size } of TARGETS) {
+// The Android app's icons for Android 7 (API 24–25), which predate adaptive
+// icons; from 8 on, res/mipmap-anydpi-v26 draws the vector mark instead. One
+// square and one round file per density, 48dp each.
+const ANDROID_RES = 'mobile/android/app/app/src/main/res';
+const ANDROID_DENSITIES = { mdpi: 48, hdpi: 72, xhdpi: 96, xxhdpi: 144, xxxhdpi: 192 };
+for (const [density, size] of Object.entries(ANDROID_DENSITIES)) {
+  TARGETS.push({ file: `${ANDROID_RES}/mipmap-${density}/ic_launcher.png`, size });
+  TARGETS.push({ file: `${ANDROID_RES}/mipmap-${density}/ic_launcher_round.png`, size, round: true });
+}
+
+for (const { file, size, round } of TARGETS) {
   const inner = Math.round(size * (1 - paddingFor(size) * 2));
   const mark = await sharp(source, { density: 512 }).resize(inner, inner).png().toBuffer();
   const out = join(root, file);
   await mkdir(dirname(out), { recursive: true });
-  await sharp({ create: { width: size, height: size, channels: 4, background: BACKGROUND } })
-    .composite([{ input: mark, gravity: 'centre' }])
-    .png()
-    .toFile(out);
+  let icon = sharp({ create: { width: size, height: size, channels: 4, background: BACKGROUND } })
+    .composite([{ input: mark, gravity: 'centre' }]);
+  if (round) {
+    // The launcher shows the round file as-is, so the circle is cut here.
+    const circle = Buffer.from(`<svg width="${size}" height="${size}"><circle cx="${size / 2}" cy="${size / 2}" r="${size / 2}"/></svg>`);
+    icon = sharp(await icon.png().toBuffer()).composite([{ input: circle, blend: 'dest-in' }]);
+  }
+  await icon.png().toFile(out);
   console.log(`wrote ${file} (${size}x${size})`);
 }

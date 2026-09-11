@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/drawable/ic_launcher_foreground.xml
+  Version: 0.1.0 — 2026-09-10
+  Why: The Taghvim mark as the adaptive icon's foreground — the same two paths
+       as src/app/icon.svg, copied because Android cannot read SVG. Keep them
+       equal to that file. The 64-unit mark is scaled 1.125× into the middle
+       of the 108dp canvas: its body spans 54dp and its rounded corners reach
+       32.6dp from the centre, inside the 33dp circle every launcher mask keeps.
+       Also the monochrome layer (Android 13 themed icons) and the splash mark.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <group
+        android:scaleX="1.125"
+        android:scaleY="1.125"
+        android:translateX="18"
+        android:translateY="18">
+        <path
+            android:fillColor="#214f40"
+            android:fillType="evenOdd"
+            android:pathData="M20 8h24c7 0 12 5 12 12v19L39 56H20C13 56 8 51 8 44V20C8 13 13 8 20 8Zm1 25a11 11 0 0 1 22 0H21Zm-1 4a2 2 0 0 0 0 4h24a2 2 0 0 0 0-4H20Zm23 7v6l7-7h-6a1 1 0 0 0-1 1Z" />
+        <path
+            android:pathData="M32 14v2m-14 7 2 1m24 0 2-1"
+            android:strokeWidth="3"
+            android:strokeColor="#f7f8f4"
+            android:strokeLineCap="round" />
+    </group>
+</vector>

@@ -16,6 +16,9 @@ const config: CapacitorConfig = {
   appId: "im.taghv.app",
   appName: "تقویم",
   webDir: "mobile/web",
+  // No backgroundColor here: it is one fixed colour. MainActivity sets the
+  // WebView's background from res/values*/splash_colors.xml so night mode gets
+  // dark paper. Left white, the emulator flashed a white frame before the page.
   android: { path: "mobile/android/app" },
 };
 

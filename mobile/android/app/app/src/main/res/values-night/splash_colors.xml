@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/values-night/splash_colors.xml. The site's dark paper colour. -->
+<resources>
+    <color name="splash_background">#121a16</color>
+</resources>

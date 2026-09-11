@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/layout/widget_loading.xml
+  Why: What a widget shows before its first update, and for a moment after
+       every app update. It carries no date on purpose: the first build used
+       the picker preview here, and on the emulator a reinstall showed
+       «یکشنبه ۱ فروردین · نوروز» on a Friday in Shahrivar until the refresh
+       ran. A calendar widget must never print a day that is not today, so
+       this is the card and the mark, and nothing to misread.
+-->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg">
+
+    <ImageView
+        android:layout_width="32dp"
+        android:layout_height="32dp"
+        android:layout_gravity="center"
+        android:contentDescription="@string/app_name"
+        android:src="@drawable/ic_launcher_foreground" />
+</FrameLayout>
