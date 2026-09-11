@@ -14,6 +14,7 @@
     "check:live": "node scripts/check-live.mjs",
     "build:icons": "node scripts/build-icons.mjs",
     "build:og": "node scripts/build-og.mjs",
+    "build:widget-data": "node scripts/build-widget-data.mjs",
     "build:extension": "vite build --config extension/vite.config.ts && node scripts/check-extension.mjs extension/dist",
     "build:extension:firefox": "TARGET=firefox vite build --config extension/vite.config.ts && node scripts/check-extension.mjs extension/dist-firefox",
     "package:extension": "node scripts/package-extension.mjs"

@@ -17,3 +17,7 @@ next-env.d.ts
 extension/dist/
 extension/dist-firefox/
 extension/*.zip
+
+# Swift package build output (swift test in mobile/ios/TaghvimCore)
+mobile/ios/**/.build/
+mobile/ios/**/.swiftpm/
