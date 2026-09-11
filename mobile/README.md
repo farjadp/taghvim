@@ -95,8 +95,25 @@ unless run with `LC_ALL=en_US.UTF-8`.
 One key signs every channel — Google Play (uploaded there once, with a
 separate upload key) and the APK on taghv.im — so an install from one source
 updates from the other. The keystore is `~/taghvim-keys/taghvim-release.jks`,
-outside this public repository, readable by its owner only. The build reads it
-from the environment and signs nothing without it:
+outside this public repository, readable by its owner only.
+
+**A published APK is never built here.** Since 11 Sep, a `v<version>` tag runs
+`.github/workflows/release.yml`, which builds the APK **unsigned** on GitHub and
+attests it; then, on the Mac that holds the key:
+
+```bash
+node scripts/sign-release-apk.mjs v<version>
+```
+
+It downloads that very file, checks its attestation, signs it (apksigner asks
+for the password), checks the certificate and that every file inside is
+unchanged, uploads it to the draft release and asks before publishing. That
+is what lets anyone confirm the APK is the public build plus a signature — see
+`VERIFY.md`. Android 1.0 and 1.1 predate this and were built locally.
+
+A local signed build is still possible for testing on a phone, never for
+publishing. The build reads the key from the environment and signs nothing
+without it:
 
 ```bash
 read -s "TAGHVIM_KEYSTORE_PASSWORD?Keystore password: " && export TAGHVIM_KEYSTORE_PASSWORD TAGHVIM_KEYSTORE=~/taghvim-keys/taghvim-release.jks && cd mobile/android/app && JAVA_HOME=/opt/homebrew/opt/openjdk@21 ./gradlew assembleRelease
