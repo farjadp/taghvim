@@ -1,12 +1,14 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.13.0 — 2026-09-09
+// Version: 0.14.0 — 2026-09-11
 // Why: Curated occasions: national, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
-// Env / Deps: Lunar dates via islamic-civil; official overrides pin 1405 only (4 dates).
+// Env / Deps: Lunar holidays from src/data/official-lunar.json for 1400–1420,
+//      islamic-civil for every other year.
 // ============================================================================
 
 import { toCalendar } from './calendar';
+import officialLunar from '../data/official-lunar.json';
 
 // 'iran'      — national and cultural occasions (Nowruz, poets, Yalda, professions)
 // 'state'     — occasions of the Islamic Republic and its institutions. The name «ایران»
@@ -33,7 +35,7 @@ export const DEFAULT_GROUPS: EventGroups = { religious: false, state: false, wor
 export const ALL_GROUPS: EventGroups = { religious: true, state: true, world: true };
 
 // Shown verbatim in the UI. Preserve it: the dataset is curated, not the official calendar.
-export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری با تقویم محاسباتی islamic-civil درج شده‌اند و ممکن است با تقویم رسمی ایران (مبتنی بر رؤیت هلال) تا یک روز تفاوت داشته باشند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
+export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری برای سال‌های ۱۴۰۰ تا ۱۴۲۰ از فهرست تعطیلات رسمی ایران درج شده‌اند؛ برای سال‌هایی که تقویم رسمی‌شان هنوز منتشر نشده، این تاریخ‌ها پیش‌بینی‌اند و ممکن است با اعلام رسمی (مبتنی بر رؤیت هلال) یک روز تفاوت کنند. برای سال‌های دیگر با تقویم محاسباتی islamic-civil حساب شده‌اند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
 
 // Citations for entries that were verified against a named source.
 export const EVENT_SOURCES = [
@@ -190,32 +192,35 @@ const LUNAR_HOLIDAYS: Record<string, string> = {
   '9-21': 'شهادت امام علی (ع)',
   '10-1': 'عید سعید فطر',
   '10-2': 'تعطیلی عید فطر',
-  '10-3': 'تعطیلی عید فطر',
+  // 3 Shawwal was listed here and is not an official holiday; only the first two
+  // days of Fitr are. 25 Shawwal was missing and is one — both found against the
+  // official list in official-lunar.json on 11 Sep.
+  '10-25': 'شهادت امام جعفر صادق (ع)',
   '12-10': 'عید سعید قربان',
   '12-18': 'عید سعید غدیر خم',
 };
 
-// Official Iranian dates that pin a lunar holiday to a Persian month-day for one year.
-// Only 1405 is covered, and only four dates — every other lunar holiday is computed.
-// 22 Aban was added on 10 Sep: islamic-civil put Fatima on 23 Aban, a day after the
-// official date (the sandbox/official-lunar comparison found it, ISNA's list has it).
-const OFFICIAL_LUNAR_OVERRIDES: Record<number, Record<string, string>> = {
-  1405: {
-    '6-8': 'میلاد پیامبر اکرم (ص) و امام جعفر صادق (ع)',
-    '8-22': 'شهادت حضرت فاطمه (س)',
-    '10-2': 'میلاد امام علی (ع) — روز پدر',
-    '10-16': 'مبعث پیامبر اکرم (ص)',
-  },
-};
+// The official Iranian dates of the lunar holidays, 1400–1420: Persian year → Persian
+// «month-day» → the Hijri «month-day» it is, which names it through LUNAR_HOLIDAYS.
+// Imported from Farjad's persian_holiday.db by scripts/import-official-lunar.mjs on
+// 11 Sep. For 1405 it agrees with ISNA's official list on every date the earlier
+// comparison checked; years not yet published by the Calendar Centre are the
+// dataset's own forecast, not an announcement.
+// For a year in this table it is the ONLY lunar source: islamic-civil is not
+// consulted at all, so a computed date a day off can never show up beside the real one.
+const OFFICIAL_LUNAR: Record<string, Record<string, string>> = officialLunar;
 
-// True when this day's lunar holiday is pinned to the official Persian calendar for its year,
-// rather than computed by islamic-civil. Only the pinned ones carry no ±1 day risk, so anything
-// that plans around a date — the holiday bridges — has to be able to tell the two apart.
+// True when this day's lunar holiday comes from the official table rather than from
+// islamic-civil. Only those carry no ±1 day risk, so anything that plans around a
+// date — the holiday bridges — has to be able to tell the two apart.
 export function hasOfficialLunarDate(date: Date): boolean {
   const persian = toCalendar(date);
-  const overrides = OFFICIAL_LUNAR_OVERRIDES[persian.year];
-  return overrides !== undefined && `${persian.month}-${persian.day}` in overrides;
+  const table = OFFICIAL_LUNAR[persian.year];
+  return table !== undefined && `${persian.month}-${persian.day}` in table;
 }
+
+// The Persian years the official table covers, for tests and the notice.
+export const OFFICIAL_LUNAR_YEARS = Object.keys(OFFICIAL_LUNAR).map(Number);
 
 // Returns the curated events for one civil day in Asia/Tehran.
 // All groups default on so the library stays neutral; the UI passes its own setting.
@@ -226,13 +231,11 @@ export function eventsForDate(date: Date, groups: EventGroups = ALL_GROUPS): Cal
   const iran = PERSIAN_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const state = STATE_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const world = GREGORIAN_EVENTS[`${gregorian.month}-${gregorian.day}`] ?? [];
-  // An official override for this Persian year wins over the computed lunar date,
-  // and the computed copy of the same title is suppressed so it cannot appear twice.
-  const officialOverrides = OFFICIAL_LUNAR_OVERRIDES[persian.year] ?? {};
-  const officialLunarTitle = officialOverrides[`${persian.month}-${persian.day}`];
-  const lunarTitle = LUNAR_HOLIDAYS[`${islamic.month}-${islamic.day}`];
-  const overriddenTitles = new Set(Object.values(officialOverrides));
-  const religiousTitle = officialLunarTitle ?? (lunarTitle && !overriddenTitles.has(lunarTitle) ? lunarTitle : undefined);
+  // A year in the official table takes its lunar holidays from it alone; any other
+  // year computes them with islamic-civil.
+  const table = OFFICIAL_LUNAR[persian.year];
+  const hijriKey = table ? table[`${persian.month}-${persian.day}`] : `${islamic.month}-${islamic.day}`;
+  const religiousTitle = hijriKey ? LUNAR_HOLIDAYS[hijriKey] : undefined;
   // Order matters for display: national first, then state, then religious, then world.
   // Hidden groups contribute no rows or holiday flags, keeping list and shading consistent.
   return [

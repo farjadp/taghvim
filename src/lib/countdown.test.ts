@@ -42,12 +42,13 @@ describe('next holidays', () => {
   });
 
   it('follows the visitor\'s groups: the default visitor sees no religious holiday', () => {
-    // Five, not three: since 22 Aban was pinned on 10 Sep, the first three religious
-    // holidays from here — Fatima, Ali, Mab'ath — are all official dates, and the first
-    // computed (uncertain) one is 15 Sha'ban on 4 Bahman, fourth in line.
+    // Every lunar holiday of 1400–1420 comes from the official table, so none of them is
+    // uncertain; the first year still computed by islamic-civil is 1421.
     const all = nextHolidays(persian(1405, 6, 18), ALL_GROUPS, 5);
     const defaults = nextHolidays(persian(1405, 6, 18), DEFAULT_GROUPS, 3);
-    expect(all.some((item) => item.uncertain)).toBe(true);
+    expect(all.some((item) => item.occasions.some((occasion) => occasion.category === 'religious'))).toBe(true);
+    expect(all.every((item) => !item.uncertain)).toBe(true);
+    expect(nextHolidays(persian(1421, 1, 5), ALL_GROUPS, 5).some((item) => item.uncertain)).toBe(true);
     expect(defaults.every((item) => !item.uncertain)).toBe(true);
     // From Shahrivar with the default groups, the next holiday is the oil-nationalisation day.
     expect(defaults[0].occasions[0].title).toContain('نفت');

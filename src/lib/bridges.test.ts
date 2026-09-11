@@ -115,11 +115,14 @@ describe('holiday bridges', () => {
   });
 
   it('flags a run built on a computed lunar holiday as uncertain', () => {
-    const { from, to } = year(1405);
+    // 1400–1420 take every lunar holiday from the official table, so the first year whose
+    // lunar holidays are still computed by islamic-civil is 1421.
+    const { from, to } = year(1421);
     const religious = findBridges(from, to, ALL_GROUPS).filter((bridge) => bridge.uncertain);
     expect(religious.length).toBeGreaterThan(0);
-    // 8 Shahrivar 1405 is one of the three dates pinned to the official calendar, so a run
-    // resting on it carries no ±1 day risk and must not be marked as if it did.
+    expect(findBridges(year(1405).from, year(1405).to, ALL_GROUPS).some((bridge) => bridge.uncertain)).toBe(false);
+    // 8 Shahrivar 1405 is an official date, so a run resting on it carries no ±1 day
+    // risk and must not be marked as if it did.
     const pinned = findBridges(persian(1405, 6, 1), persian(1405, 6, 15), ALL_GROUPS, { minFree: 2 })
       .filter((bridge) => bridge.occasions.some(({ title }) => title.includes('میلاد پیامبر')));
     expect(pinned.length).toBeGreaterThan(0);

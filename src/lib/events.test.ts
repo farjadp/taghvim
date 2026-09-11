@@ -7,8 +7,8 @@
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { addDays, fromCalendar } from './calendar';
-import { ALL_GROUPS, DEFAULT_GROUPS, EVENTS_NOTICE, eventsForDate, type EventGroups } from './events';
+import { addDays, fromCalendar, monthLength } from './calendar';
+import { ALL_GROUPS, DEFAULT_GROUPS, EVENTS_NOTICE, OFFICIAL_LUNAR_YEARS, eventsForDate, hasOfficialLunarDate, type EventGroups } from './events';
 
 const combinations: EventGroups[] = Array.from({ length: 8 }, (_, mask) => ({
   religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4),
@@ -197,6 +197,41 @@ describe('selected calendar events', () => {
     expect(EVENTS_NOTICE).toContain('قمری');
     expect(EVENTS_NOTICE).toContain('islamic-civil');
     expect(() => eventsForDate(new Date(NaN))).toThrow(RangeError);
+  });
+
+  // The table names a holiday only through LUNAR_HOLIDAYS; a Hijri date with no title
+  // there would be an official holiday that silently never shows.
+  it('names every date in the official lunar table, and holds 1400 to 1420', () => {
+    expect(OFFICIAL_LUNAR_YEARS[0]).toBe(1400);
+    expect(OFFICIAL_LUNAR_YEARS.at(-1)).toBe(1420);
+    for (const year of OFFICIAL_LUNAR_YEARS) {
+      const holidays: string[] = [];
+      for (let month = 1; month <= 12; month++) {
+        for (let day = 1; day <= monthLength(year, month); day++) {
+          const date = fromCalendar({ year, month, day });
+          if (hasOfficialLunarDate(date)) {
+            const religious = eventsForDate(date).filter((event) => event.category === 'religious');
+            expect(religious, `${year}-${month}-${day}`).toHaveLength(1);
+            holidays.push(religious[0].title);
+          }
+        }
+      }
+      expect(holidays.length, String(year)).toBeGreaterThanOrEqual(17);
+    }
+  });
+
+  // 1405, against ISNA's official list: Tasua and Ashura on 3 and 4 Tir, not a day late;
+  // Imam Sadiq on 25 Farvardin; and no third day of Fitr on 21 Esfand.
+  it('shows the official 1405 lunar dates the computed calendar got wrong', () => {
+    const religious = (month: number, day: number) =>
+      eventsForDate(fromCalendar({ year: 1405, month, day })).filter((event) => event.category === 'religious').map((event) => event.title);
+    expect(religious(4, 3)).toEqual(['تاسوعا']);
+    expect(religious(4, 4)).toEqual(['عاشورا']);
+    expect(religious(4, 5)).toEqual([]);
+    expect(religious(5, 13)).toEqual(['اربعین حسینی']);
+    expect(religious(5, 22)).toEqual(['شهادت امام رضا (ع)']);
+    expect(religious(1, 25)).toEqual(['شهادت امام جعفر صادق (ع)']);
+    expect(religious(12, 21)).toEqual([]);
   });
 
   it('prioritizes official 1405 dates over computational lunar dates', () => {
