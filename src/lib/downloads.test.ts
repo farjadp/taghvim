@@ -50,7 +50,11 @@ describe('apps panel', () => {
   it('points at one release by its tag, never at «latest»', () => {
     // Null until Farjad approves the release; after, a fixed per-version URL.
     if (ANDROID_APK_URL !== null) {
-      expect(ANDROID_APK_URL).toMatch(/^https:\/\/github\.com\/farjadp\/taghvim\/releases\/download\/android-v[\d.]+\/taghvim-[\d.]+\.apk$/);
+      // android-v1.0 / android-v1.1 were APK-only releases; from 0.9.39 the APK sits
+      // in the release of the site version that built it (v0.9.39 → taghvim-1.2.apk).
+      expect(ANDROID_APK_URL).toMatch(/^https:\/\/github\.com\/farjadp\/taghvim\/releases\/download\/(android-)?v[\d.]+\/taghvim-[\d.]+\.apk$/);
+      // The unsigned CI build sits in the same release; the page must offer the signed one.
+      expect(ANDROID_APK_URL).not.toContain('-unsigned');
     }
     expect(ANDROID_APK_URL ?? '').not.toContain('/latest/');
   });

@@ -928,7 +928,7 @@ test("the download page states each method's real status", async ({ page }) => {
   await expect(android).toContainText("آماده");
   const apk = android.locator('a[href*="/releases/"]');
   await expect(apk).toHaveCount(1);
-  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/android-v1.1/taghvim-1.1.apk");
+  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.39/taghvim-1.2.apk");
   await expect(apk).toHaveAttribute("rel", /noopener/);
   await expect(android).toContainText("SHA-256");
   await expect(android).toContainText("2A:21:28:8E");
