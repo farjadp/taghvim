@@ -58,7 +58,12 @@ const run = (cmd, argv, options = {}) => execFileSync(cmd, argv, { env, encoding
 
 // 1. The workflow's file, from the draft release.
 const work = mkdtempSync(join(tmpdir(), 'taghvim-sign-'));
-run('gh', ['release', 'download', tag, '--repo', REPO, '--pattern', '*-unsigned.apk', '--dir', work]);
+try {
+  run('gh', ['release', 'download', tag, '--repo', REPO, '--pattern', '*-unsigned.apk', '--dir', work], { stdio: ['ignore', 'ignore', 'pipe'] });
+} catch (error) {
+  // The usual cause: the tag is not pushed yet, or its workflow has not finished.
+  fail(`no release ${tag} with an unsigned APK (${String(error.stderr ?? '').trim() || error.message}).\n      Push the tag first and wait for the Release workflow: gh run list --workflow release.yml`);
+}
 const unsignedName = readdirSync(work).find((name) => name.endsWith('-unsigned.apk'));
 if (!unsignedName) fail(`release ${tag} has no *-unsigned.apk`);
 const unsigned = join(work, unsignedName);
