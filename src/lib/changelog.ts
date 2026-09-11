@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.33',
     at: '2026-09-11T12:10:46-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'ویجت پهن روی گوشی',
     changes: [
       { kind: 'fixed', text: 'صفحهٔ دریافت: روی گوشی، نمونهٔ ویجت پهن از کادرش بیرون می‌زد؛ حالا در کادر جا می‌شود.' },
