@@ -64,6 +64,25 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.clock.install({ time: new Date("2026-09-06T10:30:00Z") });
 });
 
+test("carries the same tools box, with its own separate list of dates", async ({ page }) => {
+  await page.goto(`${origin}/newtab.html`);
+  const tabs = page.getByRole("tab");
+  await expect(tabs).toHaveCount(6);
+  for (const name of ["تعطیلات پیوسته", "روزشمار", "تاریخ‌های من", "تبدیل تاریخ‌ها", "فاصلهٔ دو تاریخ", "محاسبهٔ سن"]) {
+    await expect(page.getByRole("tab", { name })).toBeVisible();
+  }
+
+  // A tool that only computes: no network, so it works here exactly as on the site
+  await page.getByRole("tab", { name: "محاسبهٔ سن" }).click();
+  await expect(page.locator("#tools")).toBeVisible();
+
+  // The extension page is its own origin, so its list is a SECOND list. The notice has
+  // to say that outright — «this browser and this device» alone would mislead.
+  await page.getByRole("tab", { name: "تاریخ‌های من" }).click();
+  await page.getByText("این تاریخ‌ها کجا ذخیره می‌شوند").click();
+  await expect(page.locator("#tools")).toContainText("با تاریخ‌هایی که در taghv.im ثبت کرده‌ای یکی نیست");
+});
+
 test("names its own build at the foot of the page", async ({ page }, testInfo) => {
   // The store rolls an update out over hours, so «am I on the new one» has to be
   // answerable from the page itself. The version is stamped from the manifest at

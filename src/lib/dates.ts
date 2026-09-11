@@ -41,6 +41,11 @@ export const MAX_TITLE = 60;
 // Shown wherever this feature is. Preserve it: it is the honest version of «nothing is stored».
 export const DATES_NOTICE = 'این فهرست فقط در حافظهٔ همین مرورگر و همین دستگاه ذخیره می‌شود. به هیچ سروری فرستاده نمی‌شود، بین دستگاه‌هایت همگام نمی‌شود، و با پاک کردن دادهٔ سایت از بین می‌رود. برای اینکه یادآوری واقعی بگیری، خروجی را به تقویم خودت اضافه کن.';
 
+// The extension's new tab is its own origin, so its list is a SECOND list: nothing the
+// visitor typed on taghv.im appears here, and nothing typed here appears there. Saying
+// «this browser and this device» alone would be true and still mislead.
+export const DATES_NOTICE_EXTENSION = 'این فهرست فقط در همین افزونه ذخیره می‌شود و با تاریخ‌هایی که در taghv.im ثبت کرده‌ای یکی نیست — افزونه حافظهٔ جدا دارد. به هیچ سروری فرستاده نمی‌شود و با پاک کردن دادهٔ افزونه از بین می‌رود. برای یادآوری واقعی، خروجی را به تقویم خودت اضافه کن.';
+
 export const INVALID_DATE = 'تاریخ معتبر نیست. روز و ماه را بررسی کن؛ سال اختیاری است و اگر نوشتی باید بین ۱۲۰۰ تا ۱۶۰۰ خورشیدی باشد.';
 export const INVALID_TITLE = 'یک عنوان بنویس — مثلاً «تولد مریم».';
 export const TOO_MANY = `بیشتر از ${MAX_DATES} مورد ذخیره نمی‌شود.`;

@@ -364,6 +364,18 @@ test("a date of your own is marked in its category's colour, not a generic dot",
   expect(new Set(colours).size).toBe(2);
 });
 
+test("each font in the picker is written in the font it names", async ({ page }) => {
+  // The page barely moves when the font changes — the calendar is digits in fixed-width
+  // cells, measured at 0.0% — so the picker itself has to show the difference. Without
+  // this the control was reported as broken twice, by an email and by Farjad.
+  await page.getByRole("button", { name: "تنظیمات نمایش" }).click();
+  const chips = page.locator("[data-font-sample]");
+  await expect(chips).toHaveCount(5);
+  const families = await chips.evaluateAll((nodes) =>
+    nodes.map((node) => getComputedStyle(node).fontFamily.split(",")[0].replace(/["']/g, "")));
+  expect(families).toEqual(["Vazirmatn", "Shabnam", "Sahel", "IRANSansX", "IRANYekanX"]);
+});
+
 test("nothing in the settings panel paints outside its card", async ({ page }) => {
   // 0.9.23 shipped the font row 48px outside the card's left edge: w-72 leaves
   // 256px of content, ~210px once a label sits beside the control, and the five

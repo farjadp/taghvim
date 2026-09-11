@@ -123,7 +123,7 @@ function Age({ now }: { now: Date }) {
 }
 
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
-export function ToolsPanel({ now, tab, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges" }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string }) {
+export function ToolsPanel({ now, tab, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges", datesNotice }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string; datesNotice?: string }) {
   const tabs = [
     { key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange, description: "بازه‌هایی که با یکی دو روز مرخصی به چند روز تعطیلی پشت‌سرهم می‌رسند." },
     { key: "countdown" as const, label: "روزشمار", icon: Timer, description: "چند روز تا مناسبت‌های بعدی، و تا نوروز و یلدا." },
@@ -146,6 +146,6 @@ export function ToolsPanel({ now, tab, onTabChange, groups, dates, datesReady, o
       {/* One line saying what this tool answers, in the panel rather than in each tool, so
           all six read alike and a new one cannot ship without one. */}
       <p data-testid="tool-description" className="mb-5 text-sm font-medium">{active.description}</p>
-      {tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} /> : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
+      {tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} notice={datesNotice} /> : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
   </section>;
 }

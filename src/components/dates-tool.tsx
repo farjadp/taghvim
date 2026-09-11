@@ -58,13 +58,15 @@ function yearsLabel(item: UpcomingDate): string | null {
  * tool owned the list privately the grid did not hear about an addition until a reload — which
  * a separate page hid, and a tab beside the calendar does not.
  */
-export function DatesTool({ now, dates, ready, onChange }: {
+export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }: {
   now: Date;
   dates: Anniversary[];
   // False until the browser's list has been read; an empty state before that would tell
   // someone with ten dates that they have none.
   ready: boolean;
   onChange: (next: Anniversary[]) => void;
+  // The extension keeps its own list on its own origin and has to say so.
+  notice?: string;
 }) {
   const months = useMonthNames();
   const [draft, setDraft] = useState(EMPTY);
@@ -217,7 +219,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
         )}
         <details className="mt-5 rounded-lg bg-paper p-3 text-[0.625rem] leading-6 text-muted">
           <summary className="flex cursor-pointer items-center gap-1.5"><Info size={13} />این تاریخ‌ها کجا ذخیره می‌شوند</summary>
-          <p className="pt-2">{DATES_NOTICE}</p>
+          <p className="pt-2">{notice}</p>
         </details>
       </div>
     </div>

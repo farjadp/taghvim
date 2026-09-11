@@ -31,8 +31,11 @@ function backgroundsOrPalettes(card: { backgrounds: Background[] }): boolean {
 // on its own line and lets the control use the panel's full width — the five font
 // names do not fit beside their label, and used to paint outside the card.
 // Both shapes wrap rather than overflow, so a sixth option can never escape again.
-function Choice<T extends string>({ label, options, value, onChange, stacked }: { label: string; options: { value: T; label: string }[]; value: T; onChange: (value: T) => void; stacked?: boolean }) {
-  const control = <div className={`flex min-w-0 flex-wrap rounded-lg bg-paper p-0.5 ${stacked ? "gap-0.5" : ""}`}>{options.map((option) => <button key={option.value} type="button" aria-pressed={value === option.value} onClick={() => onChange(option.value)} className={`shrink-0 rounded-md px-2.5 py-1 text-[0.6875rem] transition-colors ${value === option.value ? "bg-surface font-medium text-forest shadow-sm" : "text-muted hover:text-ink"}`}>{option.label}</button>)}</div>;
+function Choice<T extends string>({ label, options, value, onChange, stacked, sample }: { label: string; options: { value: T; label: string }[]; value: T; onChange: (value: T) => void; stacked?: boolean; sample?: boolean }) {
+  // `sample` writes each option's name in the font it names. The page itself barely
+  // moves when the font changes — the calendar is digits in fixed-width cells — so
+  // without this the control reads as broken. Reported twice before it was.
+  const control = <div className={`flex min-w-0 flex-wrap rounded-lg bg-paper p-0.5 ${stacked ? "gap-0.5" : ""}`}>{options.map((option) => <button key={option.value} type="button" data-font-sample={sample ? option.value : undefined} aria-pressed={value === option.value} onClick={() => onChange(option.value)} className={`shrink-0 rounded-md px-2.5 py-1 text-[0.6875rem] transition-colors ${value === option.value ? "bg-surface font-medium text-forest shadow-sm" : "text-muted hover:text-ink"}`}>{option.label}</button>)}</div>;
   if (stacked) return <div role="group" aria-label={label} className="space-y-1.5">
     <span className="block text-xs text-muted">{label}</span>
     {control}
@@ -108,7 +111,7 @@ export function SettingsMenu({ card, months }: {
     {open && <div id="display-settings" className="z-40 space-y-3 rounded-2xl border border-line bg-surface p-4 shadow-lg max-sm:fixed max-sm:inset-x-4 max-sm:top-20 sm:absolute sm:left-0 sm:top-11 sm:w-72">
       <Choice label="پوسته" options={THEMES} value={prefs.theme} onChange={(value) => update("theme", value)} />
       <Choice label="اندازهٔ قلم" options={SIZES} value={prefs.size} onChange={(value) => update("size", value)} />
-      <Choice label="قلم" options={FONTS} value={prefs.font} onChange={(value) => update("font", value)} stacked />
+      <Choice label="قلم" options={FONTS} value={prefs.font} onChange={(value) => update("font", value)} stacked sample />
       {months && <Choice label="نام ماه‌ها" options={MONTH_NAME_CHOICES} value={months.avestan ? "avestan" : "modern"}
         onChange={(value) => months.onChange(value === "avestan")} />}
       {card && backgroundsOrPalettes(card) && (

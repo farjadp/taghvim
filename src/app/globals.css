@@ -217,6 +217,16 @@
   html[data-font="sahel"] { --font-sans: "Sahel", "Vazirmatn", sans-serif; }
   html[data-font="iransans"] { --font-sans: "IRANSansX", "Vazirmatn", sans-serif; }
   html[data-font="iranyekan"] { --font-sans: "IRANYekanX", "Vazirmatn", sans-serif; }
+  /* Each name in the picker, written in the font it names. Without this the control
+     looked broken: the calendar grid is digits in fixed-width cells, so a font change
+     moves it by 0.0% and the only visible difference on the page is 5% on one heading.
+     Measured, not guessed. Keep these in step with the four rules above — a unit test
+     checks that every entry in FONTS has both a rule here and a sample below. */
+  [data-font-sample="vazirmatn"] { font-family: "Vazirmatn", sans-serif; }
+  [data-font-sample="shabnam"] { font-family: "Shabnam", "Vazirmatn", sans-serif; }
+  [data-font-sample="sahel"] { font-family: "Sahel", "Vazirmatn", sans-serif; }
+  [data-font-sample="iransans"] { font-family: "IRANSansX", "Vazirmatn", sans-serif; }
+  [data-font-sample="iranyekan"] { font-family: "IRANYekanX", "Vazirmatn", sans-serif; }
 }
 
 @layer base {

@@ -15,6 +15,8 @@ import { ArrowUpLeft } from "lucide-react";
 import { dayKey, fa, formatDate, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
 import { CalendarPanel } from "@/components/calendar-panel";
+import { DEFAULT_TOOL, ToolsPanel, type ToolTab } from "@/components/tools-panel";
+import { DATES_NOTICE_EXTENSION, datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
 import { EventsPanel } from "@/components/events-panel";
 import { SettingsMenu } from "@/components/settings-menu";
 import { MonthNamesProvider } from "@/components/month-names-context";
@@ -27,10 +29,21 @@ export function NewTab() {
   const [view, setView] = useState(() => toCalendar(new Date()));
   // Same keys and the same guarded reader as the site; this origin's own copy.
   const [preferences, setPreferences] = useState<ViewPreferences>(DEFAULT_VIEW);
+  const [tool, setTool] = useState<ToolTab>(DEFAULT_TOOL);
+  // The extension page is its own origin, so this is a SECOND list — nothing typed on
+  // taghv.im reaches it. DATES_NOTICE_EXTENSION is the version of the notice that says so.
+  const [dates, setDates] = useState<Anniversary[]>([]);
+  const [datesReady, setDatesReady] = useState(false);
   const followingToday = useRef(true);
   const initialNow = useRef(new Date().toISOString());
 
-  useEffect(() => { setPreferences(readView()); }, []);
+  useEffect(() => { setPreferences(readView()); setDates(readDates()); setDatesReady(true); }, []);
+  // One owner for the list, exactly as the site does it: the tool edits it and the grid
+  // marks it in the same render.
+  function commitDates(next: Anniversary[]) {
+    setDates(next);
+    saveDates(next);
+  }
 
   function toggleView(key: keyof ViewPreferences) {
     const next = { ...preferences, [key]: !preferences[key] };
@@ -116,6 +129,7 @@ export function NewTab() {
           </div>
         </div>
         <CalendarPanel
+          marked={dates.length > 0 ? (date) => datesOn(dates, date)[0]?.category : undefined}
           year={view.year}
           month={view.month}
           today={now}
@@ -129,6 +143,11 @@ export function NewTab() {
           onToday={today}
           onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }}
         />
+        {/* The same tools box the site carries: nothing here touches a network, and the
+            bridges link is the only thing that leaves, to taghv.im by an absolute URL. */}
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
+          dates={dates} datesReady={datesReady} onDatesChange={commitDates}
+          bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
       </main>
       {/* Which build this is. Farjad asked for it: the store rolls updates out over
           hours, so «am I on the new one» is otherwise unanswerable from the page. */}
