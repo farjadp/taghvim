@@ -14,6 +14,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowUpLeft } from "lucide-react";
 import { dayKey, fa, formatDate, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
+import { syncWidgets } from "@/lib/widget-sync";
 import { CalendarPanel } from "@/components/calendar-panel";
 import { DEFAULT_TOOL, ToolsPanel, type ToolTab } from "@/components/tools-panel";
 import { DATES_NOTICE_EXTENSION, datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
@@ -37,7 +38,9 @@ export function NewTab() {
   const followingToday = useRef(true);
   const initialNow = useRef(new Date().toISOString());
 
-  useEffect(() => { setPreferences(readView()); setDates(readDates()); setDatesReady(true); }, []);
+  // syncWidgets is a no-op outside the Android app; inside it, the widgets get the
+  // stored view once at start, in case it changed while they were not listening.
+  useEffect(() => { const view = readView(); setPreferences(view); syncWidgets(view); setDates(readDates()); setDatesReady(true); }, []);
   // One owner for the list, exactly as the site does it: the tool edits it and the grid
   // marks it in the same render.
   function commitDates(next: Anniversary[]) {
@@ -49,6 +52,7 @@ export function NewTab() {
     const next = { ...preferences, [key]: !preferences[key] };
     setPreferences(next);
     saveView(next);
+    syncWidgets(next);
   }
 
   // A new tab can stay open across midnight; the same rollover the site does.

@@ -67,6 +67,28 @@ class WidgetDaysTest {
     }
 
     @Test
+    fun theVisitorsGroupsDecideWhatShowsAndWhatIsOff() {
+        // 8 Shahrivar 1405 = 30 Aug 2026, a Sunday, with a religious holiday pinned to the official calendar.
+        val instant = Instant.parse("2026-08-30T08:00:00Z")
+        val hidden = WidgetDays.at(instant, data, EventGroups.DEFAULT)
+        val shown = WidgetDays.at(instant, data, EventGroups(religious = true, state = false, world = true))
+        assertFalse(hidden.off)
+        assertTrue(shown.off)
+        val religious = data.events(PersianDate(1405, 6, 8), EventGroups(religious = true, state = false, world = false))
+            .first { it.category == EventCategory.RELIGIOUS }
+        assertTrue(listOfNotNull(shown.occasion).isNotEmpty())
+        assertFalse(hidden.occasion == religious.title)
+    }
+
+    @Test
+    fun olderMonthNamesAreUsedWhenChosen() {
+        // 10 Mordad 1405 = 1 Aug 2026.
+        val instant = Instant.parse("2026-08-01T08:00:00Z")
+        assertEquals("مرداد", WidgetDays.at(instant, data).month)
+        assertEquals("امرداد", WidgetDays.at(instant, data, older = true).month)
+    }
+
+    @Test
     fun digitsArePersian() {
         assertEquals("۱۴۰۶", fa(1406))
         assertEquals("۲۰", fa(20))

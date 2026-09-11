@@ -32,13 +32,15 @@ abstract class TaghvimWidget : AppWidgetProvider() {
     protected abstract fun render(context: Context, day: WidgetDay, options: Bundle?): RemoteViews
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
-        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context))
+        val settings = WidgetSettings.read(context)
+        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context), settings.groups, settings.older)
         for (id in ids) manager.updateAppWidget(id, render(context, day, manager.getAppWidgetOptions(id)))
         DayTurnReceiver.schedule(context)
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
-        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context))
+        val settings = WidgetSettings.read(context)
+        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context), settings.groups, settings.older)
         manager.updateAppWidget(id, render(context, day, options))
     }
 

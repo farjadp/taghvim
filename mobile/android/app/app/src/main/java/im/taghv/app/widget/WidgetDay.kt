@@ -36,7 +36,8 @@ object WidgetDays {
         "July", "August", "September", "October", "November", "December",
     )
 
-    fun at(instant: Instant, data: WidgetData, groups: EventGroups = EventGroups.DEFAULT): WidgetDay {
+    /** [older] swaps in the older month names (امرداد، سپندارمذ) when the visitor has chosen them. */
+    fun at(instant: Instant, data: WidgetData, groups: EventGroups = EventGroups.DEFAULT, older: Boolean = false): WidgetDay {
         val persian = Today.persian(instant)
         val gregorian = Today.gregorian(instant)
         val weekday = Today.weekdayIndex(instant)
@@ -45,7 +46,7 @@ object WidgetDays {
         return WidgetDay(
             weekday = data.weekdays[weekday],
             day = persian.day,
-            month = data.months[persian.month - 1],
+            month = (if (older) data.monthsOlder else data.months)[persian.month - 1],
             year = persian.year,
             gregorian = "${gregorian.day} ${GREGORIAN_MONTHS[gregorian.month - 1]} ${gregorian.year}",
             off = weekday == 6 || events.any { it.holiday },

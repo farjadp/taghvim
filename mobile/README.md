@@ -28,8 +28,15 @@ reserves that for alarm clocks and calendars that send event notifications).
 `updatePeriodMillis` is an hourly backstop. **How late the alarm fires under
 deep Doze is not measured yet** — it needs a real phone.
 
-The groups are the site's defaults for now; the app's own settings do not reach
-the widget yet.
+**The widgets follow the app's own settings.** The page keeps them in the
+WebView's `localStorage`, which native code cannot read, so `src/lib/widget-sync.ts`
+hands the four the widgets use — religious, state, world, and the older month
+names — to `WidgetSyncPlugin`, once at start and on every change. The plugin
+writes them to the app-private `taghvim-widget` preferences and redraws. The
+memorial switch and personal dates never cross. Until the page has spoken the
+widgets use the site's defaults. Outside the app `syncWidgets` finds no native
+platform and does nothing, and it reads `window.Capacitor` rather than importing
+`@capacitor/core`, so the site and extension bundles do not change.
 
 **A widget's `initialLayout` never carries a date.** It is what shows before
 the first update and during every app update; the first build pointed it at the
