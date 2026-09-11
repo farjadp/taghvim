@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.36',
     at: '2026-09-11T12:41:11-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'نصب برنامهٔ اندروید',
     changes: [
       { kind: 'added', text: 'صفحهٔ دریافت: اگر Play Protect جلوی نصب برنامهٔ اندروید را بگیرد، حالا نوشته شده از کجا باید رد شد.' },
