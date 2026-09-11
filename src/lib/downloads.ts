@@ -122,9 +122,11 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
 // rule CHROME_STORE_URL follows. A fixed per-version URL on purpose, never
 // releases/latest: any later release of anything else would silently repoint
 // «latest», and this page would hand out the wrong file.
-// Published 11 Sep 2026; the file's SHA-256 was checked against the signed build.
+// 1.0 published 11 Sep 2026; 1.1 (versionCode 2, same key) the same day, with the
+// colours, the hero motifs and the official lunar holidays. Each time the file's
+// SHA-256 was checked against the signed build, and the download against both.
 export const ANDROID_APK_URL: string | null =
-  'https://github.com/farjadp/taghvim/releases/download/android-v1.0/taghvim-1.0.apk';
+  'https://github.com/farjadp/taghvim/releases/download/android-v1.1/taghvim-1.1.apk';
 
 // The certificate every Taghvim APK is signed with (subject CN=Taghvim), so
 // anyone handed the file somewhere else can check it came from here. It is

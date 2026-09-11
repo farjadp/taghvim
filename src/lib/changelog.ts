@@ -38,6 +38,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.38',
+    at: '2026-09-11T15:26:50-04:00',
+    status: 'ready',
+    title: 'برنامهٔ اندروید ۱٫۱',
+    changes: [
+      { kind: 'added', text: 'برنامهٔ اندروید ۱٫۱ روی صفحهٔ دریافت: رنگ‌ها، نقش‌های کارت امروز و تعطیلات قمری رسمی حالا در برنامه هم هست.' },
+    ],
+  },
+  {
     version: '0.9.37',
     at: '2026-09-11T15:12:55-04:00',
     status: 'live',
