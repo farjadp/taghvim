@@ -39,8 +39,8 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 export const RELEASES: Release[] = [
   {
     version: '0.9.27',
-    at: '2026-09-10T21:30:00-04:00',
-    status: 'ready',
+    at: '2026-09-10T21:55:00-04:00',
+    status: 'live',
     title: 'ابزارها در افزونه، و نمونهٔ قلم‌ها',
     changes: [
       { kind: 'added', text: 'پای تب جدید افزونه، شمارهٔ نسخه و تاریخ ساختش نوشته می‌شود تا معلوم باشد کدام نسخه را داری.' },
