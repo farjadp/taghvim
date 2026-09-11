@@ -72,9 +72,11 @@ bundle id `im.taghv.app`, with **Swift Package Manager**, no CocoaPods.
 Verified on the iOS 26.5 simulator, 11 Sep: the app opens the calendar offline
 with the Tehran day; the small widget sits on the home screen showing it
 (Friday 20 Shahrivar, numeral in clay); after launch the App Group holds the
-four settings the page sent; the lock-screen widget (C, rectangular) sits under
-the clock showing the same day — «۲۰ شهریور ۱۴۰۵» with «جمعه» under it. The
-inline form (the date line) is built but not yet placed on the simulator.
+four settings the page sent; the lock-screen widget (C, rectangular) is on the
+saved lock screen showing the same day — «۲۰ شهریور ۱۴۰۵» with «جمعه» under it.
+iOS 26 places lock-screen widgets at the bottom of the screen, below the
+notifications, and draws them in its own glass style rather than the
+translucent box. The inline form (the date line) is built but not yet placed.
 Changing a setting while the app runs is verified on Android, not yet on iOS.
 
 Build for the simulator (no Apple account needed; devices and TestFlight are):
