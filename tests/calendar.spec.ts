@@ -892,7 +892,18 @@ test("the download page states each method's real status", async ({ page }) => {
   expect(await status("calendar-feed")).toBe("آماده");
   // Published on the Web Store since 9 Sep; before that this read «در حال بازبینی»
   expect(await status("chrome")).toBe("آماده");
-  expect(await status("android")).toBe("هنوز ساخته نشده");
+  // The apps are in development (Farjad, 10 Sep) and get a panel of their own,
+  // with the three widgets drawn and the rest of what is coming listed after it
+  const apps = page.locator("#apps");
+  await expect(apps).toContainText("در دست ساخت");
+  await expect(apps).toContainText("اندروید");
+  await expect(apps).toContainText("آیفون");
+  await expect(apps.locator("[data-widget]")).toHaveCount(3);
+  // No release date is claimed, because there is none yet
+  await expect(apps).toContainText("زمان انتشار هنوز معلوم نیست");
+  const next = page.getByRole("region", { name: "بقیهٔ چیزهایی که در راه است" });
+  await expect(next).toContainText("ربات تلگرام");
+  await expect(next).not.toContainText("اندروید");
 
   // The store link exists now, and it is the real listing rather than a search
   // page or a placeholder — a dead button here is worse than a sentence.

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.16 — 2026-09-09
+// Version: 0.9.30 — 2026-09-10
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -20,7 +20,7 @@ export const CHROME_STORE_URL: string | null =
 // 2026; until it is approved the card says so, exactly as Chrome's did.
 export const FIREFOX_STORE_URL: string | null = null;
 
-export type DownloadStatus = 'ready' | 'review' | 'planned';
+export type DownloadStatus = 'ready' | 'review' | 'building' | 'planned';
 
 export type DownloadMethod = {
   id: string;
@@ -35,6 +35,7 @@ export type DownloadMethod = {
 export const STATUS_LABELS: Record<DownloadStatus, string> = {
   ready: 'آماده',
   review: 'در حال بازبینی',
+  building: 'در دست ساخت',
   planned: 'هنوز ساخته نشده',
 };
 
@@ -114,15 +115,28 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
     note: 'تعطیلات مذهبی قمری در این فهرست نیست، چون تاریخشان بر پایهٔ رؤیت هلال تعیین می‌شود.',
     action: { label: 'مراحل کامل در راهنما', href: '/help#subscribe' },
   },
-  {
-    id: 'android',
-    title: 'برنامهٔ اندروید و ویجت',
-    status: 'planned',
-    summary:
-      'ویجت صفحهٔ خانه پرتکرارترین چیزی است که خواسته شده. ویجت بدون برنامهٔ نصبی ممکن نیست، پس اگر ساخته شود اول اندروید خواهد بود — اپ‌استور اپل در ایران در دسترس نیست.',
-    steps: [
-      'هنوز شروع نشده. اگر ساخته شود، در همین صفحه و در فهرست تغییرات نوشته می‌شود.',
-    ],
-    action: { label: 'آنچه در دست بررسی است', href: '/changelog#upcoming' },
-  },
+] as const;
+
+// The two apps, shown on /download as their own panel rather than one more card:
+// they are what most people asked for, and the widgets are why. Farjad, 10 Sep:
+// both are in development. Nothing here names a date — there is none yet.
+export const APPS = {
+  title: 'برنامهٔ اندروید و آیفون',
+  status: 'building' as DownloadStatus,
+  summary:
+    'هر دو برنامه در دست کدنویسی‌اند. همان تقویم، به‌علاوهٔ چیزی که فقط یک برنامهٔ نصبی می‌تواند داشته باشد: ویجت روی صفحهٔ خانه و صفحهٔ قفل.',
+  platforms: [
+    { id: 'android', name: 'اندروید', points: ['ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن'] },
+    { id: 'ios', name: 'آیفون', points: ['ویجت صفحهٔ خانه و صفحهٔ قفل'] },
+  ],
+  note: 'اپ‌استور اپل از داخل ایران در دسترس نیست.',
+  timing: 'زمان انتشار هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.',
+} as const;
+
+// What each widget holds. The page draws them with a fixed date — Nowruz 1406,
+// labelled as an example — so a static page never shows a stale «today».
+export const WIDGETS = [
+  { id: 'small', name: 'کوچک', size: '۱×۱', on: 'اندروید و آیفون', shows: 'روز و ماه' },
+  { id: 'wide', name: 'پهن', size: '۴×۱', on: 'اندروید', shows: 'تاریخ کامل، روز هفته و مناسبت' },
+  { id: 'lock', name: 'صفحهٔ قفل', size: null, on: 'آیفون', shows: 'تاریخ و مناسبت، زیر ساعت' },
 ] as const;

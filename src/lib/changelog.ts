@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.6 — 2026-09-10
+// Version: 0.11.7 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -38,9 +38,18 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.30',
+    at: '2026-09-10T23:40:00-04:00',
+    status: 'ready',
+    title: 'برنامه‌ها و ویجت‌ها',
+    changes: [
+      { kind: 'changed', text: 'صفحهٔ دریافت: برنامهٔ اندروید و آیفون در دست ساخت است، با نمونهٔ ویجت‌هایی که با خودشان می‌آورند.' },
+    ],
+  },
+  {
     version: '0.9.29',
     at: '2026-09-10T23:10:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'لحظهٔ تحویل سال',
     changes: [
       { kind: 'added', text: 'از اول اسفند، زیر تاریخ امروز نوشته می‌شود چقدر تا تحویل سال مانده و لحظهٔ دقیقش به وقت تهران چیست.' },
@@ -381,13 +390,17 @@ export const RELEASES: Release[] = [
 // Under consideration — deliberately without dates or promises.
 // Written for visitors, not as internal strategy: what is being considered,
 // in plain terms, with the honest caveats attached. Order carries no meaning.
+// Its own constant so /download, which shows the apps as a panel of their own,
+// can list the rest without repeating them.
+export const UPCOMING_APP = 'برنامهٔ اندروید و آیفون، با ویجت صفحهٔ خانه و صفحهٔ قفل، در دست ساخت است. زمان انتشار هنوز معلوم نیست.';
+
 export const UPCOMING: string[] = [
   'کارکرد آفلاین، تا تقویم بدون اینترنت هم باز شود. نصب روی صفحهٔ خانهٔ گوشی از نسخهٔ ۰.۹.۱ کار می‌کند و راهنمایش هست، ولی برای دیدن تقویم هنوز به اینترنت نیاز داری.',
   'ربات تلگرام که هر روز صبح تاریخ و مناسبت‌های آن روز را بفرستد.',
   'تصویر زمینهٔ ماهانه برای موبایل، تا تقویم روی صفحهٔ قفل باشد.',
   'افزودن تعطیلات قمری به فهرست اشتراکی تقویم. نیمهٔ شمسی‌اش ساخته شد؛ این نیمه تا وقتی تاریخ‌های قمری بر پایهٔ تقویم رسمی درنیامده، اضافه نمی‌شود.',
   'تعطیلات قمری بر پایهٔ تقویم رسمی، نه محاسباتی — امروز فقط سه تاریخ از سال ۱۴۰۵ تثبیت شده است.',
-  'برنامهٔ اندروید و ویجت صفحهٔ اصلی. ویجت بدون برنامهٔ نصبی ممکن نیست، و چون اپ‌استور اپل در ایران در دسترس نیست، اگر ساخته شود اول اندروید خواهد بود.',
+  UPCOMING_APP,
 ];
 
 export const UPCOMING_NOTICE = 'این فهرست، کارهایی است که در دست بررسی‌اند؛ نه قول، نه زمان‌بندی. ترتیب هم معنایی ندارد.';
