@@ -74,6 +74,15 @@ if (lint.summary.errors) {
   process.exit(1);
 }
 
+// The release workflow builds the uploads only. The listing images are for the
+// store pages, not release artefacts, and would need a browser on the runner.
+if (process.env.PACKAGE_NO_LISTING) {
+  console.log('\nupload');
+  for (const item of packages) console.log(`        extension/${item.name.padEnd(34)} ${Math.round(item.bytes / 1024)} KB`);
+  console.log(`        addons-linter: 0 errors, ${lint.summary.warnings} warning(s)`);
+  process.exit(0);
+}
+
 // --- the listing screenshots ------------------------------------------------
 const MIME = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.woff2': 'font/woff2', '.png': 'image/png', '.svg': 'image/svg+xml', '.json': 'application/json' };
 const server = createServer((request, response) => {

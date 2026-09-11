@@ -1,0 +1,86 @@
+# ============================================================================
+# Source: .github/workflows/release.yml
+# Version: 0.1.0 — 2026-09-11
+# Why: Every published file is built here, from the tagged commit, where anyone
+#      can read how it was made — not on Farjad's Mac. Asked for publicly on
+#      11 Sep: a local build cannot be tied to the source it claims to come from.
+#      Each file gets a signed build-provenance attestation naming this workflow
+#      and the commit, checkable with `gh attestation verify` (see VERIFY.md).
+# Env / Deps: The APK is built UNSIGNED: the release key never leaves Farjad's
+#      machine. scripts/sign-release-apk.mjs downloads this very file, signs it
+#      and proves the signed APK differs from it only by the signature.
+#      A `v<package.json version>` tag (or `v<version>-<suffix>` for a test)
+#      starts it; it only ever creates a DRAFT release.
+# ============================================================================
+
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write      # the draft release
+  id-token: write      # signing the attestations
+  attestations: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 26
+          cache: npm
+
+      - run: npm ci
+
+      - name: The tag must name the version being built
+        run: |
+          v=$(node -p "require('./package.json').version")
+          case "$GITHUB_REF_NAME" in
+            "v$v"|"v$v-"*) echo "building $v from $GITHUB_REF_NAME" ;;
+            *) echo "::error::tag $GITHUB_REF_NAME does not match package.json $v"; exit 1 ;;
+          esac
+
+      - name: Extension — Chrome, Firefox and source ZIPs
+        run: node scripts/package-extension.mjs
+        env:
+          PACKAGE_NO_LISTING: "1"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - uses: android-actions/setup-android@v3
+
+      # Android only: the iOS project is not built here.
+      - name: Android — web bundle
+        run: TARGET=app npx vite build --config extension/vite.config.ts && npx cap sync android
+
+      - name: Android — APK, unsigned
+        working-directory: mobile/android/app
+        run: ./gradlew assembleRelease --no-daemon
+
+      - name: Collect the release files
+        run: |
+          vn=$(sed -n 's/^ *versionName "\(.*\)"/\1/p' mobile/android/app/app/build.gradle)
+          mkdir out
+          cp extension/taghvim-*.zip out/
+          cp mobile/android/app/app/build/outputs/apk/release/app-release-unsigned.apk "out/taghvim-$vn-unsigned.apk"
+          (cd out && sha256sum * > SHA256SUMS && cat SHA256SUMS)
+
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: "out/*"
+
+      - name: Draft release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pre=""; case "$GITHUB_REF_NAME" in *-*) pre="--prerelease" ;; esac
+          gh release create "$GITHUB_REF_NAME" out/* --draft $pre --verify-tag \
+            --title "تقویم $GITHUB_REF_NAME" --notes-file .github/release-notes.md
