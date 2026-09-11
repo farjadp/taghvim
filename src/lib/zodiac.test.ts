@@ -7,7 +7,7 @@
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { SIGNS, ZODIAC_NOTICE, ZODIAC_SHORT_NOTICE, signFor, signProgress, signRange } from './zodiac';
+import { SIGNS, ZODIAC_NOTICE, signFor, signProgress, signRange } from './zodiac';
 import { fromCalendar } from './calendar';
 
 const persian = (month: number, day: number) => fromCalendar({ year: 1405, month, day });
@@ -52,8 +52,5 @@ describe('zodiac signs', () => {
   it('says what the mapping is and is not', () => {
     expect(ZODIAC_NOTICE).toContain('افغانستان');
     expect(ZODIAC_NOTICE).toContain('طالع');
-    // The inline version has to carry the same disclaimer in one line
-    expect(ZODIAC_SHORT_NOTICE).toContain('طالع');
-    expect(ZODIAC_SHORT_NOTICE.length).toBeLessThan(60);
   });
 });

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.5 — 2026-09-10
+// Version: 0.11.6 — 2026-09-10
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -38,9 +38,20 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.29',
+    at: '2026-09-10T23:10:00-04:00',
+    status: 'ready',
+    title: 'لحظهٔ تحویل سال',
+    changes: [
+      { kind: 'added', text: 'از اول اسفند، زیر تاریخ امروز نوشته می‌شود چقدر تا تحویل سال مانده و لحظهٔ دقیقش به وقت تهران چیست.' },
+      { kind: 'added', text: 'لحظه همان است که مرکز تقویم ژئوفیزیک اعلام کرده؛ برای ۱۴۰۶ فقط تا دقیقه اعلام شده و همین‌قدر نوشته می‌شود.' },
+      { kind: 'changed', text: 'دو خط کوچک از بالای صفحه برداشته شد: توضیح زیر برج فلکی، و «بر پایهٔ ساعت دستگاه شما».' },
+    ],
+  },
+  {
     version: '0.9.28',
     at: '2026-09-10T22:20:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'جای ابزارها در افزونه',
     changes: [
       { kind: 'fixed', text: 'جعبهٔ ابزار در افزونه جای درستش نبود: تب‌هایش پشت اسکرول پنهان می‌شد و تقویم را هم نصفه می‌کرد. حالا زیر صفحهٔ اول است و ماه کامل سر جایش می‌ماند.' },

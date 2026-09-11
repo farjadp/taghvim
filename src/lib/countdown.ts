@@ -30,9 +30,10 @@ const ANCHORS = [
   { month: 9, day: 30, title: 'شب یلدا' },
 ] as const;
 
-// Shown wherever a countdown appears. Preserve it: the count is to the day, not the
-// instant, and a computed lunar occasion can move.
-export const COUNTDOWN_NOTICE = 'شمارش به روز است، نه به لحظه؛ لحظهٔ تحویل سال در این تقویم ثبت نیست. تعطیلی قمری محاسباتی ممکن است یک روز جابه‌جا شود.';
+// Shown wherever a countdown appears. The count here is still to the day; the exact
+// moment of the turn now exists (lib/tahvil) and is shown in the hero from 1 Esfand,
+// which is what this sentence has to point at instead of denying it exists.
+export const COUNTDOWN_NOTICE = 'شمارش به روز است، نه به لحظه. لحظهٔ دقیق تحویل سال از اول اسفند زیر تاریخ امروز نوشته می‌شود. تعطیلی قمری محاسباتی ممکن است یک روز جابه‌جا شود.';
 
 // The next occurrence of a fixed Persian date, today included.
 function nextFixed(now: Date, month: number, day: number): Date {

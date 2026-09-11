@@ -376,6 +376,39 @@ test("each font in the picker is written in the font it names", async ({ page })
   expect(families).toEqual(["Vazirmatn", "Shabnam", "Sahel", "IRANSansX", "IRANYekanX"]);
 });
 
+test("the hero says when the year turns, in Esfand only, and never counts seconds", async ({ page }) => {
+  const line = page.getByTestId("tahvil");
+  // Shahrivar: nothing. The line is seasonal, not a permanent resident of the hero.
+  await expect(line).toHaveCount(0);
+
+  // 19 Esfand 1405: days to the turn, and the announced moment beneath
+  await page.clock.setSystemTime(new Date("2027-03-10T08:00:00Z"));
+  await page.reload();
+  await expect(line).toContainText("تا تحویل سال ۱۴۰۶");
+  await expect(line).toContainText("روز");
+  // 1406 was announced to the minute by the Geophysics Calendar Centre, so no seconds
+  await expect(line).toContainText("ساعت ۲۳:۵۴ به وقت تهران");
+  await expect(line).not.toContainText("۲۳:۵۴:");
+
+  // The last afternoon: hours and minutes, floored. At 15:06:30 UTC there are 5h17m30s
+  // to 20:24, so «۰۵:۱۷» holds for thirty seconds — 15:07:00 sat on the boundary and
+  // the page rendered a few seconds past it, correctly reading «۰۵:۱۶».
+  await page.clock.setSystemTime(new Date("2027-03-20T15:06:30Z"));
+  await page.reload();
+  await expect(line).toContainText("۰۵:۱۷");
+
+  // A minute after the turn it is gone, though the calendar still reads 29 Esfand
+  await page.clock.setSystemTime(new Date("2027-03-20T20:25:00Z"));
+  await page.reload();
+  await expect(line).toHaveCount(0);
+});
+
+test("the two lines Farjad cut from the hero stay cut", async ({ page }) => {
+  const main = page.locator("main");
+  await expect(main).not.toContainText("بر پایهٔ ساعت دستگاه شما");
+  await expect(main).not.toContainText("برج نجومی است، نه طالع‌بینی");
+});
+
 test("nothing in the settings panel paints outside its card", async ({ page }) => {
   // 0.9.23 shipped the font row 48px outside the card's left edge: w-72 leaves
   // 256px of content, ~210px once a label sits beside the control, and the five
@@ -471,7 +504,9 @@ test("shows the zodiac sign of the current Persian month", async ({ page }) => {
   await expect(card).toContainText("برج فلکی");
   await expect(card).toContainText("سنبله");
   await expect(card).toContainText("عنصر خاک");
-  await expect(card).toContainText("طالع‌بینی");
+  // The one-line disclaimer under the sign was cut on 10 Sep; the long version
+  // stays on the about page.
+  await expect(card).not.toContainText("طالع‌بینی");
   // Drawn as SVG, never as a font character or emoji
   expect(await card.locator("svg").count()).toBeGreaterThan(1);
   await expect(page.locator("body")).not.toContainText("♍");

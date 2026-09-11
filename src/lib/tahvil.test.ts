@@ -9,7 +9,8 @@
 
 import { toGregorian } from 'jalaali-js';
 import { describe, expect, it } from 'vitest';
-import { computeMarchEquinox, nextTahvil, tahvilFor, tehranClock, turnsBeforeNoon } from './tahvil';
+import { fromCalendar, toCalendar } from './calendar';
+import { computeMarchEquinox, nextTahvil, seasonalTahvil, tahvilFor, tehranClock, turnsBeforeNoon } from './tahvil';
 
 // The Geophysics Calendar Centre's announcements, on the Tehran clock.
 const ANNOUNCED = [
@@ -76,5 +77,27 @@ describe('the next turn', () => {
     expect(nextTahvil(new Date('2026-09-10T12:00:00Z'), 1405).year).toBe(1406);
     // A second after 1406 turned, while the calendar still reads 29 Esfand 1405
     expect(nextTahvil(new Date('2027-03-20T20:24:01Z'), 1405).year).toBe(1407);
+  });
+});
+
+describe('the season it shows in', () => {
+  const at = (date: Date) => seasonalTahvil(date, toCalendar(date));
+
+  it('stays out of the rest of the year, Bahman included', () => {
+    expect(at(new Date('2026-09-10T12:00:00Z'))).toBeNull();
+    expect(at(fromCalendar({ year: 1405, month: 11, day: 30 }))).toBeNull();
+  });
+
+  it('appears on 1 Esfand, pointing at the coming year', () => {
+    expect(at(fromCalendar({ year: 1405, month: 12, day: 1 }))?.year).toBe(1406);
+  });
+
+  it('holds until the instant and is gone the moment after, still on 29 Esfand', () => {
+    const turn = tahvilFor(1406).instant.getTime();
+    expect(at(new Date(turn - 60_000))?.year).toBe(1406);
+    const after = new Date(turn + 60_000);
+    // 23:55 on the Tehran clock is still 29 Esfand 1405 by the calendar's own count
+    expect(toCalendar(after)).toMatchObject({ year: 1405, month: 12, day: 29 });
+    expect(at(after)).toBeNull();
   });
 });

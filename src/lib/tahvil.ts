@@ -88,6 +88,18 @@ export function tahvilFor(persianYear: number): Tahvil {
   return { year: persianYear, instant: computeMarchEquinox(gregorianOf(persianYear)), source: 'computed', precision: 'minute' };
 }
 
+/**
+ * The coming turn, but only in its season: from 1 Esfand until the instant itself.
+ * Farjad's pick for where the moment shows — one line under today's date in the hero,
+ * seasonal, and gone the second the year has turned. `persian` is today's Persian date
+ * as the page already reads it, so this never disagrees with the heading above it.
+ */
+export function seasonalTahvil(now: Date, persian: { year: number; month: number }): Tahvil | null {
+  if (persian.month !== 12) return null;
+  const coming = tahvilFor(persian.year + 1);
+  return coming.instant.getTime() > now.getTime() ? coming : null;
+}
+
 /** The next moment the year turns, strictly after `now`. */
 export function nextTahvil(now: Date, persianYearNow: number): Tahvil {
   const upcoming = tahvilFor(persianYearNow + 1);

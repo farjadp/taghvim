@@ -39,10 +39,9 @@ export const SIGNS: Sign[] = [
   { month: 12, name: 'حوت', latin: 'Pisces', element: 'آب' },
 ];
 
-// Shown with the sign. The mapping is calendrical, not a measured transit.
-// One line, shown beside the sign, matching how the Hijri row states its own
-// limits. The long version lives on the about page.
-export const ZODIAC_SHORT_NOTICE = 'بر پایهٔ ماه خورشیدی؛ برج نجومی است، نه طالع‌بینی.';
+// The mapping is calendrical, not a measured transit. The sign's own line under the
+// hero no longer says so — Farjad cut it on 10 Sep — and ZODIAC_NOTICE on the about
+// page is where that is explained.
 
 export const ZODIAC_NOTICE = 'نام برج‌ها همان ترتیب ماه‌های خورشیدی است؛ در تقویم افغانستان ماه‌ها را با همین نام‌ها می‌خوانند. لحظهٔ دقیق ورود خورشید به هر برج ممکن است تا یک روز با آغاز ماه فرق داشته باشد. اینجا فقط برج نجومی نوشته می‌شود، نه پیش‌بینی و طالع.';
 
