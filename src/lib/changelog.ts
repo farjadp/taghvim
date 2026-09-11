@@ -38,6 +38,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.35',
+    at: '2026-09-11T12:25:15-04:00',
+    status: 'live',
+    title: 'سربرگ روی گوشی',
+    changes: [
+      { kind: 'fixed', text: 'روی گوشی، سربرگ صفحه‌های دریافت، راهنما، درباره و تغییرات جا نمی‌شد و صفحه به پهلو می‌رفت؛ پیوندها حالا در دکمهٔ «صفحه‌ها» جمع شده‌اند.' },
+    ],
+  },
+  {
     version: '0.9.34',
     at: '2026-09-11T12:16:16-04:00',
     status: 'live',
