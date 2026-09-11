@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.37',
     at: '2026-09-11T15:12:55-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'رنگ‌ها، نقش‌های ایران کهن و تعطیلات رسمی',
     changes: [
       { kind: 'added', text: 'رنگ تازه در تنظیمات: سبز، صورتی، فیروزه‌ای یا لاجوردی، در حالت روشن و تیره.' },
