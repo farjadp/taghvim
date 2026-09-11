@@ -58,44 +58,53 @@
   --color-memorial-muted: #b7c7bd;
   --color-memorial-line: #35493f;
   --color-scrollbar: #bcc8bb;
-  /* The thirteen personal-date categories: an ink and a tint each. Every pair was
-     measured, not chosen by eye — label on tint clears 4.5:1 and the icon on the
-     surface clears 3:1, in both themes. Add a category and its two tokens go in
-     all three blocks below, or it renders transparent in one theme. */
-  --color-cat-birthday: #8a5a12;
-  --color-cat-birthday-tint: #fdf1dc;
-  --color-cat-love: #a9435c;
-  --color-cat-love-tint: #fce7ec;
-  --color-cat-anniversary: #7a5a4a;
-  --color-cat-anniversary-tint: #f2e9e4;
-  --color-cat-memorial: #3d5a4e;
-  --color-cat-memorial-tint: #e6ece8;
-  --color-cat-joy: #5f6d1a;
-  --color-cat-joy-tint: #eff2dc;
-  --color-cat-period: #a03a3a;
-  --color-cat-period-tint: #fbe6e6;
-  --color-cat-instalment: #8a5230;
-  --color-cat-instalment-tint: #f7e9df;
-  --color-cat-shopping: #1f6b6b;
-  --color-cat-shopping-tint: #e0f0ef;
-  --color-cat-work: #3a5480;
-  --color-cat-work-tint: #e6ecf7;
-  --color-cat-travel: #2b6591;
-  --color-cat-travel-tint: #e2eef7;
-  --color-cat-health: #2f6b45;
-  --color-cat-health-tint: #e3f0e7;
-  --color-cat-study: #6a4a8c;
-  --color-cat-study-tint: #efe8f7;
-  --color-cat-sport: #96541f;
-  --color-cat-sport-tint: #fbeadb;
-  --color-cat-home: #5c6a61;
-  --color-cat-home-tint: #eceeea;
 }
 
 /* Dark palette: applied by explicit choice (data-theme="dark") or by the OS
    when no choice is stored. Every token above has a counterpart here. */
 @layer base {
   html { color-scheme: light; }
+  /* The fourteen personal-date categories: an ink and a tint each. Every pair was
+     measured, not chosen by eye — label on tint clears 4.5:1 and the icon on the
+     surface clears 3:1, in both themes.
+
+     NOT in @theme, and that is load-bearing: Tailwind v4 drops a theme variable that
+     no utility references, and these are only ever read through var() in a style
+     attribute. In @theme every one of them was tree-shaken away and each category
+     rendered transparent. Declared here they always ship.
+
+     Add a category and its two tokens go in all three blocks, or it renders
+     transparent in one theme. */
+  html {
+    --color-cat-birthday: #8a5a12;
+    --color-cat-birthday-tint: #fdf1dc;
+    --color-cat-love: #a9435c;
+    --color-cat-love-tint: #fce7ec;
+    --color-cat-anniversary: #7a5a4a;
+    --color-cat-anniversary-tint: #f2e9e4;
+    --color-cat-memorial: #3d5a4e;
+    --color-cat-memorial-tint: #e6ece8;
+    --color-cat-joy: #5f6d1a;
+    --color-cat-joy-tint: #eff2dc;
+    --color-cat-period: #a03a3a;
+    --color-cat-period-tint: #fbe6e6;
+    --color-cat-instalment: #8a5230;
+    --color-cat-instalment-tint: #f7e9df;
+    --color-cat-shopping: #1f6b6b;
+    --color-cat-shopping-tint: #e0f0ef;
+    --color-cat-work: #3a5480;
+    --color-cat-work-tint: #e6ecf7;
+    --color-cat-travel: #2b6591;
+    --color-cat-travel-tint: #e2eef7;
+    --color-cat-health: #2f6b45;
+    --color-cat-health-tint: #e3f0e7;
+    --color-cat-study: #6a4a8c;
+    --color-cat-study-tint: #efe8f7;
+    --color-cat-sport: #96541f;
+    --color-cat-sport-tint: #fbeadb;
+    --color-cat-home: #5c6a61;
+    --color-cat-home-tint: #eceeea;
+  }
   html[data-theme="dark"] { color-scheme: dark; }
   @media (prefers-color-scheme: dark) {
     html:not([data-theme="light"]) { color-scheme: dark; }

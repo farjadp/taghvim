@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.4.0 — 2026-09-10
+// Version: 0.5.0 — 2026-09-10
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -118,7 +118,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
         <div className={`mt-4 grid gap-3 ${draft.repeat === "monthly" ? "grid-cols-1" : "grid-cols-[.8fr_1.35fr_1fr]"}`}>
           <label className="block text-xs text-muted"><span className="mb-2 block">روز</span>
             <input aria-label="روز" inputMode="numeric" autoComplete="off" maxLength={2} value={draft.day}
-              onChange={(event) => { setDraft({ ...draft, day: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
+              placeholder="۱۲" onChange={(event) => { setDraft({ ...draft, day: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
           {draft.repeat !== "monthly" && <>
             <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span>
               <select aria-label="ماه" value={draft.month} onChange={(event) => { setDraft({ ...draft, month: event.target.value }); setError(""); }} className="field">
@@ -126,6 +126,7 @@ export function DatesTool({ now, dates, ready, onChange }: {
               </select></label>
             <label className="block text-xs text-muted"><span className="mb-2 block">{draft.repeat === "once" ? "سال" : "سال (اختیاری)"}</span>
               <input aria-label="سال" inputMode="numeric" autoComplete="off" maxLength={4} value={draft.year}
+                placeholder={draft.repeat === "once" ? "۱۴۰۵" : "۱۳۷۰"}
                 onChange={(event) => { setDraft({ ...draft, year: event.target.value }); setError(""); }} className="field tabular-nums" /></label>
           </>}
         </div>
@@ -161,9 +162,9 @@ export function DatesTool({ now, dates, ready, onChange }: {
         </div>
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3">
           <p className="text-[0.625rem] leading-5 text-muted">
-            {draft.repeat === "monthly" ? "فقط روز لازم است؛ ماهی که کمتر از آن روز دارد، به آخرین روزش می‌افتد."
-              : draft.repeat === "once" ? "سال هم لازم است — این تاریخ فقط یک بار می‌آید."
-              : "سال را ندانی هم اشکالی ندارد؛ فقط سن نشان داده نمی‌شود."}
+            {draft.repeat === "monthly" ? "فقط روز را بنویس — عددی بین ۱ تا ۳۱. ماهی که کمتر از آن روز دارد، به آخرین روزش می‌افتد."
+              : draft.repeat === "once" ? "روز، ماه و سال هر سه لازم‌اند؛ سال شمسی، مثل ۱۴۰۵. این تاریخ فقط یک بار می‌آید."
+              : "روز و ماه لازم‌اند. سال شمسی اختیاری است — ننویسی هم ذخیره می‌شود، فقط سن نشان داده نمی‌شود."}
           </p>
           <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest-deep px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">افزودن<ArrowLeft size={16} /></button>
         </div>

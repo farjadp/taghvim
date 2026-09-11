@@ -144,7 +144,7 @@ export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: s
       <main id="main" className="mx-auto flex max-w-[1240px] flex-col px-4 pt-8 pb-10 sm:px-8 sm:pt-10 lg:block">
         <TodayPanel now={now} initialNow={initialNow} groups={preferences} cardStyle={cardStyle} backgrounds={backgrounds} className="max-lg:mt-7" />
         <div className="order-first mt-7 grid items-stretch gap-5 max-lg:mt-0 lg:grid-cols-[1.7fr_1fr]">
-          <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date).length > 0 : undefined} />
+          <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date)[0]?.category : undefined} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} dates={dates} datesReady={datesReady} onDatesChange={commitDates} />

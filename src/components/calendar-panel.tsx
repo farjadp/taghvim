@@ -12,6 +12,8 @@ import { ChevronLeft, ChevronRight, RotateCcw, CalendarDays } from "lucide-react
 import { dayKey, fa, formatDate, fromCalendar, monthGrid, monthLength, toCalendar, WEEKDAYS } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
 import { eventsForDate, type EventGroups } from "@/lib/events";
+import { categoryOf, type CategoryId } from "@/lib/date-categories";
+import { categoryInk } from "@/lib/date-categories";
 
 const VIEW_SWITCHES = [
   { key: "religious", label: "مذهبی" },
@@ -35,13 +37,18 @@ interface CalendarPanelProps {
   onNavigate: (delta: number) => void;
   onToday: () => void;
   onJump: (year: number, month: number) => void;
-  // Marks a cell carrying one of the visitor's own dates from the «تاریخ‌های من» tool. Optional and inert
-  // when not passed — the extension has no such list, and neither does a visitor with none.
-  marked?: (date: Date) => boolean;
+  // The category of the visitor's own date on this day, from the «تاریخ‌های من» tool, or
+  // undefined for a day with none. Returns the CATEGORY rather than a boolean so the mark
+  // can wear that category's colour — a birthday and an instalment should not look alike.
+  // Optional and inert when not passed: the extension has no such list, and neither does a
+  // visitor with none.
+  marked?: (date: Date) => CategoryId | undefined;
 }
 
 export function CalendarPanel({ year, month, today, selected, groups, memorial, showMemorialSwitch = true, onToggleView, onSelect, onNavigate, onToday, onJump, marked }: CalendarPanelProps) {
   const months = useMonthNames();
+  // Called twice per marked cell; cheap enough, and keeps the JSX readable.
+  const markedCategory = (date: Date) => marked?.(date);
   const grid = monthGrid(year, month);
   const selectedParts = toCalendar(selected);
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
@@ -87,13 +94,13 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
               <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-memorial-ink/80" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
               {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : holiday ? "bg-clay" : "bg-forest/60"}`} />}
               {nonFridayHoliday && !active && <span className="absolute right-1.5 top-1.5 size-1.5 rounded-full bg-clay" />}
-              {supported && marked?.(date) && <span className={`absolute left-1.5 top-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : "bg-forest"}`} />}
+              {supported && markedCategory(date) && <span title={categoryOf(markedCategory(date)!).label} className="absolute left-1.5 top-1.5 size-1.5 rounded-full" style={{ backgroundColor: active ? "currentColor" : categoryInk(markedCategory(date)!) }} />}
             </button>;
           })}
         </div>
       </div>
       <div data-testid="calendar-legend" className="border-t border-line px-5 py-4 text-[0.625rem] text-muted sm:px-7">
-        <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span>{marked && <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest" />تاریخ‌های من</span>}</div><span>اعداد کوچک: میلادی · قمری</span></div>
+        <div className="flex flex-wrap items-center justify-between gap-2"><div className="flex flex-wrap gap-4"><span className="flex items-center gap-1.5"><span className="size-2 rounded bg-holiday border border-clay/40" />تعطیلی رسمی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-clay" />مناسبت تعطیلی</span><span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full bg-forest/60" />مناسبت</span>{marked && <span className="flex items-center gap-1.5"><span className="size-1.5 rounded-full border border-muted/60" />تاریخ‌های من، به رنگ دسته‌اش</span>}</div><span>اعداد کوچک: میلادی · قمری</span></div>
         <div data-testid="view-controls" className="mt-2.5 flex flex-wrap items-center gap-2">
           <span className="text-[0.625rem] text-muted">نمایش:</span>
           <span className="flex items-center gap-1.5 rounded-full border border-line px-2.5 py-1 text-[0.625rem] text-muted"><span aria-hidden="true" className="size-1.5 rounded-full bg-forest-deep" />ملی و فرهنگی</span>

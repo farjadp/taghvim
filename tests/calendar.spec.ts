@@ -341,6 +341,29 @@ test("a view record written before the month names existed keeps every choice", 
   await expect(page.locator("#month-names-title")).toHaveCount(0);
 });
 
+test("a date of your own is marked in its category's colour, not a generic dot", async ({ page }) => {
+  // The category colours are only ever read through var() in a style attribute. In
+  // @theme, Tailwind v4 tree-shook every one of them and each category rendered
+  // transparent — invisible, with nothing failing. This asserts they actually resolve.
+  await page.evaluate(() => window.localStorage.setItem("taghvim-dates", JSON.stringify([
+    { id: "a", title: "تولد مریم", category: "birthday", repeat: "yearly", month: 6, day: 8, year: null },
+    { id: "b", title: "قسط", category: "instalment", repeat: "yearly", month: 6, day: 14, year: null },
+  ])));
+  await page.reload();
+
+  const token = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--color-cat-birthday").trim());
+  expect(token).not.toBe("");
+
+  const marks = page.locator("button span.absolute.left-1\\.5");
+  await expect(marks).toHaveCount(2);
+  const colours = await marks.evaluateAll((nodes) =>
+    nodes.map((node) => getComputedStyle(node).backgroundColor));
+  // Neither transparent nor identical: a birthday and an instalment must not look alike
+  for (const colour of colours) expect(colour).not.toBe("rgba(0, 0, 0, 0)");
+  expect(new Set(colours).size).toBe(2);
+});
+
 test("nothing in the settings panel paints outside its card", async ({ page }) => {
   // 0.9.23 shipped the font row 48px outside the card's left edge: w-72 leaves
   // 256px of content, ~210px once a label sits beside the control, and the five
