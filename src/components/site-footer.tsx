@@ -1,11 +1,12 @@
 // ============================================================================
 // Source: src/components/site-footer.tsx
-// Version: 0.9.14 — 2026-09-09
+// Version: 0.9.37 — 2026-09-11
 // Why: Shared footer. Deliberately short: the brand line with the link to why
-//      the calendar is built this way, the three pages, and five things a
-//      visitor might actually be looking for. The fifth — reporting a bug —
-//      is Farjad's explicit call on 9 Sep against the four-shortcut rule: a
-//      way to report that nobody can find is a report nobody files. Who built
+//      the calendar is built this way, the five pages, and five shortcuts.
+//      Reporting a bug is Farjad's call of 9 Sep: a way to report that nobody
+//      can find is a report nobody files. On 11 Sep he swapped the monthly
+//      calendar, date converter and prayer times — all three already on the
+//      home page — for /products, /support and /services. Who built
 //      it, the company, the repository and the contact details all live on
 //      /about — a footer that lists every link is a sitemap, not navigation.
 // Env / Deps: Server component used by every page.
@@ -24,11 +25,11 @@ const PAGES = [
 ];
 
 const SHORTCUTS = [
-  { href: "/#calendar", label: "تقویم ماهانه" },
-  { href: "/#tools", label: "تبدیل تاریخ" },
-  { href: "/#prayer", label: "اوقات شرعی" },
   { href: "/help#subscribe", label: "افزودن به تقویم گوگل و اپل" },
   { href: "/help#feedback", label: "گزارش اشکال یا پیشنهاد" },
+  { href: "/products", label: "دیگر محصولات ما" },
+  { href: "/support", label: "حمایت از ما" },
+  { href: "/services", label: "خدمات ما" },
 ];
 
 export function SiteFooter() {

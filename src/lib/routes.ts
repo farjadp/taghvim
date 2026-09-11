@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/routes.ts
-// Version: 0.9.16 — 2026-09-09
+// Version: 0.9.37 — 2026-09-11
 // Why: The site's public routes in one place, so the sitemap cannot drift from
 //      what actually ships. A unit test walks src/app and fails when a page
 //      exists that this list does not name.
@@ -18,6 +18,9 @@ export const ROUTES = [
   { path: '/help', changeFrequency: 'monthly', priority: 0.7 },
   { path: '/changelog', changeFrequency: 'weekly', priority: 0.6 },
   { path: '/about', changeFrequency: 'monthly', priority: 0.5 },
+  { path: '/services', changeFrequency: 'monthly', priority: 0.4 },
+  { path: '/products', changeFrequency: 'monthly', priority: 0.3 },
+  { path: '/support', changeFrequency: 'monthly', priority: 0.3 },
   { path: '/contact', changeFrequency: 'yearly', priority: 0.3 },
 ] as const satisfies ReadonlyArray<{
   path: string;

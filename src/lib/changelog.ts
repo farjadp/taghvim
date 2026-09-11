@@ -38,6 +38,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.37',
+    at: '2026-09-11T15:04:25-04:00',
+    status: 'ready',
+    title: 'سه صفحهٔ تازه',
+    changes: [
+      { kind: 'added', text: 'سه صفحهٔ تازه، از پانویس هر صفحه: دیگر محصولات ما، حمایت از ما و خدمات ما.' },
+      { kind: 'changed', text: 'تقویم ماهانه، تبدیل تاریخ و اوقات شرعی از دسترسی سریع پانویس برداشته شدند؛ هر سه در خود صفحهٔ اصلی‌اند.' },
+    ],
+  },
+  {
     version: '0.9.36',
     at: '2026-09-11T12:41:11-04:00',
     status: 'live',

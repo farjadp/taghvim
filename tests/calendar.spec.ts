@@ -745,6 +745,22 @@ test("serves a subscribable calendar feed that a client can parse", async ({ req
   expect(unfolded).not.toContain("۲۲ بهمن");
 });
 
+// 11 Sep: the three home-page shortcuts left the footer for three pages of their own.
+test("the footer reaches products, support and services, and no longer the home-page shortcuts", async ({ page }) => {
+  const footer = page.getByRole("contentinfo");
+  for (const gone of ["تقویم ماهانه", "تبدیل تاریخ", "اوقات شرعی"]) {
+    await expect(footer.getByRole("link", { name: gone, exact: true })).toHaveCount(0);
+  }
+  for (const [label, path] of [["دیگر محصولات ما", "/products"], ["حمایت از ما", "/support"], ["خدمات ما", "/services"]] as const) {
+    await page.goto("/");
+    await page.getByRole("contentinfo").getByRole("link", { name: label, exact: true }).click();
+    await expect(page).toHaveURL(new RegExp(`${path}$`));
+    await expect(page.getByRole("heading", { name: label, level: 1 })).toBeVisible();
+    const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
+    expect(audit.violations.map(({ id }) => id)).toEqual([]);
+  }
+});
+
 test("the help page carries the feed URL and the footer points at it", async ({ page }) => {
   await page.getByRole("contentinfo").getByRole("link", { name: "افزودن به تقویم گوگل و اپل" }).click();
   await expect(page).toHaveURL(/\/help#subscribe$/);
