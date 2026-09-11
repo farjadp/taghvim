@@ -39,8 +39,8 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 export const RELEASES: Release[] = [
   {
     version: '0.9.26',
-    at: '2026-09-10T20:20:00-04:00',
-    status: 'ready',
+    at: '2026-09-10T21:05:00-04:00',
+    status: 'live',
     title: 'نام ماه‌ها، به صورت کهن',
     changes: [
       { kind: 'added', text: 'در تنظیمات نمایش، کلید «نام ماه‌ها» را روی «اوستایی» بگذار تا «امرداد» و «سپندارمذ» جای «مرداد» و «اسفند» را بگیرند.' },
