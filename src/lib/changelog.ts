@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.30',
     at: '2026-09-10T23:40:00-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'برنامه‌ها و ویجت‌ها',
     changes: [
       { kind: 'changed', text: 'صفحهٔ دریافت: برنامهٔ اندروید و آیفون در دست ساخت است، با نمونهٔ ویجت‌هایی که با خودشان می‌آورند.' },
