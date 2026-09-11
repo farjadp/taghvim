@@ -12,7 +12,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowUpLeft } from "lucide-react";
-import { dayKey, shiftMonth, toCalendar } from "@/lib/calendar";
+import { dayKey, fa, formatDate, shiftMonth, toCalendar } from "@/lib/calendar";
 import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/view";
 import { CalendarPanel } from "@/components/calendar-panel";
 import { EventsPanel } from "@/components/events-panel";
@@ -130,6 +130,11 @@ export function NewTab() {
           onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }}
         />
       </main>
+      {/* Which build this is. Farjad asked for it: the store rolls updates out over
+          hours, so «am I on the new one» is otherwise unanswerable from the page. */}
+      <footer className="pb-6 text-center text-[0.625rem] text-muted/70">
+        نسخهٔ {fa(__EXT_VERSION__)} · {formatDate(new Date(__EXT_BUILT__))}
+      </footer>
     </div>
     </MonthNamesProvider>
   );

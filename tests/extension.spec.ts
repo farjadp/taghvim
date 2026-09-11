@@ -64,6 +64,21 @@ test.beforeEach(async ({ page }, testInfo) => {
   await page.clock.install({ time: new Date("2026-09-06T10:30:00Z") });
 });
 
+test("names its own build at the foot of the page", async ({ page }, testInfo) => {
+  // The store rolls an update out over hours, so «am I on the new one» has to be
+  // answerable from the page itself. The version is stamped from the manifest at
+  // build time, which is also what the store serves — a stale stamp fails here.
+  await page.goto(`${origin}/newtab.html`);
+  // `dist` belongs to the server setup; resolve this project's directory the same way.
+  const dir = (DIST[testInfo.project.name as keyof typeof DIST] ?? DIST.desktop).dir;
+  const manifest = JSON.parse(readFileSync(join(dir, "manifest.json"), "utf8")) as { version: string };
+  const footer = page.locator("footer");
+  const digits = manifest.version.replace(/[0-9]/g, (d) => "۰۱۲۳۴۵۶۷۸۹"[Number(d)]);
+  await expect(footer).toContainText(`نسخهٔ ${digits}`);
+  // …and a date beside it, written the way every other date in the app is
+  await expect(footer).toContainText(/\d|[۰-۹]/);
+});
+
 test("paints the Tehran date from its own files with every other origin blocked", async ({ page }) => {
   const foreign: string[] = [];
   await page.route("**/*", (route) => {

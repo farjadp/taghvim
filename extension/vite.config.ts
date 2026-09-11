@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/vite.config.ts
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.27 — 2026-09-10
 // Why: Builds the browser extension from the same source the site uses.
 //      `@/` resolves into ../src so panels and lib are imported, never copied.
 //      A small plugin emits what Vite would not otherwise produce: the
@@ -30,6 +30,13 @@ const repo = resolve(here, "..");
 // Chrome is the default so an unset environment builds what it always built.
 const TARGET = process.env.TARGET === "firefox" ? "firefox" : "chrome";
 const outDir = resolve(here, TARGET === "firefox" ? "dist-firefox" : "dist");
+
+// Stamped into the bundle so the new tab can say which build it is. Read from the
+// manifest rather than package.json, because the manifest is what the store serves
+// and a test already pins the two together. The date is this build's, not the
+// release's: what the footer answers is «which package am I looking at».
+const BUILD_VERSION = (JSON.parse(readFileSync(resolve(here, "manifest.json"), "utf8")) as { version: string }).version;
+const BUILD_AT = new Date().toISOString();
 
 // manifest.json is the Chrome manifest and the base for both. The Firefox file
 // holds only what differs, and a `null` there deletes the key outright — that
@@ -103,6 +110,10 @@ export default defineConfig({
   base: "./",
   publicDir: false,
   plugins: [react(), tailwindcss(), extensionAssets()],
+  define: {
+    __EXT_VERSION__: JSON.stringify(BUILD_VERSION),
+    __EXT_BUILT__: JSON.stringify(BUILD_AT),
+  },
   resolve: { alias: { "@": resolve(repo, "src") } },
   build: {
     outDir,
