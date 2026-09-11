@@ -136,7 +136,7 @@ export const APPS = {
 // What each widget holds. The page draws them with a fixed date — Nowruz 1406,
 // labelled as an example — so a static page never shows a stale «today».
 export const WIDGETS = [
-  { id: 'small', name: 'کوچک', size: '۱×۱', on: 'اندروید و آیفون', shows: 'روز و ماه' },
+  { id: 'small', name: 'کوچک', size: '۱×۱', on: 'اندروید و آیفون', shows: 'روز هفته، روز و ماه' },
   { id: 'wide', name: 'پهن', size: '۴×۱', on: 'اندروید', shows: 'تاریخ کامل، روز هفته و مناسبت' },
   { id: 'lock', name: 'صفحهٔ قفل', size: null, on: 'آیفون', shows: 'تاریخ و مناسبت، زیر ساعت' },
 ] as const;

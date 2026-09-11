@@ -38,8 +38,17 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.31',
+    at: '2026-09-10T22:55:47-04:00',
+    status: 'ready',
+    title: 'طرح ویجت‌ها',
+    changes: [
+      { kind: 'changed', text: 'صفحهٔ دریافت: ویجت‌ها با طرح نهایی‌شان کشیده شده‌اند؛ ویجت کوچک حالا روز هفته را هم نشان می‌دهد.' },
+    ],
+  },
+  {
     version: '0.9.30',
-    at: '2026-09-10T23:40:00-04:00',
+    at: '2026-09-10T22:27:53-04:00',
     status: 'live',
     title: 'برنامه‌ها و ویجت‌ها',
     changes: [
@@ -48,7 +57,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.29',
-    at: '2026-09-10T23:10:00-04:00',
+    at: '2026-09-10T22:18:35-04:00',
     status: 'live',
     title: 'لحظهٔ تحویل سال',
     changes: [
@@ -59,7 +68,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.28',
-    at: '2026-09-10T22:20:00-04:00',
+    at: '2026-09-10T21:39:09-04:00',
     status: 'live',
     title: 'جای ابزارها در افزونه',
     changes: [
@@ -68,7 +77,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.27',
-    at: '2026-09-10T21:55:00-04:00',
+    at: '2026-09-10T20:56:06-04:00',
     status: 'live',
     title: 'ابزارها در افزونه، و نمونهٔ قلم‌ها',
     changes: [
@@ -79,7 +88,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.26',
-    at: '2026-09-10T21:05:00-04:00',
+    at: '2026-09-10T20:06:24-04:00',
     status: 'live',
     title: 'نام ماه‌ها، به صورت کهن',
     changes: [
@@ -92,7 +101,7 @@ export const RELEASES: Release[] = [
   },
   {
     version: '0.9.25',
-    at: '2026-09-10T19:05:00-04:00',
+    at: '2026-09-10T18:44:51-04:00',
     status: 'live',
     title: 'تاریخ‌های شخصی: دسته و تکرار',
     changes: [

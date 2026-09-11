@@ -90,25 +90,30 @@ function MethodCard({ method }: { method: DownloadMethod }) {
 // is isolated too, as a guard only — digits around a colon already held their order.
 // A fixed day — 1 Farvardin 1406, Nowruz — and labelled as an
 // example, because this page is static and a drawn «today» would go stale by morning.
+// The designs are the ones Farjad picked on 10 Sep from /sandbox/widgets: small
+// B, wide B, lock screen C. The numeral is clay because Nowruz is a day off.
 function WidgetSmall() {
   return (
     <div className="flex size-[5.75rem] flex-col items-center justify-center rounded-[1.4rem] bg-surface text-ink shadow-lg shadow-black/20">
-      <span className="text-[2rem] leading-none font-extrabold text-forest">۱</span>
-      <span className="mt-1 text-[0.6875rem] font-medium">فروردین</span>
-      <span className="text-[0.5625rem] text-muted">۱۴۰۶</span>
+      <span className="text-[0.5625rem] text-muted">یکشنبه</span>
+      <span className="text-[2rem] leading-tight font-extrabold text-clay">۱</span>
+      <span className="text-[0.6875rem] font-medium">فروردین</span>
     </div>
   );
 }
 
 function WidgetWide() {
   return (
-    <div className="flex h-[5.75rem] w-[19rem] max-w-full items-center justify-between gap-3 rounded-[1.4rem] bg-surface px-5 text-ink shadow-lg shadow-black/20">
-      <div>
-        <p className="text-[0.625rem] text-muted">یکشنبه</p>
-        <p className="text-lg leading-tight font-bold">۱ فروردین ۱۴۰۶</p>
-        <p className="text-[0.5625rem] text-muted" dir="ltr">21 March 2027</p>
+    <div className="flex h-[5.75rem] w-[19rem] max-w-full items-stretch overflow-hidden rounded-[1.4rem] bg-surface text-ink shadow-lg shadow-black/20">
+      {/* text-paper, not white: dark clay is a light salmon, and white on it is unreadable. */}
+      <div className="flex w-[4.5rem] shrink-0 flex-col items-center justify-center bg-clay text-paper">
+        <span className="text-[2rem] leading-none font-extrabold">۱</span>
+        <span className="mt-1 text-[0.6875rem]">فروردین</span>
       </div>
-      <span className="rounded-full bg-holiday px-3 py-1 text-[0.6875rem] font-medium text-clay">نوروز</span>
+      <div className="flex min-w-0 flex-1 flex-col justify-center px-4">
+        <p className="text-sm font-bold">یکشنبه ۱۴۰۶</p>
+        <p className="truncate text-[0.6875rem] text-clay">نوروز</p>
+      </div>
     </div>
   );
 }
@@ -116,9 +121,14 @@ function WidgetWide() {
 function WidgetLock() {
   return (
     <div className="flex w-[11rem] flex-col items-center rounded-[1.6rem] bg-black/25 px-4 pt-3 pb-4 text-white">
-      <span className="text-[0.625rem] opacity-80">یکشنبه ۱ فروردین</span>
       <span dir="ltr" className="text-[2.4rem] leading-tight font-light tabular-nums [unicode-bidi:isolate]">۹:۴۱</span>
-      <span className="mt-1 rounded-xl bg-white/15 px-3 py-1.5 text-[0.625rem]">۱ فروردین ۱۴۰۶ · نوروز</span>
+      <div className="mt-1 flex w-full items-center gap-2.5 rounded-xl bg-white/15 px-2.5 py-2">
+        <span className="text-[1.75rem] leading-none font-extrabold">۱</span>
+        <span className="min-w-0">
+          <span className="block text-[0.75rem] font-bold">فروردین ۱۴۰۶</span>
+          <span className="block text-[0.625rem] opacity-80">نوروز</span>
+        </span>
+      </div>
     </div>
   );
 }
