@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.31',
     at: '2026-09-10T22:55:47-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'طرح ویجت‌ها',
     changes: [
       { kind: 'changed', text: 'صفحهٔ دریافت: ویجت‌ها با طرح نهایی‌شان کشیده شده‌اند؛ ویجت کوچک حالا روز هفته را هم نشان می‌دهد.' },
