@@ -21,3 +21,8 @@ extension/*.zip
 # Swift package build output (swift test in mobile/ios/TaghvimCore)
 mobile/ios/**/.build/
 mobile/ios/**/.swiftpm/
+
+# Gradle build output (./gradlew test in mobile/android/core)
+mobile/android/**/build/
+mobile/android/**/.gradle/
+mobile/android/**/.kotlin/

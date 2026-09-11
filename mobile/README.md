@@ -10,6 +10,7 @@ The Android and iPhone apps and their widgets. Roadmap and running log: the
 | `shared/widget-data.json` | What `eventsForDate` says for every day of `WIDGET_YEARS`, per category. The widgets look a day up here; they never re-implement the event tables. |
 | `shared/jalali-vectors.json` | The site's own Gregorian → Jalali answers: 9,497 consecutive days (1395–1420) and 1 Farvardin of every year 1200–1600. Every native port is tested against it. |
 | `ios/TaghvimCore/` | Swift package shared by the iPhone app and its widgets: `Jalali` (a line-for-line port of jalaali-js 2.0.1), `Today` (the day and the next midnight on the Tehran clock), `WidgetData` (reads the file, filters by group). |
+| `android/core/` | The same three, in Kotlin, as a plain JVM module (package `im.taghv.core`) the Android app and widgets will include. `org.json` is `compileOnly` because Android ships it. |
 
 Both `shared/` files are **generated and committed**. After changing events,
 month names or `WIDGET_YEARS` in `src/lib/widget-data.ts`:
@@ -40,4 +41,8 @@ current one — move the window and rebuild.
 ```bash
 npm test                                          # includes widget-data.test.ts
 cd mobile/ios/TaghvimCore && swift test           # Swift port against the vectors
+cd mobile/android/core && JAVA_HOME="/Applications/Android Studio.app/Contents/jbr/Contents/Home" ./gradlew test
 ```
+
+`JAVA_HOME` points at the JDK inside Android Studio because this Mac has no
+other one on the default path; any JDK 17+ works.
