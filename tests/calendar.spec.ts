@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.16 — 2026-09-09
+// Version: 0.9.40 — 2026-09-12
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -975,7 +975,13 @@ test("the tools box opens on continuous holidays, caps them at three, and links 
   await page.getByRole("switch", { name: "مذهبی" }).click();
   await expect(tools.getByTestId("bridges-count")).not.toHaveText(before!);
   expect(await cards.count()).toBeLessThanOrEqual(3);
-  await expect(tools.getByText("ممکن است یک روز جابه‌جا شود").first()).toBeVisible();
+  // 1400–1420 take every lunar holiday from the official table, so nothing a visitor can
+  // see this decade rests on a computed date. No card may claim the ±1 day risk here; the
+  // card that genuinely carries it is asserted below, in the first year that still computes.
+  // This line used to look for the warning anywhere inside #tools, which passed only because
+  // BRIDGES_NOTICE happens to contain the same sentence — and broke the day that notice moved
+  // inside a collapsed disclosure.
+  expect(await cards.getByText("ممکن است یک روز جابه‌جا شود").count()).toBe(0);
 
   // The countdown tab counts in whole days and never claims an instant.
   await page.getByRole("tab", { name: "روزشمار" }).click();
@@ -1008,6 +1014,25 @@ test("the tools box opens on continuous holidays, caps them at three, and links 
   await expect(page.locator("[title$='— امروز']")).toHaveCount(0);
   const audit = await new AxeBuilder({ page }).include("main").withTags(["wcag2a", "wcag2aa", "wcag21aa"]).analyze();
   expect(audit.violations.map(({ id }) => id)).toEqual([]);
+});
+
+// The warning belongs to the run, not to the panel. Asserting it on the card is only
+// possible where a run actually rests on a computed lunar date, and 1400–1420 are all
+// pinned to the official table — so this travels to the first year that is not: 1421.
+test("a run resting on a computed lunar date says so, on the card itself", async ({ page }) => {
+  // 6 Sep 2042 is 15 Shahrivar 1421, the same day of the year the rest of the suite freezes
+  // on, sixteen years after the official lunar table runs out.
+  await page.clock.setFixedTime(new Date("2042-09-06T10:30:00Z"));
+  await page.goto("/");
+  await page.getByRole("switch", { name: "مذهبی" }).click();
+
+  const cards = page.locator("#tools").getByTestId("bridge");
+  await expect(cards.first()).toBeVisible();
+  const warned = cards.getByText("ممکن است یک روز جابه‌جا شود");
+  // Every card here rests on a computed date, so every card must say so — and it must be
+  // inside the card, where the run it applies to is, not loose in the panel.
+  expect(await warned.count()).toBe(await cards.count());
+  await expect(warned.first()).toBeVisible();
 });
 
 test("personal dates live in the tools box, are stored in the browser and mark the calendar", async ({ page }) => {
