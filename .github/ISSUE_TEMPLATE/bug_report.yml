@@ -1,0 +1,80 @@
+name: گزارش اشکال / Bug report
+description: چیزی درست کار نمی‌کند / Something is not working as expected
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        آسیب‌پذیری امنیتی را اینجا گزارش نکن؛ SECURITY.md را ببین.
+        Do not report security vulnerabilities here; see SECURITY.md.
+  - type: textarea
+    id: description
+    attributes:
+      label: "توضیح / Description"
+      description: "مشکل چیست؟ / What is wrong?"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "مراحل بازتولید / Steps to reproduce"
+      placeholder: |
+        1. taghv.im را باز کن / Open taghv.im
+        2. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "رفتار مورد انتظار / Expected behavior"
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: "رفتار واقعی / Actual behavior"
+    validations:
+      required: true
+  - type: dropdown
+    id: surface
+    attributes:
+      label: "کجا؟ / Where?"
+      options:
+        - سایت taghv.im / Website
+        - افزونهٔ کروم / Chrome extension
+        - افزونهٔ فایرفاکس / Firefox extension
+        - برنامه یا ویجت اندروید / Android app or widget
+        - فید calendar.ics / Calendar feed
+        - دیگر / Other
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: "مرورگر و دستگاه / Browser and device"
+      placeholder: "Chrome 140, Windows 11 / Safari, iPhone 15, iOS 26"
+    validations:
+      required: true
+  - type: input
+    id: timezone
+    attributes:
+      label: "منطقهٔ زمانی دستگاه / Device timezone"
+      description: "مثلاً Asia/Tehran یا America/Toronto. در مرورگر Intl.DateTimeFormat().resolvedOptions().timeZone را اجرا کن. / e.g. Asia/Tehran; run Intl.DateTimeFormat().resolvedOptions().timeZone in the console."
+    validations:
+      required: true
+  - type: input
+    id: date
+    attributes:
+      label: "تقویم و تاریخ انتخاب‌شده / Selected calendar and date"
+      description: "کدام تقویم (شمسی، میلادی، قمری) و کدام تاریخ؛ و ساعت محلی وقتی مشکل را دیدی. / Which calendar and date, and your local time when it happened."
+      placeholder: "شمسی ۱۴۰۵/۰۶/۲۶، ساعت ۲۳:۵۸ / Jalali 1405-06-26, 23:58 local"
+  - type: textarea
+    id: groups
+    attributes:
+      label: "کلیدهای مناسبت و تنظیمات / Occasion switches and settings"
+      description: "اگر مربوط است: مذهبی، دولتی، جهانی، یادبود؛ پوسته؛ قلم. / If relevant."
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: "تصویر / Screenshots"
+      description: "اگر مربوط است. / If relevant."

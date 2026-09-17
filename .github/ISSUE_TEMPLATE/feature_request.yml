@@ -1,0 +1,30 @@
+name: پیشنهاد قابلیت / Feature request
+description: پیشنهاد قابلیت یا بهبود / Suggest a feature or improvement
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: مسئله / Problem
+      description: چه مشکلی را حل می‌کند؟ / What problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: راه‌حل پیشنهادی / Proposed solution
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: جایگزین‌ها / Alternatives considered
+  - type: textarea
+    id: impact
+    attributes:
+      label: اثر بر حریم خصوصی و دسترس‌پذیری / Privacy and accessibility impact
+      description: |
+        آیا درخواست شبکه، ذخیره‌سازی تازه، سرویس ثالث یا حساب کاربری لازم دارد؟ با کیبورد و صفحه‌خوان چطور کار می‌کند؟
+        Does it need a network request, new storage, a third-party service or an account? How does it work with a keyboard and screen reader?
+    validations:
+      required: true
