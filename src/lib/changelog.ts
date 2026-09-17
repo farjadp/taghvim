@@ -38,6 +38,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
   {
+    version: '0.9.40',
+    at: '2026-09-17T11:35:33-04:00',
+    status: 'ready',
+    title: 'تقویم کامل در پنجرهٔ کم‌عرض',
+    changes: [
+      { kind: 'fixed', text: 'در افزونه، وقتی پنجرهٔ مرورگر کم‌عرض بود، تقویم ماه بعد از هفتهٔ سوم بریده می‌شد و جعبهٔ مناسبت‌ها خالی دیده می‌شد.' },
+    ],
+  },
+  {
     version: '0.9.39',
     at: '2026-09-11T15:52:54-04:00',
     status: 'live',

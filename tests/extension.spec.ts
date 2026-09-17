@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.22 — 2026-09-09
+// Version: 0.9.40 — 2026-09-17
 // Why: Loads the BUILT new-tab page — the same files the browser would load —
 //      from a throwaway static server with every other origin blocked, and
 //      reads the Tehran date off it. A build that needs the network, or that
@@ -79,6 +79,27 @@ test("keeps the whole month on the first screen, with the tools below it", async
   await expect(page.locator("#tools")).toHaveCount(1);
   const scrollable = await page.evaluate(() => document.documentElement.scrollHeight - window.innerHeight);
   expect(scrollable).toBeGreaterThan(0);
+});
+
+test("a narrow window scrolls instead of clipping the month or the occasions", async ({ page }) => {
+  // Below `lg` the two columns stack, and pinning that stack to one screen height
+  // squeezed the calendar card — its overflow-hidden cut the month after the third
+  // week — and collapsed the occasions box to an empty strip. Reported from a
+  // Firefox window about 750px wide.
+  await page.setViewportSize({ width: 750, height: 940 });
+  await page.goto(`${origin}/newtab.html`);
+  const cells = page.locator('button[aria-label*="۱۴۰۵"]');
+  await expect(cells).toHaveCount(35);
+  const clipped = await page.evaluate(() => {
+    const bottom = document.querySelector("#calendar")!.getBoundingClientRect().bottom;
+    return [...document.querySelectorAll('#calendar button[aria-label*="۱۴۰۵"]')]
+      .filter((cell) => cell.getBoundingClientRect().bottom > bottom + 0.5).length;
+  });
+  expect(clipped).toBe(0);
+  // The occasions box keeps its content height rather than a scroll strip
+  const events = page.locator("#main > div > div").last();
+  const { client, scroll } = await events.evaluate((node) => ({ client: node.clientHeight, scroll: node.scrollHeight }));
+  expect(scroll - client).toBeLessThanOrEqual(1);
 });
 
 test("carries the same tools box, with its own separate list of dates", async ({ page }) => {

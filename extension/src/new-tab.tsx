@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/src/new-tab.tsx
-// Version: 0.9.21 — 2026-09-09
+// Version: 0.9.40 — 2026-09-17
 // Why: The new-tab shell: today, the month grid and the day's occasions on
 //      one screen. Every panel is the site's own component imported from
 //      ../../src; only this arrangement is the extension's. The clock,
@@ -100,7 +100,10 @@ export function NewTab() {
           box is the second and lives BELOW the fold: inside the pinned block it split
           the height with the calendar and cut the month off half way down. */}
     <div className="flex min-h-full flex-col">
-      <div className="flex h-screen flex-col">
+      {/* Pinned only from `lg`, where the two columns sit side by side. Below it they
+          stack, and a stack held to one screen height squeezed the month card until its
+          overflow-hidden cut the grid after three weeks; there the page simply scrolls. */}
+      <div className="flex flex-col lg:h-screen">
       <header className="border-b border-line bg-surface/80">
         <div className="mx-auto flex min-h-14 max-w-[1400px] items-center justify-between gap-4 px-5">
           <span className="flex items-center gap-2.5 text-forest">
@@ -127,13 +130,13 @@ export function NewTab() {
       {/* Right column (first in RTL): today and the day's occasions; left: the month.
           `min-h-0` lets the events list scroll inside its column instead of
           pushing the whole tab past the fold. */}
-      <main id="main" className="mx-auto grid min-h-0 w-full max-w-[1400px] flex-1 gap-5 p-5 lg:grid-cols-[1fr_1.5fr]">
-        <div className="flex min-h-0 flex-col gap-5">
+      <main id="main" className="mx-auto grid w-full lg:min-h-0 max-w-[1400px] flex-1 gap-5 p-5 lg:grid-cols-[1fr_1.5fr]">
+        <div className="flex flex-col gap-5 lg:min-h-0">
           {/* The extension ships no photographs — they live in the site's public folder and
               fetching one would break the zero-request rule — so its card is the plain
               palette and the picker is not offered here. */}
           <TodayHero now={now} initialNow={initialNow.current} groups={preferences} cardStyle={DEFAULT_CARD_STYLE} backgrounds={[]} />
-          <div className="min-h-0 flex-1 overflow-y-auto">
+          <div className="lg:min-h-0 lg:flex-1 lg:overflow-y-auto">
             <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
           </div>
         </div>
