@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: scripts/sign-release-aab.mjs
-// Version: 0.2.0 — 2026-10-01
+// Version: 0.2.1 — 2026-10-01
 // Why: Google Play takes an app bundle, not an APK, and wants it signed with
 //      the UPLOAD key; Play then signs what it serves with the app signing key
 //      (ours, handed over once through PEPK), the same key as the taghv.im APK.
@@ -29,11 +29,11 @@ const REPO = 'farjadp/taghvim';
 const WORKFLOW = `${REPO}/.github/workflows/release.yml`;
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 
-// The upload certificate's SHA-256 (CN=Taghvim, RSA 4096, made 1 Oct 2026 —
-// the 11 Sep upload key's password was lost before it was ever registered).
-// Public by nature; read from ~/taghvim-keys/upload_certificate.pem and handed
-// to Play with the app signing key. A bundle signed by any other key is refused.
-const UPLOAD_CERT_SHA256 = '49:47:06:0D:55:D0:78:5A:F6:9B:E3:AF:A1:89:B3:A2:18:D2:FC:5A:BC:87:EE:25:C1:4E:98:7E:91:16:B2:95';
+// The upload certificate's SHA-256 (CN=Taghvim, RSA 4096, made 1 Oct 2026 at
+// 12:08 on the Canadian layout). It replaced two upload keys whose passwords
+// were lost before either was registered anywhere. Public by nature; read from
+// ~/taghvim-keys/upload_certificate.pem. A bundle signed by any other key is refused.
+const UPLOAD_CERT_SHA256 = 'FC:A5:E4:75:ED:28:F0:28:39:55:3A:84:E7:AF:92:2D:4F:00:EA:ED:13:E5:88:3C:A0:76:87:7A:F2:7B:90:C8';
 
 const args = process.argv.slice(2);
 const tag = args.find((arg) => !arg.startsWith('--') && !args[args.indexOf(arg) - 1]?.startsWith('--'));
