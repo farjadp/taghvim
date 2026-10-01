@@ -1,6 +1,6 @@
 # ============================================================================
 # Source: .github/workflows/release.yml
-# Version: 0.2.0 — 2026-10-01
+# Version: 0.2.1 — 2026-10-01
 # Why: Every published file is built here, from the tagged commit, where anyone
 #      can read how it was made — not on Farjad's Mac. Asked for publicly on
 #      11 Sep: a local build cannot be tied to the source it claims to come from.
@@ -57,7 +57,12 @@ jobs:
           distribution: temurin
           java-version: "21"
 
+      # Only platform-tools: the action's default also asks for the legacy
+      # `tools` package, which cmdline-tools 16 no longer has, and the step
+      # fails (first seen on v0.9.40). Gradle fetches the platform it needs.
       - uses: android-actions/setup-android@v3
+        with:
+          packages: platform-tools
 
       # Android only: the iOS project is not built here.
       - name: Android — web bundle
