@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/build.gradle
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.1.1 — 2026-10-01
 // Why: The app module. Beyond Capacitor's template: Kotlin for the widgets;
 //      the shared im.taghv.core; java.time desugared, because minSdk is 24 and
 //      java.time arrived in 26 — the widget's Tehran midnight is java.time; and
@@ -22,8 +22,8 @@ android {
         applicationId "im.taghv.app"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 3
-        versionName "1.2"
+        versionCode 4
+        versionName "1.3"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
