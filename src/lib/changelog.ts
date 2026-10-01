@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.11 — 2026-09-11
+// Version: 0.11.12 — 2026-10-01
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.41',
+    at: '2026-10-01T12:37:51-04:00',
+    status: 'ready',
+    title: 'اندروید ۱٫۳، با کلید تازه',
+    changes: [
+      { kind: 'added', text: 'برنامهٔ اندروید ۱٫۳ روی صفحهٔ دریافت.' },
+      { kind: 'changed', text: 'رمز کلید امضای قبلی از دست رفت و ۱٫۳ با کلید تازه امضا شده؛ اگر ۱٫۰ تا ۱٫۲ را نصب کرده‌ای، اول آن را حذف کن، وگرنه اندروید ۱٫۳ را نصب نمی‌کند.' },
+    ],
+  },
   {
     version: '0.9.40',
     at: '2026-09-17T11:35:33-04:00',

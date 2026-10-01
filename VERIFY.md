@@ -17,7 +17,7 @@ The output names the commit and the workflow. Works for every file in the releas
 ## ۲. APK امضاشده همان خروجی GitHub است؟ / Is the signed APK the CI build?
 
 ```
-apksigcopier compare --unsigned taghvim-1.2-unsigned.apk taghvim-1.2.apk
+apksigcopier compare --unsigned taghvim-1.3-unsigned.apk taghvim-1.3.apk
 ```
 
 ([apksigcopier](https://github.com/obfusk/apksigcopier), `pip install apksigcopier`.) اگر بی‌خطا تمام شود، APK امضاشده جز بلوک امضا بایت‌به‌بایت همان فایلی است که GitHub ساخته. Exit 0 means the signed APK is the attested unsigned build with a signature block added, and nothing else.
@@ -25,10 +25,18 @@ apksigcopier compare --unsigned taghvim-1.2-unsigned.apk taghvim-1.2.apk
 ## ۳. با کلید تقویم امضا شده؟ / Signed with Taghvim's key?
 
 ```
-apksigner verify --print-certs taghvim-1.2.apk
+apksigner verify --print-certs taghvim-1.3.apk
 ```
 
 باید `CN=Taghvim` و این اثر انگشت SHA-256 باشد / must show `CN=Taghvim` and:
+
+```
+AF:5B:08:88:E0:9F:6B:19:0F:A9:66:C7:37:81:29:D7:03:BD:3C:2B:CB:D4:F5:22:32:8B:AC:13:1B:11:23:7B
+```
+
+این کلید از نسخهٔ ۱٫۳ (۹ مهر ۱۴۰۵ / ۱ اکتبر ۲۰۲۶) است و همان کلیدی است که Google Play با آن امضا می‌کند. نسخه‌های ۱٫۰ تا ۱٫۲ با کلید قبلی امضا شده‌اند، که رمزش از دست رفت و دیگر چیزی با آن امضا نمی‌شود:
+
+From 1.3 (1 Oct 2026) on, and on Google Play. Versions 1.0–1.2 were signed with the previous key, whose password was lost; nothing will be signed with it again:
 
 ```
 2A:21:28:8E:2B:A9:A8:13:C2:19:84:83:D8:29:2D:9D:03:94:7D:19:C3:D8:71:7E:42:DA:8E:CF:6C:7B:68:6E

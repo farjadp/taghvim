@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.30 — 2026-09-10
+// Version: 0.9.41 — 2026-10-01
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -126,16 +126,20 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
 // content as 1.1) is the first built by the release workflow: the unsigned APK in
 // release v0.9.39 is attested, and the signed one differs from it only by the
 // signature (scripts/sign-release-apk.mjs; VERIFY.md says how anyone can check).
+// 1.3 (versionCode 4, release v0.9.40) is the first signed with the key of 1 Oct.
 export const ANDROID_APK_URL: string | null =
-  'https://github.com/farjadp/taghvim/releases/download/v0.9.39/taghvim-1.2.apk';
+  'https://github.com/farjadp/taghvim/releases/download/v0.9.40/taghvim-1.3.apk';
 
 // The certificate every Taghvim APK is signed with (subject CN=Taghvim), so
 // anyone handed the file somewhere else can check it came from here. It is
 // public by nature — it is inside every APK — and it changes only if the key
-// does, which it must not: an APK signed with another key cannot update an
-// install signed with this one.
+// does: an APK signed with another key cannot update an install signed with
+// this one. It DID change once, on 1 Oct 2026: the password of the 11 Sep key
+// (2A:21:28:8E:…:68:6E, which signed 1.0–1.2) was lost, so 1.3 is signed with a
+// new key — the same one Google Play signs with — and installs of 1.0–1.2 must
+// be removed before 1.3 will install. The Android card says so.
 export const ANDROID_CERT_SHA256 =
-  '2A:21:28:8E:2B:A9:A8:13:C2:19:84:83:D8:29:2D:9D:03:94:7D:19:C3:D8:71:7E:42:DA:8E:CF:6C:7B:68:6E';
+  'AF:5B:08:88:E0:9F:6B:19:0F:A9:66:C7:37:81:29:D7:03:BD:3C:2B:CB:D4:F5:22:32:8B:AC:13:1B:11:23:7B';
 
 export type AppPlatform = {
   id: 'android' | 'ios';
@@ -163,6 +167,10 @@ export function appsPanel(apkUrl: string | null) {
             'ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن',
             'اندروید ۷ یا بالاتر، بدون مجوز اینترنت',
             'اندروید یک بار می‌پرسد اجازه می‌دهی مرورگر برنامه نصب کند؛ باید تأیید کنی.',
+            // The key changed on 1 Oct 2026 (see ANDROID_CERT_SHA256). Android
+            // refuses to install over an app signed with another key and says only
+            // «App not installed»; this line is the explanation it does not give.
+            'اگر نسخهٔ ۱٫۰ تا ۱٫۲ را از اینجا نصب کرده‌ای، اول آن را حذف کن؛ ۱٫۳ با کلید تازه امضا شده و روی نسخهٔ قبلی نصب نمی‌شود.',
             // Reported 11 Sep: a reader's phone showed «App blocked to protect your
             // device — Play Protect hasn't seen an app from this developer before».
             // It is about the developer being unknown to Google, not the file; the

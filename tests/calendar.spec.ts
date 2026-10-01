@@ -928,10 +928,12 @@ test("the download page states each method's real status", async ({ page }) => {
   await expect(android).toContainText("آماده");
   const apk = android.locator('a[href*="/releases/"]');
   await expect(apk).toHaveCount(1);
-  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.39/taghvim-1.2.apk");
+  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.40/taghvim-1.3.apk");
   await expect(apk).toHaveAttribute("rel", /noopener/);
   await expect(android).toContainText("SHA-256");
-  await expect(android).toContainText("2A:21:28:8E");
+  await expect(android).toContainText("AF:5B:08:88");
+  // The key changed on 1 Oct; the card must say an older install has to go first.
+  await expect(android).toContainText("۱٫۰ تا ۱٫۲");
   // Play Protect blocks an app from a developer Google does not know yet; the
   // card says where the way through is.
   await expect(android).toContainText("Install anyway");

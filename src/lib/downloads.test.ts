@@ -40,11 +40,11 @@ describe('apps panel', () => {
     expect(panel.timing).toContain('نسخهٔ آیفون');
   });
 
-  it('carries the fingerprint of the key that signed the first release', () => {
+  it('carries the fingerprint of the key that signs 1.3 and Google Play', () => {
     // 32 bytes, colon-separated, as apksigner and keytool print it.
     expect(ANDROID_CERT_SHA256).toMatch(/^([0-9A-F]{2}:){31}[0-9A-F]{2}$/);
     expect(ANDROID_CERT_SHA256.replaceAll(':', '').toLowerCase())
-      .toBe('2a21288e2ba9a813c2198483d8292d9d03947d19c3d8717e42da8ecf6c7b686e');
+      .toBe('af5b0888e09f6b190fa966c7378129d703bd3c2bcbd4f522328bac131b11237b');
   });
 
   it('points at one release by its tag, never at «latest»', () => {
