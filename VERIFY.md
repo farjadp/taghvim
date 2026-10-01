@@ -38,6 +38,7 @@ apksigner verify --print-certs taghvim-1.2.apk
 
 - نسخه‌ای که از فروشگاه کروم نصب می‌شود را فروشگاه دوباره بسته‌بندی و امضا می‌کند؛ تطبیق مستقیمش با این فایل‌ها ممکن نیست. The Chrome Web Store repackages and re-signs what it serves, so an install from the store cannot be matched byte for byte.
 - گواهی ساخت نشان می‌دهد فایل از کدام کد ساخته شده، نه اینکه آن کد بی‌اشکال است؛ کد برای خواندن باز است. An attestation proves which source a file came from, not that the source is right; the source is public to read.
+- برنامه‌ای که از Google Play نصب می‌شود را خود Play از بستهٔ `taghvim-<v>-unsigned.aab` همین release می‌سازد و با همان کلید تقویم (`CN=Taghvim`) امضا می‌کند؛ پس اثر انگشت بند ۳ برایش درست است، ولی فایلش بایت‌به‌بایت با APK این صفحه یکی نیست. The Play install is built by Google from this release's attested bundle and signed with the same Taghvim key, so step 3's fingerprint holds, but the file is not byte-identical to the APK here.
 - نسخه‌های تا ۰٫۹٫۳۸ و برنامهٔ ۱٫۰ و ۱٫۱ هنوز روی سیستم شخصی ساخته شده بودند. Releases up to 0.9.38, and Android 1.0 and 1.1, were built locally and carry no attestation.
 
 ## برای نگهدارنده / For the maintainer
@@ -45,4 +46,5 @@ apksigner verify --print-certs taghvim-1.2.apk
 1. `package.json`، مانیفست افزونه و در صورت نیاز `versionName` برنامه را بالا ببر و commit کن.
 2. `git tag v<version> && git push origin v<version>` — workflow یک release پیش‌نویس می‌سازد.
 3. `node scripts/sign-release-apk.mjs v<version>` — همان APK را دانلود، گواهی‌اش را بررسی، امضا و سنجش می‌کند و بالا می‌گذارد؛ پیش از انتشار می‌پرسد.
-4. زیپ‌های افزونه را از همان release در فروشگاه‌ها بارگذاری کن.
+4. `node scripts/sign-release-aab.mjs v<version>` — بستهٔ Play را همان‌طور دانلود و بررسی می‌کند و با **کلید upload** امضا می‌کند؛ نتیجه را در `mobile/android/app/` می‌گذارد و جایی منتشر نمی‌کند. آن را در Play Console بارگذاری کن.
+5. زیپ‌های افزونه را از همان release در فروشگاه‌ها بارگذاری کن.

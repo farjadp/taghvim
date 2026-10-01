@@ -1,6 +1,6 @@
 # ============================================================================
 # Source: .github/workflows/release.yml
-# Version: 0.1.0 — 2026-09-11
+# Version: 0.2.0 — 2026-10-01
 # Why: Every published file is built here, from the tagged commit, where anyone
 #      can read how it was made — not on Farjad's Mac. Asked for publicly on
 #      11 Sep: a local build cannot be tied to the source it claims to come from.
@@ -9,6 +9,8 @@
 # Env / Deps: The APK is built UNSIGNED: the release key never leaves Farjad's
 #      machine. scripts/sign-release-apk.mjs downloads this very file, signs it
 #      and proves the signed APK differs from it only by the signature.
+#      The app bundle for Google Play is built here too, unsigned as well;
+#      scripts/sign-release-aab.mjs signs it with the upload key the same way.
 #      A `v<package.json version>` tag (or `v<version>-<suffix>` for a test)
 #      starts it; it only ever creates a DRAFT release.
 # ============================================================================
@@ -61,9 +63,9 @@ jobs:
       - name: Android — web bundle
         run: TARGET=app npx vite build --config extension/vite.config.ts && npx cap sync android
 
-      - name: Android — APK, unsigned
+      - name: Android — APK and Play bundle, unsigned
         working-directory: mobile/android/app
-        run: ./gradlew assembleRelease --no-daemon
+        run: ./gradlew assembleRelease bundleRelease --no-daemon
 
       - name: Collect the release files
         run: |
@@ -71,6 +73,7 @@ jobs:
           mkdir out
           cp extension/taghvim-*.zip out/
           cp mobile/android/app/app/build/outputs/apk/release/app-release-unsigned.apk "out/taghvim-$vn-unsigned.apk"
+          cp mobile/android/app/app/build/outputs/bundle/release/app-release.aab "out/taghvim-$vn-unsigned.aab"
           (cd out && sha256sum * > SHA256SUMS && cat SHA256SUMS)
 
       - uses: actions/attest-build-provenance@v2
