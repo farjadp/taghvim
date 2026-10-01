@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: scripts/sign-release-aab.mjs
-// Version: 0.1.0 — 2026-10-01
+// Version: 0.1.1 — 2026-10-01
 // Why: Google Play takes an app bundle, not an APK, and wants it signed with
 //      the UPLOAD key; Play then signs what it serves with the app signing key
 //      (ours, handed over once through PEPK), the same key as the taghv.im APK.
@@ -87,7 +87,13 @@ if (/META-INF\/[^/]+\.(SF|RSA|DSA|EC)$/m.test(run('unzip', ['-Z1', unsigned]))) 
 const signedName = basename(unsigned).replace('-unsigned.aab', '-upload.aab');
 const signed = join(work, signedName);
 const passArgs = passEnv ? ['-storepass:env', passEnv] : [];
-run('jarsigner', [...passArgs, '-keystore', keystore, '-signedjar', signed, unsigned, alias], { stdio: 'inherit' });
+try {
+  run('jarsigner', [...passArgs, '-keystore', keystore, '-signedjar', signed, unsigned, alias], { stdio: 'inherit' });
+} catch {
+  // jarsigner has already printed why; the usual cause is the release key's
+  // password typed for the upload key. Nothing was signed.
+  fail(`jarsigner could not sign with ${keystore} (alias ${alias}); nothing was signed`);
+}
 // Not -strict: an Android key is self-signed by design, and -strict rejects that.
 run('jarsigner', ['-verify', signed]);
 
