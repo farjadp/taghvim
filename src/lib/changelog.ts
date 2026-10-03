@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.12 — 2026-10-01
+// Version: 0.11.13 — 2026-10-03
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.42',
+    at: '2026-10-03T15:04:09-04:00',
+    status: 'ready',
+    title: 'فایرفاکس، از فروشگاه',
+    changes: [
+      { kind: 'fixed', text: 'صفحهٔ دریافت می‌گفت افزونهٔ فایرفاکس هنوز در بازبینی است، در حالی که دست‌کم از ۲۱ شهریور در فروشگاه فایرفاکس منتشر شده بود؛ حالا دکمهٔ نصبش آنجاست.' },
+    ],
+  },
   {
     version: '0.9.41',
     at: '2026-10-01T12:37:51-04:00',

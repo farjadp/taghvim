@@ -913,6 +913,10 @@ test("the download page states each method's real status", async ({ page }) => {
   expect(await status("calendar-feed")).toBe("آماده");
   // Published on the Web Store since 9 Sep; before that this read «در حال بازبینی»
   expect(await status("chrome")).toBe("آماده");
+  // Public on addons.mozilla.org since 12 Sep; the card said «در حال بازبینی» until 3 Oct
+  expect(await status("firefox")).toBe("آماده");
+  await expect(page.locator("#firefox").getByRole("link", { name: "نصب از فروشگاه فایرفاکس" }))
+    .toHaveAttribute("href", "https://addons.mozilla.org/firefox/addon/%D8%AA%D9%82%D9%88%DB%8C%D9%85/");
   // The apps are in development (Farjad, 10 Sep) and get a panel of their own,
   // with the three widgets drawn and the rest of what is coming listed after it
   const apps = page.locator("#apps");

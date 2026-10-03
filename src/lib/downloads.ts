@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.41 — 2026-10-01
+// Version: 0.9.42 — 2026-10-03
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -17,8 +17,12 @@ export const CHROME_STORE_URL: string | null =
   'https://chromewebstore.google.com/detail/%D8%AA%D9%82%D9%88%DB%8C%D9%85/idfklcgaapfagcichjeonihhbkcfggim';
 
 // Set this the day addons.mozilla.org approves the listing. Submitted 9 Sep
-// 2026; until it is approved the card says so, exactly as Chrome's did.
-export const FIREFOX_STORE_URL: string | null = null;
+// 2026 and public by 12 Sep (AMO API: status «public», 0.9.38) — but this stayed
+// null until 3 Oct, so /download told visitors for three weeks that a live
+// add-on was still in review. Locale-free on purpose: AMO redirects to the
+// visitor's own language.
+export const FIREFOX_STORE_URL: string | null =
+  'https://addons.mozilla.org/firefox/addon/%D8%AA%D9%82%D9%88%DB%8C%D9%85/';
 
 export type DownloadStatus = 'ready' | 'review' | 'building' | 'planned';
 
