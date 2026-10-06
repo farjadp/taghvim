@@ -5,7 +5,11 @@
   <key>CAPACITOR_DEBUG</key>
 	<string>$(CAPACITOR_DEBUG)</string>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>en</string>
+	<string>fa</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>fa</string>
+	</array>
 	<key>CFBundleDisplayName</key>
         <string>تقویم</string>
 	<key>CFBundleExecutable</key>

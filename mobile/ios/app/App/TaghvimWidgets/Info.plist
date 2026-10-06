@@ -4,7 +4,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<string>fa</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>fa</string>
+	</array>
 	<key>CFBundleDisplayName</key>
 	<string>تقویم</string>
 	<key>CFBundleExecutable</key>
