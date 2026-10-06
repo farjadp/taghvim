@@ -20,8 +20,10 @@
 		890D534DA0E290BB476519D6 /* TaghvimCore in Frameworks */ = {isa = PBXBuildFile; productRef = 1AEA08BC6F00BE48310B86A7 /* TaghvimCore */; };
 		8A9D35B23F937258B40F045F /* TaghvimWidgets.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 227F8F49CEE1349C96357233 /* TaghvimWidgets.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9582B6822FE993A50072D4E8 /* SceneDelegate.swift */; };
+		9616F7FB83207EC49D382B0A /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = C995F6FBE47F206CCD3D424F /* PrivacyInfo.xcprivacy */; };
 		9C449E1AC963EE6A0CACF58A /* MainViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BC6285BEBBF8EF177BC61265 /* MainViewController.swift */; };
 		9D12778CE906FA841358CD2D /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 779A3064F0234C818E96E236 /* Foundation.framework */; };
+		A516716438A7868EE44AC750 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 29D9B9C4FF15FA400DB320D4 /* PrivacyInfo.xcprivacy */; };
 		AF83E3496B68AAFDA6E69222 /* widget-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 6653622D21C113FB005D7F9B /* widget-data.json */; };
 		BDF0148A6439BEFC6CA719E3 /* WidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298FEDA66893830017DA2BC7 /* WidgetViews.swift */; };
 /* End PBXBuildFile section */
@@ -55,6 +57,7 @@
 		109ADAA841A7E75E4DBE63F6 /* TaghvimWidgets.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = TaghvimWidgets.swift; sourceTree = "<group>"; };
 		227F8F49CEE1349C96357233 /* TaghvimWidgets.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = TaghvimWidgets.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		298FEDA66893830017DA2BC7 /* WidgetViews.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = WidgetViews.swift; sourceTree = "<group>"; };
+		29D9B9C4FF15FA400DB320D4 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		2FAD9762203C412B000D30F8 /* config.xml */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = config.xml; sourceTree = "<group>"; };
 		50379B222058CBB4000EE86E /* capacitor.config.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = capacitor.config.json; sourceTree = "<group>"; };
 		504EC3041FED79650016851F /* App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = App.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -71,6 +74,7 @@
 		958DCC722DB07C7200EA8C5F /* debug.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = debug.xcconfig; path = ../debug.xcconfig; sourceTree = SOURCE_ROOT; };
 		9A961312F9E8A992EE6D9319 /* TaghvimWidgets.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = TaghvimWidgets.entitlements; sourceTree = "<group>"; };
 		BC6285BEBBF8EF177BC61265 /* MainViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
+		C995F6FBE47F206CCD3D424F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E60D17085C67E5AF82462D79 /* App.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -118,6 +122,7 @@
 				298FEDA66893830017DA2BC7 /* WidgetViews.swift */,
 				650A06B4E2691229948A6F2A /* Info.plist */,
 				9A961312F9E8A992EE6D9319 /* TaghvimWidgets.entitlements */,
+				29D9B9C4FF15FA400DB320D4 /* PrivacyInfo.xcprivacy */,
 			);
 			name = TaghvimWidgets;
 			path = TaghvimWidgets;
@@ -159,6 +164,7 @@
 				0D868101425F9AB51BF01EFF /* WidgetSyncPlugin.swift */,
 				BC6285BEBBF8EF177BC61265 /* MainViewController.swift */,
 				E60D17085C67E5AF82462D79 /* App.entitlements */,
+				C995F6FBE47F206CCD3D424F /* PrivacyInfo.xcprivacy */,
 			);
 			path = App;
 			sourceTree = "<group>";
@@ -262,6 +268,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AF83E3496B68AAFDA6E69222 /* widget-data.json in Resources */,
+				A516716438A7868EE44AC750 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -275,6 +282,7 @@
 				50379B232058CBB4000EE86E /* capacitor.config.json in Resources */,
 				504EC30D1FED79650016851F /* Main.storyboard in Resources */,
 				2FAD9763203C412B000D30F8 /* config.xml in Resources */,
+				9616F7FB83207EC49D382B0A /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
