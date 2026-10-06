@@ -7,7 +7,8 @@
 //      backdrop behind the status bar: with contentInset "always" the page
 //      starts below it, but scrolled content slid underneath with nothing
 //      behind the clock and battery icons. The backdrop takes the page's own
-//      background colour, so it follows the in-app theme, not only the system's.
+//      background colour, so it follows the in-app theme, not only the system's,
+//      and so does the strip behind the home indicator.
 // Env / Deps: Capacitor 8, iOS 15+ (WKWebView.underPageBackgroundColor).
 // ============================================================================
 
@@ -47,6 +48,11 @@ class MainViewController: CAPBridgeViewController {
     private func applyPageColor(_ color: UIColor?) {
         guard let color = color else { return }
         statusBarBackdrop.backgroundColor = color
+        // The home-indicator inset at the bottom is the scroll view's own
+        // background, which Capacitor leaves at systemBackground: a white band
+        // under the paper colour, and black under the dark one.
+        webView?.backgroundColor = color
+        webView?.scrollView.backgroundColor = color
         // Dark icons on a light page, light icons on a dark one. Read from the
         // colour itself because the in-app theme can disagree with the system's.
         var white: CGFloat = 0
