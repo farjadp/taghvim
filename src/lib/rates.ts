@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/rates.ts
-// Version: 0.1.0 — 2026-10-07
+// Version: 0.1.1 — 2026-10-07
 // Why: Free-market exchange rates for the «نرخ ارز» tool, read from the public
 //      Telegram channel @sarafha_rate: the post parser, the read schedule and the
 //      types. Pure — the fetching lives in rates-server.ts, so a client component
@@ -9,7 +9,6 @@
 // ============================================================================
 
 export const RATES_CHANNEL = 'sarafha_rate';
-export const RATES_CHANNEL_URL = `https://t.me/${RATES_CHANNEL}`;
 
 export type RateUnit = 'toman' | 'usd';
 export type Rate = { id: string; label: string; unit: RateUnit; value: number; prev: number | null };

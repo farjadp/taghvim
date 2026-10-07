@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/rates-tool.tsx
-// Version: 0.1.0 — 2026-10-07
+// Version: 0.1.1 — 2026-10-07
 // Why: «نرخ ارز» as a tab in the tools box (variant C, Farjad's pick of 7 Oct):
 //      three headline rates as cards, the rest as a list, each with its change
 //      since the channel's previous post.
@@ -13,7 +13,7 @@
 
 import { ArrowDown, ArrowUp, Clock3 } from "lucide-react";
 import { addDays, dayKey, fa, formatDate } from "@/lib/calendar";
-import { RATES_CHANNEL_URL, RATES_NOTICE, type Rate, type RatesSnapshot } from "@/lib/rates";
+import { RATES_NOTICE, type Rate, type RatesSnapshot } from "@/lib/rates";
 import { useMonthNames } from "./month-names-context";
 
 const HEADLINE = ["usd", "eur", "emami"];
@@ -51,7 +51,8 @@ export function RatesTool({ snapshot, now }: { snapshot: RatesSnapshot; now: Dat
       {headline.map((rate) => <div key={rate.id} className="rounded-xl border border-line px-4 py-3"><p className="text-[0.6875rem] text-muted">{rate.label}</p><p className="mt-1 text-xl font-medium tabular-nums">{money(rate.value)}</p><div className="mt-1 flex items-center justify-between"><span className="text-[0.625rem] text-muted">{unitLabel(rate)}</span><Change rate={rate} /></div></div>)}
     </div>
     <ul className="mt-4 grid gap-x-6 text-xs sm:grid-cols-2">{rest.map((rate) => <li key={rate.id} className="flex items-center justify-between gap-3 border-b border-line py-2"><span>{rate.label}</span><span className="flex items-center gap-2"><Change rate={rate} /><span className="font-medium tabular-nums">{money(rate.value)}</span><span className="w-8 text-[0.625rem] text-muted">{unitLabel(rate)}</span></span></li>)}</ul>
-    <div className="mt-4 flex flex-wrap items-center justify-between gap-2 text-[0.625rem] text-muted"><Updated at={new Date(snapshot.at)} now={now} /><a href={RATES_CHANNEL_URL} target="_blank" rel="noopener noreferrer" className="underline-offset-4 hover:text-forest hover:underline">منبع: کانال «قیمت لحظه ای دلار»</a></div>
+    {/* No «منبع» link line: Farjad removed it on 7 Oct; the notice below still says where the rates come from */}
+    <p className="mt-4 text-[0.625rem] text-muted"><Updated at={new Date(snapshot.at)} now={now} /></p>
     <p className="mt-3 text-[0.625rem] leading-6 text-muted">{RATES_NOTICE}</p>
   </div>;
 }
