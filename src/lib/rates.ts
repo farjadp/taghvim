@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/rates.ts
-// Version: 0.1.1 — 2026-10-07
+// Version: 0.1.2 — 2026-10-07
 // Why: Free-market exchange rates for the «نرخ ارز» tool, read from the public
 //      Telegram channel @sarafha_rate: the post parser, the read schedule and the
 //      types. Pure — the fetching lives in rates-server.ts, so a client component
@@ -38,7 +38,7 @@ const KNOWN: { id: string; source: string; label: string; unit: RateUnit }[] = [
 // A post without these is not a rates post (an ad, an announcement) and is skipped
 const REQUIRED = ['usd', 'eur', 'emami'];
 
-export const RATES_NOTICE = 'نرخ بازار آزاد، نه نرخ رسمی. از کانال عمومی تلگرام «قیمت لحظه ای دلار» خوانده می‌شود، روزی پنج بار؛ پس ممکن است چند ساعت از بازار عقب باشد. ارزها، سکه و طلا به تومان؛ اونس و نفت به دلار.';
+export const RATES_NOTICE = 'نرخ بازار آزاد، نه نرخ رسمی. از یک کانال عمومی تلگرام خوانده می‌شود، روزی پنج بار؛ پس ممکن است چند ساعت از بازار عقب باشد. ارزها، سکه و طلا به تومان؛ اونس و نفت به دلار.';
 
 // The channel writes «18»; Persian or Arabic-Indic digits would be normalised the same way
 function latinDigits(text: string) {

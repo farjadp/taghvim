@@ -51,7 +51,7 @@ export function RatesTool({ snapshot, now }: { snapshot: RatesSnapshot; now: Dat
       {headline.map((rate) => <div key={rate.id} className="rounded-xl border border-line px-4 py-3"><p className="text-[0.6875rem] text-muted">{rate.label}</p><p className="mt-1 text-xl font-medium tabular-nums">{money(rate.value)}</p><div className="mt-1 flex items-center justify-between"><span className="text-[0.625rem] text-muted">{unitLabel(rate)}</span><Change rate={rate} /></div></div>)}
     </div>
     <ul className="mt-4 grid gap-x-6 text-xs sm:grid-cols-2">{rest.map((rate) => <li key={rate.id} className="flex items-center justify-between gap-3 border-b border-line py-2"><span>{rate.label}</span><span className="flex items-center gap-2"><Change rate={rate} /><span className="font-medium tabular-nums">{money(rate.value)}</span><span className="w-8 text-[0.625rem] text-muted">{unitLabel(rate)}</span></span></li>)}</ul>
-    {/* No «منبع» link line: Farjad removed it on 7 Oct; the notice below still says where the rates come from */}
+    {/* No «منبع» link line: Farjad removed it on 7 Oct; the notice below says only «a public Telegram channel», by name nowhere */}
     <p className="mt-4 text-[0.625rem] text-muted"><Updated at={new Date(snapshot.at)} now={now} /></p>
     <p className="mt-3 text-[0.625rem] leading-6 text-muted">{RATES_NOTICE}</p>
   </div>;
