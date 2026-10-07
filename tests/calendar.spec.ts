@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.40 — 2026-09-12
+// Version: 0.9.43 — 2026-10-07
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -917,10 +917,9 @@ test("the download page states each method's real status", async ({ page }) => {
   expect(await status("firefox")).toBe("آماده");
   await expect(page.locator("#firefox").getByRole("link", { name: "نصب از فروشگاه فایرفاکس" }))
     .toHaveAttribute("href", "https://addons.mozilla.org/firefox/addon/%D8%AA%D9%82%D9%88%DB%8C%D9%85/");
-  // The apps are in development (Farjad, 10 Sep) and get a panel of their own,
-  // with the three widgets drawn and the rest of what is coming listed after it
+  // The apps get a panel of their own, with the three widgets drawn and the
+  // rest of what is coming listed after it
   const apps = page.locator("#apps");
-  await expect(apps).toContainText("در دست ساخت");
   await expect(apps).toContainText("اندروید");
   await expect(apps).toContainText("آیفون");
   await expect(apps.locator("[data-widget]")).toHaveCount(3);
@@ -928,8 +927,10 @@ test("the download page states each method's real status", async ({ page }) => {
   // with the signing certificate beside it. The iPhone is still in development
   // and no date is claimed for it. Both states are unit-tested in
   // lib/downloads.test.ts; this holds the page to the one it is in.
+  // Both apps are out, so the panel carries one «آماده» for both instead of a
+  // label per card.
+  await expect(page.locator("#apps-title + *")).toContainText("آماده");
   const android = page.locator("#app-android");
-  await expect(android).toContainText("آماده");
   const apk = android.locator('a[href*="/releases/"]');
   await expect(apk).toHaveCount(1);
   await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.40/taghvim-1.3.apk");
@@ -941,11 +942,17 @@ test("the download page states each method's real status", async ({ page }) => {
   // Play Protect blocks an app from a developer Google does not know yet; the
   // card says where the way through is.
   await expect(android).toContainText("Install anyway");
-  await expect(page.locator("#app-ios")).toContainText("در دست ساخت");
-  await expect(apps).toContainText("زمان انتشار نسخهٔ آیفون هنوز معلوم نیست");
+  // The iPhone app is out (7 Oct): its card links to the App Store listing by
+  // the app's id, and nothing on the panel says a version is still coming.
+  const ios = page.locator("#app-ios");
+  await expect(ios.getByRole("link", { name: "دریافت از App Store" }))
+    .toHaveAttribute("href", "https://apps.apple.com/app/id6819758617");
+  await expect(apps).not.toContainText("در دست ساخت");
+  await expect(apps).not.toContainText("هنوز معلوم نیست");
   const next = page.getByRole("region", { name: "بقیهٔ چیزهایی که در راه است" });
   await expect(next).toContainText("ربات تلگرام");
   await expect(next).not.toContainText("اندروید");
+  await expect(next).not.toContainText("آیفون");
 
   // The store link exists now, and it is the real listing rather than a search
   // page or a placeholder — a dead button here is worse than a sentence.

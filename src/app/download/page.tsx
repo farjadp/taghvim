@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/download/page.tsx
-// Version: 0.9.33 — 2026-09-11
+// Version: 0.9.43 — 2026-10-07
 // Why: One page for getting the calendar onto a device. Every method carries
 //      its real status, and each extension only offers a store button once
 //      lib/downloads has a store URL for it. The Android and iPhone apps get a
@@ -19,7 +19,7 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { StructuredData } from "@/components/structured-data";
 import { APPS, CHROME_STORE_URL, DOWNLOAD_METHODS, STATUS_LABELS, WIDGETS, type DownloadMethod, type DownloadStatus } from "@/lib/downloads";
-import { UPCOMING, UPCOMING_APP, UPCOMING_NOTICE } from "@/lib/changelog";
+import { UPCOMING, UPCOMING_NOTICE } from "@/lib/changelog";
 import { breadcrumbStructuredData, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
@@ -234,7 +234,7 @@ function AppsPanel() {
       </div>
 
       <div className="mt-6 space-y-1 text-xs leading-6 text-[#d9e3cf]">
-        <p>{APPS.timing}</p>
+        {APPS.timing && <p>{APPS.timing}</p>}
         <p>{APPS.note}</p>
       </div>
     </section>
@@ -242,9 +242,9 @@ function AppsPanel() {
 }
 
 // «و بقیه»: the rest of what is being considered, from the same list the changelog
-// shows, less the apps line the panel above already covers.
+// shows. Both apps are out, so the list no longer carries an apps line.
 function NextUp() {
-  const rest = UPCOMING.filter((line) => line !== UPCOMING_APP);
+  const rest = UPCOMING;
   return (
     <section aria-labelledby="next-title" className="rounded-2xl border border-line bg-surface p-6 sm:p-7">
       <h2 id="next-title" className="text-base font-semibold text-ink">بقیهٔ چیزهایی که در راه است</h2>

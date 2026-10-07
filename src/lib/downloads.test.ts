@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.test.ts
-// Version: 0.1.0 — 2026-09-11
+// Version: 0.2.0 — 2026-10-07
 // Why: The apps panel must not offer a download that does not exist, and the
 //      day it does, it must carry the certificate that lets anyone check the
 //      file. Both states are built by appsPanel, so both are tested here
@@ -9,7 +9,7 @@
 // ============================================================================
 
 import { describe, expect, it } from 'vitest';
-import { ANDROID_APK_URL, ANDROID_CERT_SHA256, appsPanel } from './downloads';
+import { ANDROID_APK_URL, ANDROID_CERT_SHA256, APP_STORE_URL, appsPanel } from './downloads';
 
 const URL = 'https://github.com/farjadp/taghvim/releases/download/android-v1.0/taghvim-1.0.apk';
 
@@ -38,6 +38,24 @@ describe('apps panel', () => {
     // The iPhone is untouched: still in development, still no date.
     expect(panel.platforms.find((p) => p.id === 'ios')!.status).toBe('building');
     expect(panel.timing).toContain('نسخهٔ آیفون');
+  });
+
+  it('offers the App Store listing once the iPhone app is out, and no pending line', () => {
+    const store = 'https://apps.apple.com/app/id6819758617';
+    const panel = appsPanel(URL, store);
+    const ios = panel.platforms.find((p) => p.id === 'ios')!;
+    expect(ios.status).toBe('ready');
+    expect(ios.action).toEqual({ label: 'دریافت از App Store', href: store, external: true });
+    expect(ios.points.join(' ')).toContain('صفحهٔ قفل');
+    expect(panel.summary).toContain('هر دو برنامه آماده است');
+    // Nothing is pending, so nothing claims a date or a «not yet».
+    expect(panel.timing).toBeNull();
+    // Apple's store is not reachable from inside Iran; the panel keeps saying so.
+    expect(panel.note).toContain('ایران');
+  });
+
+  it('points the App Store button at the app by its id, never at a search', () => {
+    if (APP_STORE_URL !== null) expect(APP_STORE_URL).toMatch(/^https:\/\/apps\.apple\.com\/app\/id\d+$/);
   });
 
   it('carries the fingerprint of the key that signs 1.3 and Google Play', () => {

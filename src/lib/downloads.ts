@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.42 — 2026-10-03
+// Version: 0.9.43 — 2026-10-07
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -23,6 +23,13 @@ export const CHROME_STORE_URL: string | null =
 // visitor's own language.
 export const FIREFOX_STORE_URL: string | null =
   'https://addons.mozilla.org/firefox/addon/%D8%AA%D9%82%D9%88%DB%8C%D9%85/';
+
+// Set this the day the iPhone app is RELEASED on the App Store — not the day
+// it is approved: Farjad releases by hand, and until he does the listing does
+// not exist for anyone else. App Review approved 1.0 (2) on 7 Oct 2026; the id
+// is the app's Apple ID in App Store Connect. Locale-free: Apple sends the
+// visitor to their own storefront.
+export const APP_STORE_URL: string | null = 'https://apps.apple.com/app/id6819758617';
 
 export type DownloadStatus = 'ready' | 'review' | 'building' | 'planned';
 
@@ -156,11 +163,12 @@ export type AppPlatform = {
 
 // The two apps, shown on /download as their own panel rather than one more card:
 // they are what most people asked for, and the widgets are why. Built from the
-// APK URL so the page cannot claim a download that does not exist, and so both
-// states are testable without flipping the constant. Nothing names an iPhone
-// date — there is none yet.
-export function appsPanel(apkUrl: string | null) {
+// APK and App Store URLs so the page cannot claim a download that does not
+// exist, and so every state is testable without flipping a constant. While the
+// iPhone app is not out, nothing names a date for it.
+export function appsPanel(apkUrl: string | null, appStoreUrl: string | null = null) {
   const android = apkUrl !== null;
+  const iphone = appStoreUrl !== null;
   const platforms: AppPlatform[] = [
     android
       ? {
@@ -186,22 +194,42 @@ export function appsPanel(apkUrl: string | null) {
           fingerprint: ANDROID_CERT_SHA256,
         }
       : { id: 'android', name: 'اندروید', status: 'building', points: ['ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن'] },
-    { id: 'ios', name: 'آیفون', status: 'building', points: ['ویجت صفحهٔ خانه و صفحهٔ قفل'] },
+    iphone
+      ? {
+          id: 'ios',
+          name: 'آیفون',
+          status: 'ready',
+          points: [
+            'ویجت صفحهٔ خانه و صفحهٔ قفل',
+            // Deployment targets: the app 15.0, the widget extension 16.0 (the
+            // lock-screen families need it).
+            'iOS ۱۵ یا بالاتر؛ ویجت‌ها iOS ۱۶ می‌خواهند.',
+            'بدون حساب کاربری و بدون هیچ درخواست شبکه.',
+          ],
+          action: { label: 'دریافت از App Store', href: appStoreUrl, external: true },
+        }
+      : { id: 'ios', name: 'آیفون', status: 'building', points: ['ویجت صفحهٔ خانه و صفحهٔ قفل'] },
   ];
+  const ANNOUNCE = 'هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.';
   return {
     title: 'برنامهٔ اندروید و آیفون',
-    summary: android
-      ? 'برنامهٔ اندروید آماده است: همان تقویم، به‌علاوهٔ ویجت روی صفحهٔ خانه. نسخهٔ آیفون، با ویجت صفحهٔ قفل، در دست ساخت است.'
-      : 'هر دو برنامه در دست کدنویسی‌اند. همان تقویم، به‌علاوهٔ چیزی که فقط یک برنامهٔ نصبی می‌تواند داشته باشد: ویجت روی صفحهٔ خانه و صفحهٔ قفل.',
+    summary: android && iphone
+      ? 'هر دو برنامه آماده است: همان تقویم، به‌علاوهٔ ویجت روی صفحهٔ خانه، و در آیفون روی صفحهٔ قفل هم.'
+      : android
+        ? 'برنامهٔ اندروید آماده است: همان تقویم، به‌علاوهٔ ویجت روی صفحهٔ خانه. نسخهٔ آیفون، با ویجت صفحهٔ قفل، در دست ساخت است.'
+        : 'هر دو برنامه در دست کدنویسی‌اند. همان تقویم، به‌علاوهٔ چیزی که فقط یک برنامهٔ نصبی می‌تواند داشته باشد: ویجت روی صفحهٔ خانه و صفحهٔ قفل.',
     platforms,
     note: 'اپ‌استور اپل از داخل ایران در دسترس نیست.',
-    timing: android
-      ? 'زمان انتشار نسخهٔ آیفون هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.'
-      : 'زمان انتشار هنوز معلوم نیست. هر خبری اول همین‌جا و در صفحهٔ تغییرات نوشته می‌شود.',
+    // Nothing is pending once both are out, so there is no timing line to show.
+    timing: android && iphone
+      ? null
+      : android
+        ? `زمان انتشار نسخهٔ آیفون هنوز معلوم نیست. ${ANNOUNCE}`
+        : `زمان انتشار هنوز معلوم نیست. ${ANNOUNCE}`,
   };
 }
 
-export const APPS = appsPanel(ANDROID_APK_URL);
+export const APPS = appsPanel(ANDROID_APK_URL, APP_STORE_URL);
 
 // What each widget holds. The page draws them with a fixed date — Nowruz 1406,
 // labelled as an example — so a static page never shows a stale «today».
