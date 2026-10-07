@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.43',
     at: '2026-10-07T09:17:44-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'تقویم برای آیفون',
     changes: [
       { kind: 'added', text: 'برنامهٔ آیفون در App Store: همان تقویم، با ویجت صفحهٔ خانه و صفحهٔ قفل. دکمهٔ دریافتش در صفحهٔ دریافت است.' },
