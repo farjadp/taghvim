@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/about/page.tsx
-// Version: 0.9.17 — 2026-09-09
+// Version: 0.9.18 — 2026-10-07
 // Why: Static about page: what the app does, what it deliberately leaves out.
 // Env / Deps: Server component; shares SiteHeader/SiteFooter with the contact page.
 // ============================================================================
@@ -157,6 +157,13 @@ export default function AboutPage() {
               دیگر <strong className="font-medium text-ink">هیچ درخواستی به بیرون از این سایت نمی‌رود</strong>.
               قلم‌ها، آیکن‌ها و کل تقویم روی همین سرور میزبانی می‌شوند.
             </p>
+            {/* The rates are read server to server: worth saying, because a visitor seeing
+                Telegram's name might reasonably assume their browser goes there. */}
+            <p>
+              نرخ‌های زبانهٔ «نرخ ارز» را سرور ما روزی چند بار از یک کانال عمومی تلگرام می‌خواند
+              و همراه صفحه می‌فرستد؛ مرورگر تو به تلگرام وصل نمی‌شود و چیزی دربارهٔ تو به آن
+              کانال نمی‌رسد.
+            </p>
 
             <h3 className="pt-2 text-sm font-semibold text-ink">افزونهٔ کروم</h3>
             <p>
@@ -172,7 +179,7 @@ export default function AboutPage() {
               می‌دارد. ما از آن‌ها برای شناسایی یا ردیابی کسی استفاده نمی‌کنیم و چیزی به آن
               اضافه نکرده‌ایم.
             </p>
-            <p className="text-xs">آخرین به‌روزرسانی: ۱۸ شهریور ۱۴۰۵</p>
+            <p className="text-xs">آخرین به‌روزرسانی: ۱۵ مهر ۱۴۰۵</p>
           </div>
         </section>
 

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.43 — 2026-10-07
+// Version: 0.9.44 — 2026-10-07
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -1124,7 +1124,10 @@ test("the hero draws the day as an image, from what is actually on screen", asyn
 test("every tool says what it answers, in one line", async ({ page }) => {
   const tools = page.locator("#tools");
   const tabs = await page.getByRole("tab").all();
-  expect(tabs).toHaveLength(6);
+  // Seven when the server has rates to show, six when Telegram could not be read —
+  // the test server reads the real channel, so either is a correct page.
+  const names = await Promise.all(tabs.map(async (tab) => (await tab.textContent())?.trim()));
+  expect(tabs.length).toBe(names.includes("نرخ ارز") ? 7 : 6);
   const seen = new Set<string>();
   for (const tab of tabs) {
     await tab.click();
@@ -1134,7 +1137,7 @@ test("every tool says what it answers, in one line", async ({ page }) => {
     expect(description).not.toBe((await tab.textContent())?.trim());
     seen.add(description);
   }
-  expect(seen.size).toBe(6);
+  expect(seen.size).toBe(tabs.length);
 });
 
 test("the changelog opens short, with the rest one fold away", async ({ page }) => {

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.9.26 — 2026-09-10
+// Version: 0.9.27 — 2026-10-07
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and independent event/panel visibility.
 // Env / Deps: lib/view guards taghvim-view persistence and legacy migration.
@@ -16,6 +16,8 @@ import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/vi
 import { datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
 import { DEFAULT_CARD_STYLE, readCardStyle, saveCardStyle, type Background, type CardStyle } from "@/lib/card-style";
 import type { Person } from "@/lib/javidnaman";
+import type { RatesSnapshot } from "@/lib/rates";
+import { RatesTool } from "./rates-tool";
 import { TodayPanel } from "./today-panel";
 import { CalendarPanel } from "./calendar-panel";
 import { EventsPanel } from "./events-panel";
@@ -31,7 +33,7 @@ function BrandMark() {
   return <Image src="/icon.svg" width={40} height={40} alt="" unoptimized className="size-10 shrink-0" />;
 }
 
-export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: string; person: Person; backgrounds: Background[] }) {
+export function CalendarApp({ initialNow, person, backgrounds, rates }: { initialNow: string; person: Person; backgrounds: Background[]; rates: RatesSnapshot | null }) {
   const [now, setNow] = useState(new Date(initialNow));
   const [selected, setSelected] = useState(new Date(initialNow));
   const [view, setView] = useState(() => toCalendar(new Date(initialNow)));
@@ -147,7 +149,7 @@ export function CalendarApp({ initialNow, person, backgrounds }: { initialNow: s
           <CalendarPanel year={view.year} month={view.month} today={now} selected={selected} groups={preferences} memorial={preferences.memorial} onToggleView={toggleView} onSelect={select} onNavigate={navigate} onToday={today} onJump={(year, month) => { followingToday.current = false; setView({ year, month, day: 1 }); }} marked={dates.length > 0 ? (date) => datesOn(dates, date)[0]?.category : undefined} />
           <EventsPanel year={view.year} month={view.month} selected={selected} groups={preferences} onSelect={select} />
         </div>
-        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} dates={dates} datesReady={datesReady} onDatesChange={commitDates} />
+        <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences} dates={dates} datesReady={datesReady} onDatesChange={commitDates} rates={rates ? <RatesTool snapshot={rates} now={now} /> : undefined} />
         {/* The older month names rename two months; this panel says which two and why. */}
         {preferences.avestan && <MonthNamesPanel />}
         {/* Memorial visibility is independent; religious occasions also control prayer times. */}

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.14 — 2026-10-07
+// Version: 0.11.15 — 2026-10-07
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.44',
+    at: '2026-10-07T12:10:13-04:00',
+    status: 'ready',
+    title: 'نرخ ارز',
+    changes: [
+      { kind: 'added', text: 'زبانهٔ تازهٔ «نرخ ارز» در ابزارها: دلار، یورو، سکه، طلا، اونس و نفت در بازار آزاد، روزی پنج بار به‌روز، با تغییر هر کدام از نرخ قبلی.' },
+    ],
+  },
   {
     version: '0.9.43',
     at: '2026-10-07T09:17:44-04:00',

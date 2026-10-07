@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.40 — 2026-09-17
+// Version: 0.9.44 — 2026-10-07
 // Why: Loads the BUILT new-tab page — the same files the browser would load —
 //      from a throwaway static server with every other origin blocked, and
 //      reads the Tehran date off it. A build that needs the network, or that
@@ -105,6 +105,7 @@ test("a narrow window scrolls instead of clipping the month or the occasions", a
 test("carries the same tools box, with its own separate list of dates", async ({ page }) => {
   await page.goto(`${origin}/newtab.html`);
   const tabs = page.getByRole("tab");
+  // Six, not the site's seven: «نرخ ارز» is read over the network, and the extension makes no request
   await expect(tabs).toHaveCount(6);
   for (const name of ["تعطیلات پیوسته", "روزشمار", "تاریخ‌های من", "تبدیل تاریخ‌ها", "فاصلهٔ دو تاریخ", "محاسبهٔ سن"]) {
     await expect(page.getByRole("tab", { name })).toBeVisible();
