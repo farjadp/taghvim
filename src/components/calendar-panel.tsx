@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/calendar-panel.tsx
-// Version: 0.9.8 — 2026-09-08
+// Version: 0.9.9 — 2026-10-08
 // Why: Monthly Jalali grid, RTL keyboard navigation and interactive legend.
 //      Event groups and memorial visibility are controlled below the grid.
 // Env / Deps: Pure UI; lib/events filters grid events with the same groups as the list.
@@ -16,6 +16,7 @@ import { categoryOf, type CategoryId } from "@/lib/date-categories";
 import { categoryInk } from "@/lib/date-categories";
 
 const VIEW_SWITCHES = [
+  { key: "festival", label: "جشن‌ها" },
   { key: "religious", label: "مذهبی" },
   { key: "state", label: "دولتی" },
   { key: "world", label: "جهانی" },

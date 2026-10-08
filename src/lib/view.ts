@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/view.ts
-// Version: 0.10.0 — 2026-09-10
+// Version: 0.11.0 — 2026-10-08
 // Why: Persist independent event groups, memorial visibility and the Avestan
 //      month names, with safe legacy migration.
 // Env / Deps: Browser localStorage (taghvim-view; migrates taghvim-scope), guarded for SSR.
@@ -20,8 +20,9 @@ const LEGACY_KEY = 'taghvim-scope';
 const REQUIRED_FIELDS = ['religious', 'state', 'world', 'memorial'] as const;
 // Added later. A record written before them is COMPLETE, not corrupt — treating it
 // as corrupt would reset the event groups of everyone who ever set one, which is
-// what a strict key count did when `avestan` was added on 10 Sep.
-const OPTIONAL_FIELDS = ['avestan'] as const;
+// what a strict key count did when `avestan` was added on 10 Sep. `festival` (8 Oct)
+// is on by default, so every earlier record opens with the festivals shown.
+const OPTIONAL_FIELDS = ['avestan', 'festival'] as const;
 
 function isView(value: unknown): value is Partial<ViewPreferences> {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) return false;
@@ -51,7 +52,7 @@ export function readView(getStorage?: StorageGetter): ViewPreferences {
     if (scope === 'secular' || scope === 'all') {
       // Both old scopes showed world events and the memorial. Only state/religious differed.
       const migrated: ViewPreferences = {
-        religious: scope === 'all', state: scope === 'all', world: true, memorial: true, avestan: false,
+        festival: true, religious: scope === 'all', state: scope === 'all', world: true, memorial: true, avestan: false,
       };
       // Do not use saveView here: its swallowed write errors must never permit legacy deletion.
       storage.setItem(VIEW_KEY, JSON.stringify(migrated));

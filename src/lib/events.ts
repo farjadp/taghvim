@@ -1,13 +1,13 @@
 // ============================================================================
 // Source: src/lib/events.ts
-// Version: 0.14.0 — 2026-09-11
-// Why: Curated occasions: national, state, lunar religious, and world.
+// Version: 0.15.0 — 2026-10-08
+// Why: Curated occasions: national, ancient festivals, state, lunar religious, and world.
 //      Not the official calendar. Group filtering lives here so grid and list agree.
 // Env / Deps: Lunar holidays from src/data/official-lunar.json for 1400–1420,
 //      islamic-civil for every other year.
 // ============================================================================
 
-import { toCalendar } from './calendar';
+import { monthLength, toCalendar, weekdayIndex } from './calendar';
 import officialLunar from '../data/official-lunar.json';
 
 // 'iran'      — national and cultural occasions (Nowruz, poets, Yalda, professions)
@@ -19,9 +19,13 @@ import officialLunar from '../data/official-lunar.json';
 //               prefix, suffix or description: Farjad's call of 10 Sep, replacing the
 //               epithets of 9 Sep. Both are under test, so no row can bring back an
 //               epithet or either man's official honorific.
+// 'festival'  — the old Iranian festivals: the twelve days whose name matches their
+//               month's (مهرگان، آبانگان …), سده, چهارشنبه‌سوری, and Zoroaster's birth and
+//               death. Its own switch since 8 Oct, on by default. Nowruz, سیزده‌به‌در,
+//               تیرگان and یلدا stay in `iran`, which the .ics feed carries.
 // 'religious' — lunar religious holidays, computed via islamic-civil
 // 'world'     — international observances on the Gregorian calendar
-export type EventCategory = 'iran' | 'state' | 'religious' | 'world';
+export type EventCategory = 'iran' | 'festival' | 'state' | 'religious' | 'world';
 
 export type CalendarEvent = {
   title: string;
@@ -30,12 +34,12 @@ export type CalendarEvent = {
 };
 
 // National occasions always remain visible; the other groups are independent.
-export type EventGroups = { religious: boolean; state: boolean; world: boolean };
-export const DEFAULT_GROUPS: EventGroups = { religious: false, state: false, world: true };
-export const ALL_GROUPS: EventGroups = { religious: true, state: true, world: true };
+export type EventGroups = { festival: boolean; religious: boolean; state: boolean; world: boolean };
+export const DEFAULT_GROUPS: EventGroups = { festival: true, religious: false, state: false, world: true };
+export const ALL_GROUPS: EventGroups = { festival: true, religious: true, state: true, world: true };
 
 // Shown verbatim in the UI. Preserve it: the dataset is curated, not the official calendar.
-export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری برای سال‌های ۱۴۰۰ تا ۱۴۲۰ از فهرست تعطیلات رسمی ایران درج شده‌اند؛ برای سال‌هایی که تقویم رسمی‌شان هنوز منتشر نشده، این تاریخ‌ها پیش‌بینی‌اند و ممکن است با اعلام رسمی (مبتنی بر رؤیت هلال) یک روز تفاوت کنند. برای سال‌های دیگر با تقویم محاسباتی islamic-civil حساب شده‌اند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست.';
+export const EVENTS_NOTICE = 'این فهرست گزیده‌ای از مناسبت‌های ثابت ایرانی و جهانی است، نه تقویم کامل رسمی. تعطیلات مذهبی قمری برای سال‌های ۱۴۰۰ تا ۱۴۲۰ از فهرست تعطیلات رسمی ایران درج شده‌اند؛ برای سال‌هایی که تقویم رسمی‌شان هنوز منتشر نشده، این تاریخ‌ها پیش‌بینی‌اند و ممکن است با اعلام رسمی (مبتنی بر رؤیت هلال) یک روز تفاوت کنند. برای سال‌های دیگر با تقویم محاسباتی islamic-civil حساب شده‌اند. مناسبت‌ها بر اساس تکرار سالانهٔ تاریخ فعلی نمایش داده می‌شوند و وضعیت تاریخی سال‌های گذشته یا تغییرات آینده را تأیید نمی‌کنند. عنوان تعطیل فقط برای تعطیلات رسمی ایران ثبت شده است؛ مناسبت جهانی به معنی تعطیلی در ایران نیست. تاریخ برخی جشن‌های ایرانی، مانند مهرگان و سپندارمذگان، در منابع یکی نیست؛ این تقویم برای هر جشن یک تاریخ را نشان می‌دهد که در ایران رایج‌تر است.';
 
 // Citations for entries that were verified against a named source.
 export const EVENT_SOURCES = [
@@ -103,6 +107,45 @@ const PERSIAN_EVENTS: FixedEvents = {
   '12-25': [['روز بزرگداشت پروین اعتصامی']],
   '12-29': [['روز ملی شدن صنعت نفت ایران', true]],
 };
+
+// The old festivals, keyed on the Persian calendar. Most fall on the day whose old name
+// matches its month's — the 16th is «مهر», so مهرگان is 16 Mehr in al-Biruni — but the
+// modern calendar's 31-day months shifted those days, and Iranian sources disagree on
+// which to keep. These are the dates most commonly published in Iran, which follow the
+// old day number except for مهرگان, سپندارمذگان and Zoroaster's death, where the shifted
+// date won. EVENTS_NOTICE says so. Never a holiday. چهارشنبه‌سوری has no fixed date and
+// is computed in eventsForDate.
+const FESTIVAL_EVENTS: FixedEvents = {
+  '1-6': [['زادروز زرتشت']],
+  '1-19': [['جشن فروردینگان']],
+  '2-3': [['جشن اردیبهشتگان']],
+  '3-6': [['جشن خردادگان']],
+  '5-7': [['جشن امردادگان']],
+  '6-4': [['جشن شهریورگان']],
+  '7-10': [['جشن مهرگان']],
+  '8-10': [['جشن آبانگان']],
+  '9-9': [['جشن آذرگان']],
+  '10-1': [['جشن دیگان']],
+  '10-5': [['درگذشت زرتشت']],
+  '11-2': [['جشن بهمنگان']],
+  '11-10': [['جشن سده']],
+  '11-29': [['جشن سپندارمذگان']],
+};
+
+export const CHAHARSHANBE_SURI = 'چهارشنبه‌سوری';
+
+// True on the Tuesday whose evening is چهارشنبه‌سوری: the eve of the year's last
+// Wednesday. Not simply the last Tuesday — when the year ends on a Tuesday, its last
+// Wednesday is a week earlier, and so is the eve.
+function isChaharshanbeSuri(date: Date): boolean {
+  const persian = toCalendar(date);
+  if (persian.month !== 12 || weekdayIndex(date) !== 3) return false;
+  // Counted inside Esfand rather than with addDays, which refuses to step past 1600.
+  // The Wednesday must still be in Esfand (a Tuesday on the year's last day is followed
+  // by Nowruz), and the Wednesday after it must not be.
+  const length = monthLength(persian.year, 12);
+  return persian.day + 1 <= length && persian.day + 8 > length;
+}
 
 // Occasions tied to the Islamic Republic and its institutions. Hidden unless state is enabled.
 // Key format: `${persianMonth}-${persianDay}`
@@ -229,6 +272,10 @@ export function eventsForDate(date: Date, groups: EventGroups = ALL_GROUPS): Cal
   const gregorian = toCalendar(date, 'gregorian');
   const islamic = toCalendar(date, 'islamic');
   const iran = PERSIAN_EVENTS[`${persian.month}-${persian.day}`] ?? [];
+  const festival = [
+    ...(FESTIVAL_EVENTS[`${persian.month}-${persian.day}`] ?? []),
+    ...(isChaharshanbeSuri(date) ? [[CHAHARSHANBE_SURI] as const] : []),
+  ];
   const state = STATE_EVENTS[`${persian.month}-${persian.day}`] ?? [];
   const world = GREGORIAN_EVENTS[`${gregorian.month}-${gregorian.day}`] ?? [];
   // A year in the official table takes its lunar holidays from it alone; any other
@@ -236,10 +283,11 @@ export function eventsForDate(date: Date, groups: EventGroups = ALL_GROUPS): Cal
   const table = OFFICIAL_LUNAR[persian.year];
   const hijriKey = table ? table[`${persian.month}-${persian.day}`] : `${islamic.month}-${islamic.day}`;
   const religiousTitle = hijriKey ? LUNAR_HOLIDAYS[hijriKey] : undefined;
-  // Order matters for display: national first, then state, then religious, then world.
+  // Order matters for display: national first, then festivals, state, religious, world.
   // Hidden groups contribute no rows or holiday flags, keeping list and shading consistent.
   return [
     ...iran.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'iran' })),
+    ...(groups.festival ? festival.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'festival' })) : []),
     ...(groups.state ? state.map(([title, holiday = false]): CalendarEvent => ({ title, holiday, category: 'state' })) : []),
     ...(groups.religious && religiousTitle ? [{ title: religiousTitle, holiday: true, category: 'religious' as const }] : []),
     ...(groups.world ? world.map(([title]): CalendarEvent => ({ title, holiday: false, category: 'world' })) : []),

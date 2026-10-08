@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/events-panel.tsx
-// Version: 0.9.17 — 2026-09-09
+// Version: 0.9.18 — 2026-10-08
 // Why: Selected-day events and the month's event list with category chips.
 // Env / Deps: lib/events uses the grid's groups; only enabled category chips appear.
 // ============================================================================
@@ -17,6 +17,7 @@ import { Occasions } from "./occasions";
 const FILTERS = [
   { key: "all", label: "همه" },
   { key: "iran", label: "ایرانی" },
+  { key: "festival", label: "جشن‌ها" },
   { key: "world", label: "جهانی" },
   { key: "religious", label: "مذهبی" },
   { key: "state", label: "دولتی" },

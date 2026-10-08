@@ -91,7 +91,7 @@ class WidgetDataTest {
     @Test
     fun nowruzIsANationalHolidayUnderEveryGroupSetting() {
         val nowruz = PersianDate(1406, 1, 1)
-        val none = EventGroups(religious = false, state = false, world = false)
+        val none = EventGroups(religious = false, state = false, world = false, festival = false)
         assertTrue(file.isHoliday(nowruz, none))
         assertTrue(file.events(nowruz, none).all { it.category == EventCategory.IRAN })
     }
@@ -103,6 +103,15 @@ class WidgetDataTest {
         val on = EventGroups(religious = true, state = false, world = false)
         assertTrue(file.events(day, on).any { it.category == EventCategory.RELIGIOUS && !it.uncertain })
         assertFalse(file.events(day, EventGroups.DEFAULT).any { it.category == EventCategory.RELIGIOUS })
+    }
+
+    @Test
+    fun festivalsShowByDefaultAndFollowTheirSwitch() {
+        val mehrgan = PersianDate(1405, 7, 10)
+        assertTrue(file.events(mehrgan, EventGroups.DEFAULT).any { it.category == EventCategory.FESTIVAL && it.title == "جشن مهرگان" })
+        val off = EventGroups.DEFAULT.copy(festival = false)
+        assertFalse(file.events(mehrgan, off).any { it.category == EventCategory.FESTIVAL })
+        assertFalse(file.isHoliday(mehrgan, EventGroups.DEFAULT))
     }
 
     @Test

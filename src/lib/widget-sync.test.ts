@@ -22,7 +22,7 @@ describe('widget sync', () => {
     const setView = vi.fn(() => Promise.resolve());
     const view = { ...DEFAULT_VIEW, religious: true, avestan: true, memorial: false };
     syncWidgets(view, { Capacitor: { isNativePlatform: () => true, Plugins: { WidgetSync: { setView } } } });
-    expect(setView).toHaveBeenCalledWith({ religious: true, state: false, world: true, avestan: true });
+    expect(setView).toHaveBeenCalledWith({ festival: true, religious: true, state: false, world: true, avestan: true });
   });
 
   it('falls back to registerPlugin, and swallows a rejected call', async () => {

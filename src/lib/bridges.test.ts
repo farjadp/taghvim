@@ -12,7 +12,7 @@ import { ALL_GROUPS, DEFAULT_GROUPS, type EventGroups } from './events';
 import { BRIDGES_NOTICE, findBridges, nextBridge } from './bridges';
 
 const persian = (year: number, month: number, day: number) => fromCalendar({ year, month, day });
-const NO_GROUPS: EventGroups = { religious: false, state: false, world: false };
+const NO_GROUPS: EventGroups = { festival: false, religious: false, state: false, world: false };
 
 // The whole of one Persian year, the window the panel will ask for.
 const year = (value: number) => ({ from: persian(value, 1, 1), to: persian(value, 12, 29) });

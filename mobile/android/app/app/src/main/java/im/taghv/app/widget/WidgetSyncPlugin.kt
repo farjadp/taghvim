@@ -1,8 +1,8 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/widget/WidgetSyncPlugin.kt
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-08
 // Why: The one door from the page to the widgets. The page calls
-//      WidgetSync.setView({religious, state, world, avestan}) — src/lib/
+//      WidgetSync.setView({festival, religious, state, world, avestan}) — src/lib/
 //      widget-sync.ts — and the widgets redraw with the same groups and month
 //      names the calendar on screen uses. Nothing else crosses: not the
 //      memorial switch, not personal dates. A missing field keeps the default.
@@ -27,6 +27,7 @@ class WidgetSyncPlugin : Plugin() {
                 religious = call.getBoolean("religious", d.groups.religious) ?: d.groups.religious,
                 state = call.getBoolean("state", d.groups.state) ?: d.groups.state,
                 world = call.getBoolean("world", d.groups.world) ?: d.groups.world,
+                festival = call.getBoolean("festival", d.groups.festival) ?: d.groups.festival,
             ),
             older = call.getBoolean("avestan", d.older) ?: d.older,
         )

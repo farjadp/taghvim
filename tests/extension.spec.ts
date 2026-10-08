@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.44 — 2026-10-07
+// Version: 0.9.45 — 2026-10-08
 // Why: Loads the BUILT new-tab page — the same files the browser would load —
 //      from a throwaway static server with every other origin blocked, and
 //      reads the Tehran date off it. A build that needs the network, or that
@@ -160,8 +160,8 @@ test("paints the Tehran date from its own files with every other origin blocked"
   await page.goto(`${origin}/newtab.html`);
   await expect(page.getByRole("heading", { level: 1 })).toHaveText("۱۵ شهریور ۱۴۰۵");
   await expect(page.getByRole("region", { name: "تقویم ماهانه" })).toBeVisible();
-  // Three switches: the memorial is not rendered here, so its switch is not either
-  await expect(page.getByTestId("view-controls").getByRole("switch")).toHaveCount(3);
+  // Four switches: the memorial is not rendered here, so its switch is not either
+  await expect(page.getByTestId("view-controls").getByRole("switch")).toHaveCount(4);
   expect(foreign, "the page reached outside its own origin").toEqual([]);
 
   // The FIRST SCREEN must still hold everything a new tab is for, at a common laptop

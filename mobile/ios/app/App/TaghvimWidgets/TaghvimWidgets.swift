@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/app/App/TaghvimWidgets/TaghvimWidgets.swift
-// Version: 0.1.0 — 2026-09-11
+// Version: 0.1.1 — 2026-10-08
 // Why: The iPhone widgets. Two, as picked on 10 Sep: small B on the home screen
 //      and C on the lock screen (rectangular, plus the one-line inline form).
 //      The timeline carries one entry now and one a second past each of the
@@ -32,7 +32,7 @@ enum WidgetStore {
         let d = EventGroups.default
         guard let defaults else { return d }
         func flag(_ key: String, _ fallback: Bool) -> Bool { defaults.object(forKey: key) as? Bool ?? fallback }
-        return EventGroups(religious: flag("religious", d.religious), state: flag("state", d.state), world: flag("world", d.world))
+        return EventGroups(religious: flag("religious", d.religious), state: flag("state", d.state), world: flag("world", d.world), festival: flag("festival", d.festival))
     }
 
     static var older: Bool { defaults?.bool(forKey: "avestan") ?? false }

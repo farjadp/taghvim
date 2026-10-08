@@ -24,9 +24,9 @@ import {
 const shared = (name: string) => JSON.parse(readFileSync(join(process.cwd(), 'mobile/shared', name), 'utf8'));
 const data = buildWidgetData();
 
-const COMBINATIONS: EventGroups[] = [false, true].flatMap((religious) =>
-  [false, true].flatMap((state) => [false, true].map((world) => ({ religious, state, world }))),
-);
+const COMBINATIONS: EventGroups[] = [false, true].flatMap((festival) => [false, true].flatMap((religious) =>
+  [false, true].flatMap((state) => [false, true].map((world) => ({ festival, religious, state, world }))),
+));
 
 describe('widget data', () => {
   it('is committed exactly as the code would write it — run npm run build:widget-data', () => {

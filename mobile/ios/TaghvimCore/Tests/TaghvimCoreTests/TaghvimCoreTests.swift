@@ -145,7 +145,7 @@ final class WidgetDataTests: XCTestCase {
 
     func testNowruzIsANationalHolidayUnderEveryGroupSetting() {
         let nowruz = PersianDate(year: 1406, month: 1, day: 1)
-        let none = EventGroups(religious: false, state: false, world: false)
+        let none = EventGroups(religious: false, state: false, world: false, festival: false)
         XCTAssertTrue(file.isHoliday(on: nowruz, groups: none))
         XCTAssertTrue(file.events(on: nowruz, groups: none).allSatisfy { $0.category == .iran })
     }
@@ -156,6 +156,15 @@ final class WidgetDataTests: XCTestCase {
         let on = EventGroups(religious: true, state: false, world: false)
         XCTAssertTrue(file.events(on: day, groups: on).contains { $0.category == .religious && !$0.uncertain })
         XCTAssertFalse(file.events(on: day, groups: .default).contains { $0.category == .religious })
+    }
+
+    func testFestivalsShowByDefaultAndFollowTheirSwitch() {
+        let mehrgan = PersianDate(year: 1405, month: 7, day: 10)
+        XCTAssertTrue(file.events(on: mehrgan, groups: .default).contains { $0.category == .festival && $0.title == "جشن مهرگان" })
+        var off = EventGroups.default
+        off.festival = false
+        XCTAssertFalse(file.events(on: mehrgan, groups: off).contains { $0.category == .festival })
+        XCTAssertFalse(file.isHoliday(on: mehrgan, groups: .default))
     }
 
     func testTheFileNamesItsWindow() {

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/core/src/main/kotlin/im/taghv/core/WidgetData.kt
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-08
 // Why: Reads mobile/shared/widget-data.json and answers «what does this day
 //      carry, for these groups». The filter is the one src/lib/widget-data.ts
 //      names as the reference: `iran` always, the rest by their switch, and a
@@ -15,7 +15,7 @@ package im.taghv.core
 import org.json.JSONArray
 import org.json.JSONObject
 
-enum class EventCategory { IRAN, STATE, RELIGIOUS, WORLD }
+enum class EventCategory { IRAN, FESTIVAL, STATE, RELIGIOUS, WORLD }
 
 data class WidgetEvent(
     val title: String,
@@ -25,16 +25,19 @@ data class WidgetEvent(
     val uncertain: Boolean,
 )
 
-data class EventGroups(val religious: Boolean, val state: Boolean, val world: Boolean) {
+// `festival` came last (8 Oct) and defaults on, as on the site, so a call that predates it
+// keeps compiling and shows the festivals.
+data class EventGroups(val religious: Boolean, val state: Boolean, val world: Boolean, val festival: Boolean = true) {
     fun shows(category: EventCategory): Boolean = when (category) {
         EventCategory.IRAN -> true
+        EventCategory.FESTIVAL -> festival
         EventCategory.STATE -> state
         EventCategory.RELIGIOUS -> religious
         EventCategory.WORLD -> world
     }
 
     companion object {
-        /** The site's default, «پیش‌فرض ایران عزیز»: religious and state off, world on. */
+        /** The site's default, «پیش‌فرض ایران عزیز»: religious and state off, world and festivals on. */
         val DEFAULT = EventGroups(religious = false, state = false, world = true)
     }
 }

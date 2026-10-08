@@ -10,8 +10,8 @@ import { describe, expect, it } from 'vitest';
 import { addDays, fromCalendar, monthLength } from './calendar';
 import { ALL_GROUPS, DEFAULT_GROUPS, EVENTS_NOTICE, OFFICIAL_LUNAR_YEARS, eventsForDate, hasOfficialLunarDate, type EventGroups } from './events';
 
-const combinations: EventGroups[] = Array.from({ length: 8 }, (_, mask) => ({
-  religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4),
+const combinations: EventGroups[] = Array.from({ length: 16 }, (_, mask) => ({
+  religious: Boolean(mask & 1), state: Boolean(mask & 2), world: Boolean(mask & 4), festival: Boolean(mask & 8),
 }));
 
 const persian = (month: number, day: number) => fromCalendar({ year: 1404, month, day });
@@ -82,8 +82,8 @@ describe('selected calendar events', () => {
   });
 
   it('exports app defaults while leaving the library default inclusive', () => {
-    expect(DEFAULT_GROUPS).toEqual({ religious: false, state: false, world: true });
-    expect(ALL_GROUPS).toEqual({ religious: true, state: true, world: true });
+    expect(DEFAULT_GROUPS).toEqual({ festival: true, religious: false, state: false, world: true });
+    expect(ALL_GROUPS).toEqual({ festival: true, religious: true, state: true, world: true });
     expect(eventsForDate(persian(11, 22))).toEqual(eventsForDate(persian(11, 22), ALL_GROUPS));
   });
 
@@ -252,5 +252,55 @@ describe('selected calendar events', () => {
     expect(dey16).toContainEqual(expect.objectContaining({
       title: expect.stringContaining('مبعث'), holiday: true, category: 'religious',
     }));
+  });
+});
+
+// The old festivals, Farjad's call of 8 Oct: their own switch, on by default, one date
+// each, never a holiday.
+describe('festivals', () => {
+  const festivals: [month: number, day: number, title: string][] = [
+    [1, 6, 'زادروز زرتشت'], [1, 19, 'جشن فروردینگان'], [2, 3, 'جشن اردیبهشتگان'],
+    [3, 6, 'جشن خردادگان'], [5, 7, 'جشن امردادگان'], [6, 4, 'جشن شهریورگان'],
+    [7, 10, 'جشن مهرگان'], [8, 10, 'جشن آبانگان'], [9, 9, 'جشن آذرگان'],
+    [10, 1, 'جشن دیگان'], [10, 5, 'درگذشت زرتشت'], [11, 2, 'جشن بهمنگان'],
+    [11, 10, 'جشن سده'], [11, 29, 'جشن سپندارمذگان'],
+  ];
+
+  it.each(festivals)('puts %i/%i «%s» in the festival group, shown by default and never a holiday', (month, day, title) => {
+    const date = fromCalendar({ year: 1405, month, day });
+    expect(eventsForDate(date, DEFAULT_GROUPS)).toContainEqual({ title, holiday: false, category: 'festival' });
+    expect(eventsForDate(date, { ...ALL_GROUPS, festival: false }).some((event) => event.category === 'festival')).toBe(false);
+  });
+
+  it('lists each festival on exactly one day of the year', () => {
+    const seen = new Map<string, number>();
+    for (let date = fromCalendar({ year: 1405, month: 1, day: 1 }); date < fromCalendar({ year: 1406, month: 1, day: 1 }); date = addDays(date, 1)) {
+      for (const event of eventsForDate(date, DEFAULT_GROUPS)) {
+        if (event.category === 'festival') seen.set(event.title, (seen.get(event.title) ?? 0) + 1);
+      }
+    }
+    expect([...seen.values()].every((count) => count === 1)).toBe(true);
+    expect(seen.size).toBe(festivals.length + 1);
+  });
+
+  // The eve of the year's last Wednesday, on the Tuesday it begins. Walked over the
+  // whole supported range: once a year, and Esfand 1600 must not throw.
+  it('marks چهارشنبه‌سوری once a year, on the Tuesday before the last Wednesday of Esfand', () => {
+    for (let year = 1200; year <= 1600; year += 1) {
+      const length = monthLength(year, 12);
+      const days = Array.from({ length }, (_, i) => i + 1).filter((day) =>
+        eventsForDate(fromCalendar({ year, month: 12, day }), DEFAULT_GROUPS).some((event) => event.title === 'چهارشنبه‌سوری'));
+      expect(days).toHaveLength(1);
+      const [day] = days;
+      const tuesday = fromCalendar({ year, month: 12, day });
+      expect(new Intl.DateTimeFormat('en-US', { weekday: 'long', timeZone: 'Asia/Tehran' }).format(tuesday)).toBe('Tuesday');
+      expect(day + 1).toBeLessThanOrEqual(length);
+      expect(day + 8).toBeGreaterThan(length);
+    }
+  });
+
+  it('dates چهارشنبه‌سوری 1405 to the evening of Tuesday 25 Esfand', () => {
+    expect(eventsForDate(fromCalendar({ year: 1405, month: 12, day: 25 }), DEFAULT_GROUPS))
+      .toContainEqual({ title: 'چهارشنبه‌سوری', holiday: false, category: 'festival' });
   });
 });

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.44 — 2026-10-07
+// Version: 0.9.45 — 2026-10-08
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -122,6 +122,20 @@ test("world switch removes events and its active list filter", async ({ page }) 
   await expect(page.getByRole("switch", { name: "جهانی", exact: true })).toHaveAttribute("aria-checked", "false");
 });
 
+test("festival switch is on by default and removes the festivals and their filter", async ({ page }) => {
+  const list = page.locator("aside");
+  await expect(page.getByRole("switch", { name: "جشن‌ها", exact: true })).toHaveAttribute("aria-checked", "true");
+  await page.getByRole("button", { name: "۴ شهریور ۱۴۰۵", exact: true }).click();
+  await expect(page.getByTestId("selected-events")).toContainText("جشن شهریورگان");
+  await list.getByRole("button", { name: "جشن‌ها", exact: true }).click();
+  await expect(list).toContainText("جشن شهریورگان");
+  await page.getByRole("switch", { name: "جشن‌ها", exact: true }).click();
+  await expect(page.getByTestId("selected-events")).not.toContainText("جشن شهریورگان");
+  await expect(list.getByRole("button", { name: "جشن‌ها", exact: true })).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("switch", { name: "جشن‌ها", exact: true })).toHaveAttribute("aria-checked", "false");
+});
+
 for (const legacy of ["secular", "all"]) {
   test(`migrates legacy ${legacy} preference on first read`, async ({ page }) => {
     await page.evaluate((value) => {
@@ -133,7 +147,7 @@ for (const legacy of ["secular", "all"]) {
     await expect(page.getByRole("switch", { name: "دولتی", exact: true })).toHaveAttribute("aria-checked", String(legacy === "all"));
     expect(await page.evaluate(() => localStorage.getItem("taghvim-scope"))).toBeNull();
     expect(await page.evaluate(() => JSON.parse(localStorage.getItem("taghvim-view")!))).toEqual({
-      religious: legacy === "all", state: legacy === "all", world: true, memorial: true, avestan: false,
+      festival: true, religious: legacy === "all", state: legacy === "all", world: true, memorial: true, avestan: false,
     });
   });
 }
@@ -564,7 +578,7 @@ test("legend controls fit the card and remain keyboard accessible", async ({ pag
   const calendar = page.getByRole("region", { name: "تقویم ماهانه" });
   const controls = page.getByTestId("view-controls");
   const legend = page.getByTestId("calendar-legend");
-  await expect(controls.getByRole("switch")).toHaveCount(4);
+  await expect(controls.getByRole("switch")).toHaveCount(5);
   const sizes = await calendar.evaluate((card) => {
     const block = card.querySelector<HTMLElement>('[data-testid="calendar-legend"]')!;
     const row = block.querySelector<HTMLElement>('[data-testid="view-controls"]')!;

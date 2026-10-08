@@ -71,8 +71,8 @@ function dateStamp(date: Date): string {
 
 export type FeedEvent = { date: Date; title: string; holiday: boolean; persian: { year: number; month: number; day: number } };
 
-// Every 'iran' occasion in the window, in date order. State, religious and
-// world categories are excluded: the first two are a product decision, and the
+// Every 'iran' occasion in the window, in date order. Festival, state, religious and
+// world categories are excluded (festivals: this feed's subscribers never asked for them): the first two are a product decision, and the
 // religious ones are the dates this project cannot yet promise.
 export function feedEvents(today: Date, yearsBehind = YEARS_BEHIND, yearsAhead = YEARS_AHEAD): FeedEvent[] {
   const current = toCalendar(today).year;
@@ -81,7 +81,7 @@ export function feedEvents(today: Date, yearsBehind = YEARS_BEHIND, yearsAhead =
     for (let month = 1; month <= 12; month += 1) {
       for (let day = 1; day <= monthLength(year, month); day += 1) {
         const date = fromCalendar({ year, month, day });
-        for (const event of eventsForDate(date, { religious: false, state: false, world: false })) {
+        for (const event of eventsForDate(date, { festival: false, religious: false, state: false, world: false })) {
           events.push({ date, title: event.title, holiday: event.holiday, persian: { year, month, day } });
         }
       }

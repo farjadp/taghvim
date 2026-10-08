@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/TaghvimCore/Sources/TaghvimCore/WidgetData.swift
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-08
 // Why: Reads mobile/shared/widget-data.json and answers «what does this day
 //      carry, for these groups». The filter is the one src/lib/widget-data.ts
 //      names as the reference: `iran` always, the rest by their switch, and a
@@ -12,7 +12,7 @@
 import Foundation
 
 public enum EventCategory: String, Decodable, Sendable {
-    case iran, state, religious, world
+    case iran, festival, state, religious, world
 }
 
 public struct WidgetEvent: Decodable, Equatable, Sendable {
@@ -36,19 +36,23 @@ public struct EventGroups: Equatable, Sendable {
     public var religious: Bool
     public var state: Bool
     public var world: Bool
+    /// Added 8 Oct; on by default, as on the site.
+    public var festival: Bool
 
-    /// The site's default, «پیش‌فرض ایران عزیز»: religious and state off, world on.
-    public static let `default` = EventGroups(religious: false, state: false, world: true)
+    /// The site's default, «پیش‌فرض ایران عزیز»: religious and state off, world and festivals on.
+    public static let `default` = EventGroups(religious: false, state: false, world: true, festival: true)
 
-    public init(religious: Bool, state: Bool, world: Bool) {
+    public init(religious: Bool, state: Bool, world: Bool, festival: Bool = true) {
         self.religious = religious
         self.state = state
         self.world = world
+        self.festival = festival
     }
 
     func shows(_ category: EventCategory) -> Bool {
         switch category {
         case .iran: return true
+        case .festival: return festival
         case .state: return state
         case .religious: return religious
         case .world: return world

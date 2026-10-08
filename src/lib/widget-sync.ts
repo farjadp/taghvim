@@ -1,7 +1,7 @@
 // ============================================================================
 // Source: src/lib/widget-sync.ts
-// Version: 0.1.0 — 2026-09-10
-// Why: Hands the home-screen widgets the visitor's view — the three event
+// Version: 0.2.0 — 2026-10-08
+// Why: Hands the home-screen widgets the visitor's view — the four event
 //      groups and the older month names — so a widget shows what the calendar
 //      on screen shows. Only inside the Android app: there the native side
 //      injects `window.Capacitor` and registers the WidgetSync plugin
@@ -16,7 +16,7 @@
 
 import type { ViewPreferences } from './view';
 
-export type WidgetView = Pick<ViewPreferences, 'religious' | 'state' | 'world' | 'avestan'>;
+export type WidgetView = Pick<ViewPreferences, 'festival' | 'religious' | 'state' | 'world' | 'avestan'>;
 
 type WidgetSync = { setView(view: WidgetView): Promise<unknown> };
 type Bridge = {
@@ -30,7 +30,7 @@ export function syncWidgets(view: ViewPreferences, host: unknown = globalThis): 
   if (!capacitor?.isNativePlatform?.()) return;
   const plugin = capacitor.Plugins?.WidgetSync ?? capacitor.registerPlugin?.('WidgetSync');
   if (!plugin) return;
-  const { religious, state, world, avestan } = view;
+  const { festival, religious, state, world, avestan } = view;
   // A failure here must not disturb the page; the widget keeps its last copy.
-  plugin.setView({ religious, state, world, avestan }).catch(() => undefined);
+  plugin.setView({ festival, religious, state, world, avestan }).catch(() => undefined);
 }
