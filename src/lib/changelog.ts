@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.16 — 2026-10-08
+// Version: 0.11.17 — 2026-10-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.46',
+    at: '2026-10-09T10:30:42-04:00',
+    status: 'ready',
+    title: 'بی‌زوم روی گوشی',
+    changes: [
+      { kind: 'fixed', text: 'روی آیفون، نوشتن در تبدیل تاریخ صفحه را بزرگ می‌کرد و برنمی‌گشت؛ حالا نه.' },
+      { kind: 'fixed', text: 'دو ضربهٔ پشت سر هم دیگر صفحه را بزرگ نمی‌کند؛ بزرگ کردن با دو انگشت سر جایش است.' },
+    ],
+  },
   {
     version: '0.9.45',
     at: '2026-10-08T14:14:06-04:00',

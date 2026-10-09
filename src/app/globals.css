@@ -1,6 +1,6 @@
 /* ============================================================================
    Source: src/app/globals.css
-   Version: 0.9.38 — 2026-09-11
+   Version: 0.9.39 — 2026-10-09
    Why: Visual system: colour tokens, the accent palettes, the hero motif switch, the five font faces,
         base element styles.
    Env / Deps: Tailwind v4 via @import; tokens exposed as utilities through @theme.
@@ -295,7 +295,10 @@
 }
 
 @layer base {
-  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  /* manipulation keeps pinch-zoom and scrolling but drops the double-tap zoom, which
+     zoomed the whole iPhone app on a quick second tap (reported on X, 8 Oct). The
+     value is intersected down the tree, so setting it here covers every element. */
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; touch-action: manipulation; }
   body { @apply bg-paper font-sans text-ink antialiased; }
   button, a, input, select { -webkit-tap-highlight-color: transparent; }
   button:not(:disabled), select { cursor: pointer; }
@@ -317,6 +320,16 @@
 @utility scrollbar-hidden {
   scrollbar-width: none;
   &::-webkit-scrollbar { display: none; }
+}
+
+/* iOS zooms the page into any field whose text is under 16px and does not zoom back,
+   so typing a date in the converter left the page magnified and scrolling sideways
+   (reported on X, 8 Oct). On a touch screen every field is at least 16px — in px on
+   purpose: the threshold is iOS's, and at the small text setting 1rem is only 14px.
+   Unlayered, so it outranks the text-xs / text-sm utilities on the fields themselves.
+   Never fix this with maximum-scale: that takes zoom away from people who need it. */
+@media (any-pointer: coarse) {
+  input, select, textarea { font-size: max(16px, 1rem); }
 }
 
 @media (prefers-reduced-motion: reduce) {

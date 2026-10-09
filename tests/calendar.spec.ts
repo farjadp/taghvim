@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.45 — 2026-10-08
+// Version: 0.9.46 — 2026-10-09
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -683,6 +683,28 @@ test("every page links the manifest and the apple touch icon", async ({ page }) 
 
 // The month grid used to start at 942px on a 664px-tall phone screen, so the page
 // people open to see a calendar opened on everything except the calendar.
+// iOS zooms into a field under 16px and stays zoomed; a double tap zoomed the whole app.
+// Both reported on X on 8 Oct. Measured on every form field a phone can reach, at the
+// small text setting too, where 1rem is only 14px.
+test("phone fields never trigger the iOS input zoom, and double-tap zoom is off", async ({ page }, testInfo) => {
+  test.skip(testInfo.project.name !== "mobile", "touch screens only");
+  for (const size of ["md", "sm"]) {
+    await page.evaluate((value) => localStorage.setItem("taghvim-size", value), size);
+    for (const tool of ["convert", "dates", "distance", "age"]) {
+      // A hash-only change is not a load; reload so the boot script reads the size.
+      await page.goto(`/#${tool}`);
+      await page.reload();
+      await expect(page.locator("#tools")).toBeVisible();
+      if (size === "sm") await expect(page.locator("html")).toHaveAttribute("data-size", "sm");
+      const smallest = await page.evaluate(() => Math.min(...Array.from(document.querySelectorAll("input, select, textarea"))
+        .map((field) => parseFloat(getComputedStyle(field).fontSize))));
+      expect(smallest, `${tool} at ${size}`).toBeGreaterThanOrEqual(16);
+    }
+  }
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).touchAction)).toBe("manipulation");
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth)).toBeLessThanOrEqual(0);
+});
+
 test("puts the month grid first on phones and leaves the desktop order alone", async ({ page }, testInfo) => {
   const mobile = testInfo.project.name === "mobile";
   if (!mobile) await page.setViewportSize({ width: 1280, height: 900 });
