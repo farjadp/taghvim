@@ -1,8 +1,9 @@
 // ============================================================================
 // Source: mobile/ios/app/App/TaghvimWidgets/TaghvimWidgets.swift
-// Version: 0.1.1 — 2026-10-08
-// Why: The iPhone widgets. Two, as picked on 10 Sep: small B on the home screen
-//      and C on the lock screen (rectangular, plus the one-line inline form).
+// Version: 0.2.0 — 2026-10-09
+// Why: The iPhone widgets, as picked on 10 Sep: small B and wide B on the home
+//      screen (wide since 9 Oct, matching Android) and C on the lock screen
+//      (rectangular, plus the one-line inline form).
 //      The timeline carries one entry now and one a second past each of the
 //      next seven Tehran midnights — WidgetKit's documented way for a widget
 //      whose reload points are known — then asks for a new one. The day is the
@@ -80,6 +81,19 @@ struct SmallWidget: Widget {
     }
 }
 
+struct MediumWidget: Widget {
+    var body: some WidgetConfiguration {
+        StaticConfiguration(kind: "TaghvimMedium", provider: DayProvider()) { entry in
+            MediumView(day: entry.day)
+        }
+        .configurationDisplayName("تقویم — پهن")
+        .description("روز و ماه، روز هفته و مناسبت امروز")
+        .supportedFamilies([.systemMedium])
+        // The block runs to the card's edge, as on Android; iOS 17 would inset it.
+        .contentMarginsDisabled()
+    }
+}
+
 struct LockWidget: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: "TaghvimLock", provider: DayProvider()) { entry in
@@ -95,6 +109,7 @@ struct LockWidget: Widget {
 struct TaghvimWidgets: WidgetBundle {
     var body: some Widget {
         SmallWidget()
+        MediumWidget()
         LockWidget()
     }
 }
