@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.46',
     at: '2026-10-09T10:30:42-04:00',
-    status: 'ready',
+    status: 'live',
     title: 'بی‌زوم روی گوشی',
     changes: [
       { kind: 'fixed', text: 'روی آیفون، نوشتن در تبدیل تاریخ صفحه را بزرگ می‌کرد و برنمی‌گشت؛ حالا نه.' },
