@@ -11,4 +11,6 @@
     <color name="widget_forest">#214f40</color> <!-- forest -->
     <color name="widget_clay">#a9503b</color> <!-- clay -->
     <color name="widget_paper">#f7f8f4</color> <!-- paper: text on the forest/clay block -->
+    <color name="widget_line">#e6eae3</color> <!-- line: the month widget's divider -->
+    <color name="widget_faint">#665c6a61</color> <!-- muted at 40%: the neighbouring months' days -->
 </resources>

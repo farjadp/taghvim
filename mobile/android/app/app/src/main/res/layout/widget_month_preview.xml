@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/layout/widget_month_preview.xml — what the widget picker shows:
+  Farvardin 1406 with Nowruz as today, drawn statically because the real grid
+  is built at run time. Written by a one-off script on 10 Oct; if the month
+  layout changes, change this with it.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/widget_bg"
+    android:layoutDirection="rtl"
+    android:orientation="vertical"
+    android:paddingHorizontal="6dp"
+    android:paddingTop="10dp"
+    android:paddingBottom="6dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="6dp"
+        android:paddingBottom="2dp">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="فروردین"
+            android:textColor="@color/widget_ink"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="4dp"
+            android:singleLine="true"
+            android:text="۱۴۰۶"
+            android:textColor="@color/widget_muted"
+            android:textSize="15sp" />
+
+        <!-- A spacer; plain View is not allowed in a widget, FrameLayout is. -->
+        <FrameLayout
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <TextView
+            android:id="@+id/weekday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:singleLine="true"
+            android:text="یکشنبه"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="ش"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="ی"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="د"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="س"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="چ"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="پ"
+            android:textColor="@color/widget_muted"
+            android:textSize="11sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="ج"
+            android:textColor="@color/widget_clay"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۹"
+                android:textColor="@color/widget_faint" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:background="@drawable/widget_today"
+                android:text="۱"
+                android:textColor="@color/widget_paper" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۳"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۴"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۵"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۶"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۷"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۸"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۹"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۰"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۱"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۲"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۳"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۴"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۵"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۶"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۷"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۸"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱۹"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۰"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۱"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۲"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۳"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۴"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۵"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۶"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۷"
+                android:textColor="@color/widget_clay" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:orientation="horizontal">
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۸"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲۹"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۳۰"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۳۱"
+                android:textColor="@color/widget_ink" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۱"
+                android:textColor="@color/widget_faint" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۲"
+                android:textColor="@color/widget_faint" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+
+        <FrameLayout style="@style/WidgetMonthCell">
+            <TextView
+                style="@style/WidgetMonthDay"
+                android:text="۳"
+                android:textColor="@color/widget_faint" />
+            <ImageView style="@style/WidgetMonthDot" />
+        </FrameLayout>
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

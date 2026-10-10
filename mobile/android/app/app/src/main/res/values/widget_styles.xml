@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/values/widget_styles.xml — the month widget's repeated cell, numeral and dot, so its 42 cells are not 42 copies of the same attributes. -->
+<resources>
+    <!-- A FrameLayout, so the dot can sit at the numeral's corner instead of under it:
+         a 4×2 widget gives each row about 23dp, and a dot below a 22dp numeral ran
+         into the next row on the emulator (10 Oct). -->
+    <style name="WidgetMonthCell">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <!-- 20dp square so today's disc is round; the text never needs more. -->
+    <style name="WidgetMonthDay">
+        <item name="android:layout_width">20dp</item>
+        <item name="android:layout_height">20dp</item>
+        <item name="android:layout_gravity">center</item>
+        <item name="android:gravity">center</item>
+        <item name="android:includeFontPadding">false</item>
+        <item name="android:textColor">@color/widget_ink</item>
+        <item name="android:textSize">12sp</item>
+    </style>
+
+    <style name="WidgetMonthDot">
+        <item name="android:layout_width">4dp</item>
+        <item name="android:layout_height">4dp</item>
+        <!-- Centred, then pushed to the numeral's upper end corner: in a FrameLayout a
+             centred child moves by its margins, and in RTL «start» is the right. -->
+        <item name="android:layout_gravity">center</item>
+        <item name="android:layout_marginStart">10dp</item>
+        <item name="android:layout_marginBottom">8dp</item>
+        <item name="android:src">@drawable/widget_dot_muted</item>
+        <item name="android:visibility">invisible</item>
+    </style>
+</resources>

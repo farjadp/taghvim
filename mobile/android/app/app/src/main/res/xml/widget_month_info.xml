@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/xml/widget_month_info.xml — four cells by two; make it a row taller and the month's next occasions appear under the grid (WidgetViews.month). -->
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:description="@string/widget_month_description"
+    android:initialLayout="@layout/widget_loading"
+    android:minHeight="110dp"
+    android:minResizeHeight="110dp"
+    android:minResizeWidth="220dp"
+    android:minWidth="250dp"
+    android:previewLayout="@layout/widget_month_preview"
+    android:resizeMode="horizontal|vertical"
+    android:targetCellHeight="2"
+    android:targetCellWidth="4"
+    android:updatePeriodMillis="3600000"
+    android:widgetCategory="home_screen" />

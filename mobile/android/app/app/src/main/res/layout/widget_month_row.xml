@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: res/layout/widget_month_row.xml — one week of the month widget, added
+  to the grid once per row by WidgetViews.month. Seven cells, each a numeral
+  (d0…d6) with an occasion dot (o0…o6) at its corner; cell 6 is Friday, the layout being RTL.
+  Weight 1 in a vertical parent, so five or six rows share the height evenly.
+-->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="0dp"
+    android:layout_weight="1"
+    android:layoutDirection="rtl"
+    android:orientation="horizontal">
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d0" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o0" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d1" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o1" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d2" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o2" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d3" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o3" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d4" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o4" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d5" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o5" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+
+    <FrameLayout style="@style/WidgetMonthCell">
+        <TextView android:id="@+id/d6" style="@style/WidgetMonthDay" />
+        <ImageView android:id="@+id/o6" style="@style/WidgetMonthDot" />
+    </FrameLayout>
+</LinearLayout>

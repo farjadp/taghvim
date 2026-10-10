@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/drawable/widget_today.xml — today's disc in the month widget: forest, with paper text, as the site's grid marks today. -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android" android:shape="oval">
+    <solid android:color="@color/widget_forest" />
+</shape>

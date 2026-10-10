@@ -1,7 +1,8 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/widget/Widgets.kt
-// Version: 0.1.0 — 2026-09-10
-// Why: The two widget providers and the receiver that turns their day.
+// Version: 0.2.0 — 2026-10-10
+// Why: The three widget providers (small, wide, and the month since 10 Oct)
+//      and the receiver that turns their day.
 //      Midnight: Android has no «the date changed» broadcast a manifest
 //      receiver can rely on (DATE_CHANGED is not exempt), so each update
 //      schedules an alarm one second past the next Tehran midnight with
@@ -29,27 +30,30 @@ import im.taghv.core.Today
 import java.time.Instant
 
 abstract class TaghvimWidget : AppWidgetProvider() {
-    protected abstract fun render(context: Context, day: WidgetDay, options: Bundle?): RemoteViews
+    /** Lays out the widget for this instant; each kind reads only what it prints. */
+    protected abstract fun render(context: Context, now: Instant, settings: WidgetSettings, options: Bundle?): RemoteViews
 
     override fun onUpdate(context: Context, manager: AppWidgetManager, ids: IntArray) {
         val settings = WidgetSettings.read(context)
-        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context), settings.groups, settings.older)
-        for (id in ids) manager.updateAppWidget(id, render(context, day, manager.getAppWidgetOptions(id)))
+        val now = Instant.now()
+        for (id in ids) manager.updateAppWidget(id, render(context, now, settings, manager.getAppWidgetOptions(id)))
         DayTurnReceiver.schedule(context)
     }
 
     override fun onAppWidgetOptionsChanged(context: Context, manager: AppWidgetManager, id: Int, options: Bundle) {
-        val settings = WidgetSettings.read(context)
-        val day = WidgetDays.at(Instant.now(), WidgetDataStore.get(context), settings.groups, settings.older)
-        manager.updateAppWidget(id, render(context, day, options))
+        manager.updateAppWidget(id, render(context, Instant.now(), WidgetSettings.read(context), options))
     }
 
     override fun onEnabled(context: Context) = DayTurnReceiver.schedule(context)
 
     companion object {
-        private val PROVIDERS = listOf(SmallWidget::class.java to { SmallWidget() }, WideWidget::class.java to { WideWidget() })
+        private val PROVIDERS = listOf(
+            SmallWidget::class.java to { SmallWidget() },
+            WideWidget::class.java to { WideWidget() },
+            MonthWidget::class.java to { MonthWidget() },
+        )
 
-        /** Redraws every placed widget of both kinds. */
+        /** Redraws every placed widget of every kind. */
         fun refreshAll(context: Context) {
             val manager = AppWidgetManager.getInstance(context)
             for ((type, make) in PROVIDERS) {
@@ -60,12 +64,22 @@ abstract class TaghvimWidget : AppWidgetProvider() {
     }
 }
 
+private fun day(context: Context, now: Instant, s: WidgetSettings) =
+    WidgetDays.at(now, WidgetDataStore.get(context), s.groups, s.older)
+
 class SmallWidget : TaghvimWidget() {
-    override fun render(context: Context, day: WidgetDay, options: Bundle?) = WidgetViews.small(context, day, options)
+    override fun render(context: Context, now: Instant, settings: WidgetSettings, options: Bundle?) =
+        WidgetViews.small(context, day(context, now, settings), options)
 }
 
 class WideWidget : TaghvimWidget() {
-    override fun render(context: Context, day: WidgetDay, options: Bundle?) = WidgetViews.wide(context, day, options)
+    override fun render(context: Context, now: Instant, settings: WidgetSettings, options: Bundle?) =
+        WidgetViews.wide(context, day(context, now, settings), options)
+}
+
+class MonthWidget : TaghvimWidget() {
+    override fun render(context: Context, now: Instant, settings: WidgetSettings, options: Bundle?) =
+        WidgetViews.month(context, WidgetMonths.at(now, WidgetDataStore.get(context), settings.groups, settings.older), options)
 }
 
 class DayTurnReceiver : BroadcastReceiver() {

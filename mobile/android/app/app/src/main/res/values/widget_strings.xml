@@ -5,4 +5,6 @@
     <string name="widget_wide_label">تقویم — پهن</string>
     <string name="widget_small_description">روز هفته، روز و ماه</string>
     <string name="widget_wide_description">تاریخ کامل، روز هفته و مناسبت</string>
+    <string name="widget_month_label">تقویم — ماه</string>
+    <string name="widget_month_description">جدول ماه؛ یک ردیف بلندترش کنی، مناسبت‌های بعدی هم می‌آید</string>
 </resources>

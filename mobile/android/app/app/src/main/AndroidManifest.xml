@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
   Source: mobile/android/app/app/src/main/AndroidManifest.xml
-  Version: 0.1.0 — 2026-09-10
+  Version: 0.2.0 — 2026-10-10
   Why: The app and its two widgets. There is NO INTERNET permission, on
        purpose: the calendar is served from the app's own files, like the
        browser extension, and a missing permission is a promise the system
@@ -56,6 +56,18 @@
             <meta-data
                 android:name="android.appwidget.provider"
                 android:resource="@xml/widget_wide_info" />
+        </receiver>
+
+        <receiver
+            android:name=".widget.MonthWidget"
+            android:label="@string/widget_month_label"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/widget_month_info" />
         </receiver>
 
         <!-- TIME_SET and TIMEZONE_CHANGED are on Android's list of broadcasts a
