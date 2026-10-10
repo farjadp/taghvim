@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.18 — 2026-10-09
+// Version: 0.11.19 — 2026-10-09
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -39,13 +39,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 export const RELEASES: Release[] = [
   {
     version: '0.9.47',
-    at: '2026-10-09T22:52:00-04:00',
+    at: '2026-10-09T23:01:00-04:00',
     status: 'ready',
     title: 'تقویم برای صفحه‌خوان',
     changes: [
       { kind: 'fixed', text: 'صفحه‌خوان‌ها برای هر روز تقویم فقط تاریخش را می‌خواندند؛ حالا روز هفته، تعطیلی و مناسبت‌ها را هم می‌خوانند.' },
       { kind: 'fixed', text: 'در نرخ ارز، صفحه‌خوان تغییر قیمت را پیش از خود قیمت می‌خواند؛ حالا هر نرخ یک جملهٔ کامل است.' },
       { kind: 'added', text: 'لینک «رفتن به تقویم ماه» برای کسی که با کیبورد کار می‌کند، با کلید Tab ظاهر می‌شود.' },
+      { kind: 'added', text: 'صفحه‌خوان بالای صفحه اول می‌گوید امروز تعطیل است یا نه، و چند روز به نوروز یا یلدا مانده.' },
+      { kind: 'added', text: 'در تقویم، Page Up و Page Down یک ماه جابه‌جا می‌کنند و با Shift یک سال.' },
+      { kind: 'added', text: 'وقتی «تصویر امروز» را می‌فرستی، تاریخ و مناسبت‌ها به‌صورت متن هم همراهش می‌رود.' },
     ],
   },
   {

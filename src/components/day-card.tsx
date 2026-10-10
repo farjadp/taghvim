@@ -1,19 +1,22 @@
 // ============================================================================
 // Source: src/components/day-card.tsx
-// Version: 0.2.0 — 2026-09-09
+// Version: 0.3.0 — 2026-10-09
 // Why: Draws one day as an image the visitor can save and send. Canvas, in
 //      their own browser — nothing is uploaded and no server renders anything.
 // Env / Deps: lib/day-card decides the content; this file only draws it.
 //      Colours are hex here and nowhere else in a component: a canvas cannot
 //      read a CSS variable, and the card is an exported image rather than
 //      themed UI. Keep PALETTE equal to the tokens it names, the same rule
-//      scripts/build-og already follows.
+//      scripts/build-og already follows. The share carries the day as text too
+//      (lib/day-label shareText): Telegram has no alt text, so a blind recipient
+//      of the image alone gets nothing.
 // ============================================================================
 
 "use client";
 
 import { CARD_SOURCE, cardFilename, cardOccasions, dayCard, type DayCard } from "@/lib/day-card";
 import { type EventGroups } from "@/lib/events";
+import { shareText } from "@/lib/day-label";
 import { DEFAULT_PALETTE, resolveCardStyle, type Background, type CardColours, type CardStyle } from "@/lib/card-style";
 
 // One card, chosen by Farjad on 9 Sep from three in a sandbox: the green square. Square is
@@ -189,9 +192,10 @@ export async function shareDayCard(now: Date, groups: EventGroups, style: CardSt
   if (!blob) throw new Error("card render failed");
   const name = cardFilename(now, format.extension);
   const file = new File([blob], name, { type: format.type });
-  if (navigator.canShare?.({ files: [file] })) {
+  const payload = { files: [file], text: shareText(now, groups, { months }) };
+  if (navigator.canShare?.(payload)) {
     try {
-      await navigator.share({ files: [file] });
+      await navigator.share(payload);
       return "shared";
     } catch (thrown) {
       // Dismissing the sheet is not a failure and must not be reported as one.

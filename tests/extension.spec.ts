@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/extension.spec.ts
-// Version: 0.9.45 — 2026-10-08
+// Version: 0.9.46 — 2026-10-09
 // Why: Loads the BUILT new-tab page — the same files the browser would load —
 //      from a throwaway static server with every other origin blocked, and
 //      reads the Tehran date off it. A build that needs the network, or that
@@ -158,7 +158,7 @@ test("paints the Tehran date from its own files with every other origin blocked"
   });
 
   await page.goto(`${origin}/newtab.html`);
-  await expect(page.getByRole("heading", { level: 1 })).toHaveText("۱۵ شهریور ۱۴۰۵");
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(/^امروز یکشنبه ۱۵ شهریور ۱۴۰۵،/);
   await expect(page.getByRole("region", { name: "تقویم ماهانه" })).toBeVisible();
   // Four switches: the memorial is not rendered here, so its switch is not either
   await expect(page.getByTestId("view-controls").getByRole("switch")).toHaveCount(4);

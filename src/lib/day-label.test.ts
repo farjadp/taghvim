@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/day-label.test.ts
-// Version: 0.1.0 — 2026-10-09
+// Version: 0.2.0 — 2026-10-09
 // Why: The sentence a screen reader speaks for a day cell must carry what the
 //      grid shows by colour: the weekday, a day off, the occasions, the
 //      Gregorian date — and must follow the visitor's groups like the shading.
@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { fromCalendar, MONTHS } from './calendar';
 import { ALL_GROUPS, DEFAULT_GROUPS, eventsForDate } from './events';
-import { dayLabel, occasionText, STATE_MARK_LABEL } from './day-label';
+import { dayLabel, occasionText, shareText, STATE_MARK_LABEL, todaySentence } from './day-label';
 
 const day = (year: number, month: number, d: number) => fromCalendar({ year, month, day: d });
 
@@ -60,5 +60,27 @@ describe('occasionText', () => {
   it('speaks the state\'s mark the way the drawn mark is labelled', () => {
     expect(occasionText({ title: 'x', holiday: false, category: 'state' })).toBe(`${STATE_MARK_LABEL}: x`);
     expect(occasionText({ title: 'x', holiday: false, category: 'iran' })).toBe('x');
+  });
+});
+
+describe('todaySentence', () => {
+  it('says the day, whether it is off, and the nearer of Nowruz and Yalda', () => {
+    // 16 Mehr 1405 = 8 October 2026, a Thursday: Yalda (30 Azar) is 74 days away
+    const sentence = todaySentence(day(1405, 7, 16), DEFAULT_GROUPS);
+    expect(sentence).toBe('امروز پنجشنبه ۱۶ مهر ۱۴۰۵، ۸ اکتبر. تعطیل نیست. ۷۴ روز تا شب یلدا.');
+  });
+
+  it('a day off says so, with its occasions', () => {
+    const sentence = todaySentence(day(1405, 1, 1), DEFAULT_GROUPS);
+    expect(sentence.startsWith('امروز شنبه ۱ فروردین ۱۴۰۵، ۲۱ مارس. تعطیل: ')).toBe(true);
+    expect(sentence).not.toContain('تعطیل نیست');
+  });
+});
+
+describe('shareText', () => {
+  it('is the day without «امروز»: the recipient reads it later', () => {
+    const text = shareText(day(1405, 7, 10), DEFAULT_GROUPS);
+    expect(text).toBe(dayLabel(day(1405, 7, 10), DEFAULT_GROUPS));
+    expect(text).not.toContain('امروز');
   });
 });

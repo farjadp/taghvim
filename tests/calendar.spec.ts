@@ -1259,3 +1259,21 @@ test("a day cell speaks what the grid shows only by colour and dots", async ({ p
   await page.keyboard.press("Enter");
   await expect(page.locator("#calendar")).toBeFocused();
 });
+
+test("the hero says first whether today is off, and Page Up/Down move a month", async ({ page }) => {
+  // One heading for a screen reader: the day, «is it off», then the nearer of Nowruz and Yalda
+  await expect(page.getByRole("heading", { level: 1 })).toHaveAccessibleName(/^امروز یکشنبه ۱۵ شهریور ۱۴۰۵، ۶ سپتامبر\. تعطیل نیست\. .*روز تا شب یلدا\.$/);
+  const grid = page.getByRole("group", { name: /روزهای ماه/ });
+  await grid.getByRole("button", { name: dayName("۱۵ شهریور ۱۴۰۵") }).focus();
+  await page.keyboard.press("PageDown");
+  await expect(grid.getByRole("button", { name: dayName("۱۵ مهر ۱۴۰۵") })).toBeFocused();
+  await expect(page.locator("#calendar h2")).toHaveText("مهر ۱۴۰۵");
+  await page.keyboard.press("Shift+PageUp");
+  await expect(grid.getByRole("button", { name: dayName("۱۵ مهر ۱۴۰۴") })).toBeFocused();
+  // 31 Shahrivar has no twin in Mehr: the day is clamped, not spilled into Aban
+  await page.keyboard.press("Shift+PageDown");
+  await page.keyboard.press("PageUp");
+  await grid.getByRole("button", { name: dayName("۳۱ شهریور ۱۴۰۵") }).click();
+  await page.keyboard.press("PageDown");
+  await expect(grid.getByRole("button", { name: dayName("۳۰ مهر ۱۴۰۵") })).toBeFocused();
+});

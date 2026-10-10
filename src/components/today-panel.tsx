@@ -1,12 +1,15 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.38 — 2026-09-11
+// Version: 0.9.39 — 2026-10-09
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
 //      and OtherCalendars, so the Chrome extension can place them itself;
 //      TodayPanel composes both for the site and is unchanged in behaviour.
 //      On phones this whole block sits BELOW the month grid; see calendar-app.
+//      To a screen reader the weekday line and the drawn date are one heading,
+//      lib/day-label's todaySentence: the day, whether it is off, and the days to
+//      Nowruz or Yalda — the answer to «is today off?» said first.
 // Env / Deps: Clock is the device clock rendered in Asia/Tehran, not NTP.
 //      The hero cannot clip its own overflow, because the clock picker opens
 //      out of it, so the drawing (components/hero-motifs) is clipped by its own
@@ -22,6 +25,7 @@ import { useMonthNames } from "./month-names-context";
 import { signFor } from "@/lib/zodiac";
 import { seasonalTahvil, tehranClock, type Tahvil } from "@/lib/tahvil";
 import { type EventGroups } from "@/lib/events";
+import { todaySentence } from "@/lib/day-label";
 import { type Background, type CardStyle } from "@/lib/card-style";
 import { shareDayCard } from "./day-card";
 import { WorldClocks } from "./world-clocks";
@@ -99,8 +103,8 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><HeroMotifs /></div>
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
           <div>
-            <div className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
-            <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]">{fa(persian.day)} {months[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></h1>
+            <div aria-hidden="true" className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
+            <h1 className="text-3xl leading-normal font-semibold sm:text-[2.7rem]"><span aria-hidden="true">{fa(persian.day)} {months[persian.month - 1]} <span className="font-normal text-[#d9e3cf]">{fa(persian.year)}</span></span><span className="sr-only">{todaySentence(now, groups, { months })}</span></h1>
             {/* From 1 Esfand until the instant itself, and gone the moment the year turns.
                 Days while it is far, hours and minutes on the last day, never seconds: the
                 hero redraws once a minute, and 1406 was announced to the minute anyway. */}

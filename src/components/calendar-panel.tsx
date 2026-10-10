@@ -1,18 +1,21 @@
 // ============================================================================
 // Source: src/components/calendar-panel.tsx
-// Version: 0.10.0 — 2026-10-09
+// Version: 0.11.0 — 2026-10-09
 // Why: Monthly Jalali grid, RTL keyboard navigation and interactive legend.
 //      Event groups and memorial visibility are controlled below the grid.
 //      Each cell's accessible name is a whole sentence from lib/day-label, so a
 //      screen reader hears the weekday, «تعطیل» and the occasions the grid shows
-//      only by colour and dots.
+//      only by colour and dots. PageUp/PageDown move a month, with Shift a year —
+//      the keys of the ARIA date-picker pattern, which screen-reader users expect;
+//      single-letter shortcuts would collide with their reader's own keys.
 // Env / Deps: Pure UI; lib/events filters grid events with the same groups as the list.
 // ============================================================================
 
 "use client";
 
+import { useEffect, useRef } from "react";
 import { ChevronLeft, ChevronRight, RotateCcw, CalendarDays } from "lucide-react";
-import { dayKey, fa, formatDate, fromCalendar, monthGrid, monthLength, toCalendar, WEEKDAYS } from "@/lib/calendar";
+import { dayKey, fa, formatDate, fromCalendar, monthGrid, monthLength, shiftMonth, toCalendar, WEEKDAYS } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
 import { eventsForDate, type EventGroups } from "@/lib/events";
 import { categoryOf, type CategoryId } from "@/lib/date-categories";
@@ -59,6 +62,26 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
   const selectionInView = selectedParts.year === year && selectedParts.month === month;
   const start = fromCalendar({ year, month, day: 1 });
   const end = fromCalendar({ year, month, day: monthLength(year, month) });
+  // Set by PageUp/PageDown: after the new month renders, focus follows the selection,
+  // or it would stay on a button that no longer exists and the reader would go quiet.
+  const focusSelection = useRef(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (!focusSelection.current) return;
+    focusSelection.current = false;
+    gridRef.current?.querySelector<HTMLButtonElement>('button[aria-pressed="true"]')?.focus();
+  });
+  // The same day `delta` months away, clamped to the target month's length; null past the
+  // supported range, where shiftMonth throws.
+  function shiftedSelection(delta: number): Date | null {
+    const base = selectionInView ? selectedParts : { year, month, day: 1 };
+    try {
+      const target = shiftMonth(base.year, base.month, delta);
+      return fromCalendar({ ...target, day: Math.min(base.day, monthLength(target.year, target.month)) });
+    } catch {
+      return null;
+    }
+  }
   const englishMonth = (date: Date) => new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "Asia/Tehran" }).format(date);
   return (
     <section id="calendar" tabIndex={-1} aria-label="تقویم ماهانه" className="min-w-0 focus:outline-none overflow-hidden rounded-[1.75rem] border border-line bg-surface">
@@ -73,7 +96,15 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
       <div className="px-2 pt-3 pb-4 sm:px-5">
         <div className="grid grid-cols-7">{WEEKDAYS.map((name, i) => <div key={name} className={`py-3 text-center text-[0.625rem] font-medium sm:text-xs ${i === 6 ? "text-clay" : "text-muted"}`}><span className="hidden min-[420px]:inline">{name}</span><span className="min-[420px]:hidden">{["ش", "ی", "د", "س", "چ", "پ", "ج"][i]}</span></div>)}</div>
         {/* RTL keyboard grid: ArrowLeft moves forward in reading order, ArrowRight back */}
-        <div role="group" aria-label="روزهای ماه؛ جابه‌جایی با کلیدهای جهت‌نما" className="grid grid-cols-7 gap-1 sm:gap-1.5" onKeyDown={(event) => {
+        <div ref={gridRef} role="group" aria-label="روزهای ماه؛ جابه‌جایی با کلیدهای جهت‌نما، ماه با Page Up و Page Down" className="grid grid-cols-7 gap-1 sm:gap-1.5" onKeyDown={(event) => {
+          if (event.key === "PageUp" || event.key === "PageDown") {
+            event.preventDefault();
+            const target = shiftedSelection((event.key === "PageUp" ? -1 : 1) * (event.shiftKey ? 12 : 1));
+            if (!target) return;
+            focusSelection.current = true;
+            onSelect(target);
+            return;
+          }
           const buttons = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>("button"));
           const index = buttons.indexOf(event.target as HTMLButtonElement);
           if (index < 0) return;
