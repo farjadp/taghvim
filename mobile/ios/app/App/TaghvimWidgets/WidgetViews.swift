@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/app/App/TaghvimWidgets/WidgetViews.swift
-// Version: 0.2.0 — 2026-10-09
+// Version: 0.3.0 — 2026-10-09
 // Why: The designs Farjad picked, drawn in SwiftUI: small B (weekday, the
 //      numeral, the month), wide B (since 9 Oct, the Android widget ported
 //      after «ویجت‌ها خیلی محدوده» on X: a forest block with the numeral and
@@ -9,7 +9,8 @@
 //      the inline form). Colours are the site's tokens with their dark
 //      counterparts — keep them equal to src/app/globals.css. The numeral is
 //      clay on a day off. System font, as on Android. Right to left always,
-//      whatever the phone's language.
+//      whatever the phone's language. Each widget is one VoiceOver element
+//      reading `day.spoken`, not the bare numeral and month.
 // Env / Deps: SwiftUI, WidgetKit, TaghvimCore.
 // ============================================================================
 
@@ -36,6 +37,15 @@ enum Palette {
 }
 
 private extension View {
+    /// One VoiceOver element for the whole widget, reading the day's sentence.
+    @ViewBuilder func spoken(_ day: WidgetDay?) -> some View {
+        if let day {
+            accessibilityElement(children: .ignore).accessibilityLabel(day.spoken)
+        } else {
+            self
+        }
+    }
+
     /// iOS 17 wants the background declared as the widget's container; 16 draws it.
     @ViewBuilder func widgetBackground<Background: View>(@ViewBuilder _ background: () -> Background) -> some View {
         if #available(iOSApplicationExtension 17.0, *) {
@@ -67,6 +77,7 @@ struct SmallView: View {
                 Text("تقویم").font(.system(size: 18, weight: .heavy)).foregroundStyle(Palette.forest)
             }
         }
+        .spoken(day)
         .environment(\.layoutDirection, .rightToLeft)
         .widgetBackground { Palette.surface }
     }
@@ -118,6 +129,7 @@ struct MediumView: View {
                 Text("تقویم").font(.system(size: 18, weight: .heavy)).foregroundStyle(Palette.forest)
             }
         }
+        .spoken(day)
         .environment(\.layoutDirection, .rightToLeft)
         .widgetBackground { Palette.surface }
     }
@@ -147,6 +159,7 @@ struct LockView: View {
                 Text("تقویم").font(.system(size: 14, weight: .bold))
             }
         }
+        .spoken(day)
         .environment(\.layoutDirection, .rightToLeft)
         .widgetBackground { AccessoryWidgetBackground() }
     }

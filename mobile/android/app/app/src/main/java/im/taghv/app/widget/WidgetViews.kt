@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/widget/WidgetViews.kt
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-09
 // Why: Lays a WidgetDay out as the designs Farjad picked on 10 Sep — small B
 //      (weekday, numeral, month) and wide B (a green block with the numeral and
 //      month, clay on a day off, then weekday, year and the first occasion) —
@@ -10,6 +10,8 @@
 //      decides. System font, by Farjad's call: widgets cannot use a bundled one.
 //      Colours come from resources with night variants; on 12+ they are passed
 //      as resources so the launcher re-resolves them when the theme flips.
+//      Every form sets the root's content description to `day.spoken`, so
+//      TalkBack reads one sentence instead of the bare numeral and month.
 // Env / Deps: RemoteViews; layouts res/layout/widget_*.xml.
 // ============================================================================
 
@@ -62,6 +64,7 @@ object WidgetViews {
             setTextViewText(R.id.day, fa(day.day))
             setTextViewText(R.id.month, day.month)
             numeral(context, R.id.day, day)
+            spoken(day)
             opensApp(context)
         }
 
@@ -71,6 +74,7 @@ object WidgetViews {
             setTextViewText(R.id.day, fa(day.day))
             setTextViewText(R.id.month, day.month)
             numeral(context, R.id.day, day)
+            spoken(day)
             opensApp(context)
         }
 
@@ -81,6 +85,7 @@ object WidgetViews {
             setTextViewText(R.id.title, "${day.weekday} ${fa(day.year)}")
             occasionLine(context, day)
             block(day)
+            spoken(day)
             opensApp(context)
         }
 
@@ -90,6 +95,7 @@ object WidgetViews {
             setTextViewText(R.id.title, "${day.weekday} ${day.month} ${fa(day.year)}")
             occasionLine(context, day)
             block(day)
+            spoken(day)
             opensApp(context)
         }
 
@@ -118,6 +124,11 @@ object WidgetViews {
     private fun RemoteViews.color(context: Context, id: Int, colorRes: Int) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) setColorStateList(id, "setTextColor", colorRes)
         else setTextColor(id, context.getColor(colorRes))
+    }
+
+    // One sentence for the whole widget; the root is the click target TalkBack lands on.
+    private fun RemoteViews.spoken(day: WidgetDay) {
+        setContentDescription(R.id.root, day.spoken)
     }
 
     private fun RemoteViews.opensApp(context: Context) {

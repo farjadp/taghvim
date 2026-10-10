@@ -1,12 +1,13 @@
 // ============================================================================
 // Source: mobile/ios/TaghvimCore/Sources/TaghvimCore/WidgetDay.swift
-// Version: 0.1.0 — 2026-09-11
+// Version: 0.2.0 — 2026-10-09
 // Why: Everything an iPhone widget prints for one instant, decided in one place
 //      and tested on the Mac — the twin of the Android app's WidgetDays. The day
 //      is the Tehran day. A day is «off» on Friday or when a visible row is a
 //      holiday, the rule that paints the site's grid in clay. A computed lunar
 //      holiday is marked «(احتمالی)». Beyond the data file's years the date is
-//      still right (it is computed) and no occasion is claimed.
+//      still right (it is computed) and no occasion is claimed. `spoken` is the
+//      one sentence VoiceOver reads for a whole widget — the twin of Android's.
 // Env / Deps: Jalali, Today, WidgetData in this package.
 // ============================================================================
 
@@ -21,6 +22,13 @@ public struct WidgetDay: Equatable, Sendable {
     public let off: Bool
     public let occasion: String?
     public let occasionIsHoliday: Bool
+
+    /// «جمعه ۱۸ مهر ۱۴۰۵، تعطیل، جشن مهرگان» — the numeral alone says nothing of a day off.
+    public var spoken: String {
+        ["\(weekday) \(fa(day)) \(month) \(fa(year))", off ? "تعطیل" : nil, occasion]
+            .compactMap { $0 }
+            .joined(separator: "، ")
+    }
 
     private static let gregorianMonths = [
         "January", "February", "March", "April", "May", "June",

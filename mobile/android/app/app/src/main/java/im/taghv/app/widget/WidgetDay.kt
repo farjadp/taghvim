@@ -1,13 +1,14 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/widget/WidgetDay.kt
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-09
 // Why: Everything a widget prints for one instant, decided in one place and
 //      tested on the JVM, so the RemoteViews code only lays it out. The day is
 //      the Tehran day. A day is «off» on Friday or when a visible row is a
 //      holiday — the same rule that paints the site's grid in clay. A computed
 //      lunar holiday is marked «(احتمالی)», because it may land a day off.
 //      Outside the data file's years the date is still right (it is computed)
-//      and no occasion is claimed.
+//      and no occasion is claimed. `spoken` is the one sentence TalkBack reads
+//      for the whole widget, because the numeral alone says nothing about a day off.
 // Env / Deps: im.taghv.core; widget-data.json from the app's assets.
 // ============================================================================
 
@@ -28,7 +29,11 @@ data class WidgetDay(
     val off: Boolean,
     val occasion: String?,
     val occasionIsHoliday: Boolean,
-)
+) {
+    /** «جمعه ۱۸ مهر ۱۴۰۵، تعطیل، جشن مهرگان» — the widget's content description. */
+    val spoken: String
+        get() = listOfNotNull("$weekday ${fa(day)} $month ${fa(year)}", if (off) "تعطیل" else null, occasion).joinToString("، ")
+}
 
 object WidgetDays {
     private val GREGORIAN_MONTHS = listOf(

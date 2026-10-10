@@ -117,6 +117,13 @@ final class WidgetDayTests: XCTestCase {
         XCTAssertEqual(day.gregorian, "25 September 2026")
     }
 
+    func testTheSpokenSentenceSaysWhatTheColourShows() {
+        XCTAssertEqual(WidgetDay.at(utc("2026-09-25T08:00:00Z"), data: file).spoken, "جمعه ۳ مهر ۱۴۰۵، تعطیل")
+        XCTAssertFalse(WidgetDay.at(utc("2026-09-10T08:00:00Z"), data: file).spoken.contains("تعطیل"))
+        let nowruz = WidgetDay.at(utc("2027-03-21T08:00:00Z"), data: file)
+        XCTAssertEqual(nowruz.spoken, "یکشنبه ۱ فروردین ۱۴۰۶، تعطیل، \(nowruz.occasion!)")
+    }
+
     func testAThursdayIsNotOff() {
         XCTAssertFalse(WidgetDay.at(utc("2026-09-10T08:00:00Z"), data: file).off)
     }

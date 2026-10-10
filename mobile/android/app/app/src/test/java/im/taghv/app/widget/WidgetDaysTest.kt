@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/test/java/im/taghv/app/widget/WidgetDaysTest.kt
-// Version: 0.1.0 — 2026-09-10
+// Version: 0.2.0 — 2026-10-09
 // Why: What the widgets print, checked on the JVM against the same data file
 //      the site's tests hold equal to eventsForDate: Nowruz is a day off with
 //      its own title, a plain Friday is off with no occasion, a Thursday is not
@@ -48,6 +48,17 @@ class WidgetDaysTest {
         assertTrue(day.off)
         assertNull(day.occasion)
         assertEquals("25 September 2026", day.gregorian)
+    }
+
+    @Test
+    fun theSpokenSentenceSaysWhatTheColourShows() {
+        // 3 Mehr 1405, a plain Friday: off, no occasion
+        assertEquals("جمعه ۳ مهر ۱۴۰۵، تعطیل", WidgetDays.at(Instant.parse("2026-09-25T08:00:00Z"), data).spoken)
+        // A Thursday is not off, and says nothing of it
+        assertFalse(WidgetDays.at(Instant.parse("2026-09-10T08:00:00Z"), data).spoken.contains("تعطیل"))
+        // Nowruz: off, with its title
+        val nowruz = WidgetDays.at(Instant.parse("2027-03-21T08:00:00Z"), data)
+        assertEquals("یکشنبه ۱ فروردین ۱۴۰۶، تعطیل، ${nowruz.occasion}", nowruz.spoken)
     }
 
     @Test
