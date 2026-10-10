@@ -44,8 +44,22 @@ test("calendar navigates, selects a day and returns to today", async ({ page }) 
   await expect(page.getByTestId("selected-events")).toContainText("شهریار");
 });
 
-test("date conversion validates and converts actual dates", async ({ page }) => {
+test("date conversion reads a date in words, and still takes three fields", async ({ page }) => {
   await page.getByRole("button", { name: "تبدیل تاریخ", exact: true }).click();
+  const field = page.getByLabel("تاریخ را بنویس");
+  // The calendar comes from the month's name, and the reading is shown before the answer
+  await field.fill("۱ فروردین ۱۴۰۳");
+  await expect(page.getByTestId("convert-read")).toHaveText("خوانده شد: ۱ فروردین ۱۴۰۳ (خورشیدی)");
+  await expect(page.getByTestId("conversion-result")).toContainText("2024-03-20");
+  await field.fill("۲۰ مارس ۲۰۲۴");
+  await expect(page.getByTestId("conversion-result")).toContainText("۱۴۰۳/۰۱/۰۱");
+  await field.fill("۳۰ اسفند ۱۴۰۴");
+  await expect(page.getByTestId("convert-read")).toContainText("وجود ندارد");
+  // Spoken only once the typing has settled
+  await expect(page.locator("#tools [aria-live=polite]").last()).toContainText("وجود ندارد");
+  // The three fields are still there, behind the disclosure
+  await field.fill("");
+  await page.getByText("وارد کردن با روز، ماه و سال").click();
   await page.getByLabel("سال", { exact: true }).fill("1403");
   await page.getByLabel("ماه", { exact: true }).selectOption("1");
   await page.getByLabel("روز", { exact: true }).fill("1");

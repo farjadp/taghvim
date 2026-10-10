@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/tools-panel.tsx
-// Version: 0.10.0 — 2026-10-07
+// Version: 0.11.0 — 2026-10-09
 // Why: Date tools: continuous holidays, countdown, conversion, distance, age.
 //      «تعطیلات پیوسته» is the first tab and the default one. «تاریخ‌های من» is
 //      third rather than last: on a phone the strip scrolls, and a tab nobody
@@ -10,15 +10,18 @@
 //      them; the other three do not care. «نرخ ارز» exists only when the caller
 //      passes its content: the site does, the extension and the apps never do —
 //      they make no network request, so they have no rates to show.
+//      «تبدیل تاریخ» opens on one text field that reads a date in words (variant C,
+//      Farjad's pick of 9 Oct from a sandbox: 2 tab stops instead of 5, 432px on a
+//      phone instead of 471); the three fields are still there, behind a disclosure.
 // ============================================================================
 
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowLeftRight, Banknote, CalendarHeart, CalendarRange, Cake, Hourglass, Timer } from "lucide-react";
-import { type CalendarKind, GREGORIAN_MONTHS_FA, dateNumbers, daysBetween, fa, formatDate, fromCalendar, toCalendar } from "@/lib/calendar";
+import { type CalendarKind, GREGORIAN_MONTHS_FA, ISLAMIC_MONTHS, dateNumbers, daysBetween, fa, formatDate, fromCalendar, toCalendar } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
-import { elapsedAge, parseNumericInput } from "@/lib/date-tools";
+import { DATE_TEXT_EXAMPLE, elapsedAge, parseDateText, parseNumericInput } from "@/lib/date-tools";
 import { type EventGroups } from "@/lib/events";
 import { type Anniversary } from "@/lib/dates";
 import { BridgesTool } from "./bridges-tool";
@@ -33,7 +36,6 @@ export const DEFAULT_TOOL: ToolTab = "bridges";
 export const TOOL_TABS: ToolTab[] = ["bridges", "countdown", "dates", "rates", "convert", "distance", "age"];
 type DateInput = { year: string; month: string; day: string };
 const KINDS: { value: CalendarKind; label: string }[] = [{ value: "persian", label: "خورشیدی" }, { value: "gregorian", label: "میلادی" }, { value: "islamic", label: "قمری محاسباتی" }];
-const ISLAMIC_MONTHS = ["محرم", "صفر", "ربیع‌الاول", "ربیع‌الثانی", "جمادی‌الاول", "جمادی‌الثانی", "رجب", "شعبان", "رمضان", "شوال", "ذی‌القعده", "ذی‌الحجه"];
 const INVALID_DATE = "تاریخ معتبر نیست. روز، ماه و سال را بررسی کنید؛ بازهٔ پشتیبانی‌شده ۱۲۰۰ تا ۱۶۰۰ خورشیدی است.";
 
 // Date → three input strings in Persian digits, for pre-filling a form
@@ -60,26 +62,64 @@ function SubmitButton({ children }: { children: React.ReactNode }) {
   return <button type="submit" className="flex h-12 items-center justify-center gap-5 rounded-xl bg-forest-deep px-6 text-xs font-medium text-white transition-colors hover:bg-[#173d30]">{children}<ArrowLeft size={16} /></button>;
 }
 
-// Tab 1: convert a date from one calendar into the other two
+// The value once the visitor has stopped typing for `ms`: a live region that changed on
+// every keystroke would make a screen reader talk over the typing.
+function useSettled<T>(value: T, ms = 700): T {
+  const [settled, setSettled] = useState(value);
+  useEffect(() => {
+    const timer = setTimeout(() => setSettled(value), ms);
+    return () => clearTimeout(timer);
+  }, [value, ms]);
+  return settled;
+}
+
+// What the live region says for a result: the three calendars in Persian words
+function spokenResult(date: Date, months: string[]) {
+  const g = toCalendar(date, "gregorian");
+  return `خورشیدی ${formatDate(date, "persian", true, months)}، میلادی ${fa(g.day)} ${GREGORIAN_MONTHS_FA[g.month - 1]} ${fa(g.year)}، قمری ${formatDate(date, "islamic")}`;
+}
+
+// Tab 1: convert a date from one calendar into the other two. One text field first;
+// the original three fields stay one click away for whoever prefers them.
 function Converter({ now }: { now: Date }) {
+  const months = useMonthNames();
+  const [text, setText] = useState("");
   const [kind, setKind] = useState<CalendarKind>("persian");
   const [value, setValue] = useState(inputDate(now));
-  const [result, setResult] = useState<Date | null>(null);
+  const [fromForm, setFromForm] = useState<Date | null>(null);
   const [error, setError] = useState("");
-  function change(next: DateInput) { setValue(next); setResult(null); setError(""); }
+  const parsed = parseDateText(text, now, months);
+  const result = parsed?.ok ? parsed.date : fromForm;
+  function change(next: DateInput) { setValue(next); setFromForm(null); setError(""); }
+  // Spoken after the typing settles: how the text was read, then the answer — or why not
+  const spoken = parsed ? (parsed.ok ? `${parsed.read}. ${spokenResult(parsed.date, months)}` : parsed.error) : fromForm ? spokenResult(fromForm, months) : "";
+  const settled = useSettled(spoken);
   return <div className="grid gap-7 lg:grid-cols-[1.2fr_1fr]">
-    <form noValidate onSubmit={(event) => {
-      event.preventDefault();
-      try { setResult(parseDate(value, kind)); setError(""); }
-      catch { setError(INVALID_DATE); setResult(null); }
-    }}>
-      <div className="mb-5 flex flex-wrap items-center justify-between gap-3"><p className="text-sm font-medium">تاریخ را در کدام تقویم وارد می‌کنی؟</p><select aria-label="تقویم مبدأ" value={kind} onChange={(event) => { const next = event.target.value as CalendarKind; setKind(next); change(inputDate(now, next)); }} className="rounded-lg border border-line bg-paper px-3 py-2 text-xs">{KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
-      <DateFields value={value} kind={kind} onChange={change} />
-      <div className="mt-5 flex flex-wrap items-center justify-between gap-3"><p className="text-[0.625rem] text-muted">تبدیل هم‌زمان به هر سه تقویم</p><SubmitButton>تبدیل کن</SubmitButton></div>
-      {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
-    </form>
-    <div data-testid="conversion-result" aria-live="polite" className="rounded-xl bg-paper px-5 py-3">
-      {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[0.6875rem] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[0.625rem] text-muted">{formatDate(result, item.value)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-xs leading-6 text-muted">تاریخ را وارد کن و «تبدیل کن» را بزن.<br />معادل شمسی، میلادی و قمری اینجا می‌آید.</p></div>}
+    <div>
+      <label htmlFor="convert-text" className="mb-2 block text-sm font-medium">تاریخ را بنویس</label>
+      <input id="convert-text" value={text} onChange={(event) => { setText(event.target.value); setFromForm(null); setError(""); }} onKeyDown={(event) => { if (event.key === "Enter") event.preventDefault(); }} autoComplete="off" aria-describedby="convert-hint" className="field" />
+      <p id="convert-hint" className="mt-2 text-[0.625rem] leading-5 text-muted">{DATE_TEXT_EXAMPLE}</p>
+      {parsed && <p data-testid="convert-read" className={`mt-1 text-[0.6875rem] ${parsed.ok ? "text-forest" : "text-clay"}`}>{parsed.ok ? parsed.read : parsed.error}</p>}
+      <details className="mt-4 rounded-xl border border-line px-4 py-3">
+        <summary className="cursor-pointer text-xs text-muted">وارد کردن با روز، ماه و سال</summary>
+        <form noValidate className="mt-4" onSubmit={(event) => {
+          event.preventDefault();
+          setText("");
+          try { setFromForm(parseDate(value, kind)); setError(""); }
+          catch { setError(INVALID_DATE); setFromForm(null); }
+        }}>
+          <div className="mb-4 flex flex-wrap items-center justify-between gap-3"><p className="text-xs text-muted">تاریخ در کدام تقویم است؟</p><select aria-label="تقویم مبدأ" value={kind} onChange={(event) => { const next = event.target.value as CalendarKind; setKind(next); change(inputDate(now, next)); }} className="rounded-lg border border-line bg-paper px-3 py-2 text-xs">{KINDS.map((item) => <option key={item.value} value={item.value}>{item.label}</option>)}</select></div>
+          <DateFields value={value} kind={kind} onChange={change} />
+          <div className="mt-4 flex justify-end"><SubmitButton>تبدیل کن</SubmitButton></div>
+          {error && <p role="alert" className="mt-3 text-xs leading-6 text-clay">{error}</p>}
+        </form>
+      </details>
+    </div>
+    <div>
+      <div data-testid="conversion-result" className="rounded-xl bg-paper px-5 py-3">
+        {result ? KINDS.map((item) => <div key={item.value} className="flex flex-wrap items-center justify-between gap-2 border-b border-line py-3 last:border-0"><span className="text-[0.6875rem] text-muted">{item.label}</span><div className="text-left"><p className="text-sm font-semibold tabular-nums" dir="ltr">{dateNumbers(result, item.value)}</p><p className="mt-1 text-[0.625rem] text-muted">{formatDate(result, item.value, false, months)}</p></div></div>) : <div className="flex h-full min-h-44 flex-col items-center justify-center gap-3 text-center"><ArrowLeftRight size={28} strokeWidth={1.3} className="text-forest" /><p className="text-xs leading-6 text-muted">تاریخ را بنویس.<br />معادل شمسی، میلادی و قمری اینجا می‌آید.</p></div>}
+      </div>
+      <p className="sr-only" aria-live="polite">{settled}</p>
     </div>
     <p className="text-[0.625rem] leading-6 text-muted lg:col-span-2">تقویم قمری بر اساس روش محاسباتی است، نه رؤیت هلال؛ ممکن است با تقویم رسمی ایران متفاوت باشد.</p>
   </div>;
