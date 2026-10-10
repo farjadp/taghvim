@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.46 — 2026-10-09
+// Version: 0.9.47 — 2026-10-09
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -9,6 +9,10 @@
 
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
+
+// A day cell's accessible name is a whole sentence since 0.9.47 («یکشنبه ۱۵ شهریور ۱۴۰۵، …»);
+// this finds a cell by its Persian date alone, and never «۱۱ …» for «۱ …».
+const dayName = (date: string) => new RegExp(`(^|\\s)${date}(،|$)`);
 
 // Every test starts at a fixed instant (6 Sep 2026, 14:00 Tehran) so dates are deterministic.
 test.beforeEach(async ({ page }) => {
@@ -35,7 +39,7 @@ test("calendar navigates, selects a day and returns to today", async ({ page }) 
   await page.getByRole("button", { name: "ماه بعد", exact: true }).click();
   await expect(page.getByRole("heading", { name: "مهر ۱۴۰۵", exact: true })).toBeVisible();
   await page.getByRole("button", { name: "برگشت به امروز" }).click();
-  await page.getByRole("button", { name: "۲۷ شهریور ۱۴۰۵", exact: true }).click();
+  await page.getByRole("button", { name: dayName("۲۷ شهریور ۱۴۰۵") }).click();
   await expect(page.getByTestId("selected-date")).toContainText("۲۷ شهریور");
   await expect(page.getByTestId("selected-events")).toContainText("شهریار");
 });
@@ -61,7 +65,7 @@ test("legend switches independently control state holidays and persist", async (
   await expect(calendar.getByRole("button", { name: "ملی و فرهنگی" })).toHaveCount(0);
   await page.getByLabel("انتخاب ماه تقویم").selectOption("11");
   const shaded = calendar.getByRole("group", { name: /روزهای ماه/ }).locator("button.bg-holiday");
-  const bahman22 = page.getByRole("button", { name: "۲۲ بهمن ۱۴۰۵", exact: true });
+  const bahman22 = page.getByRole("button", { name: dayName("۲۲ بهمن ۱۴۰۵") });
   await expect(shaded).toHaveCount(5);
   await expect(bahman22).not.toHaveClass(/bg-holiday/);
   await toggle.click();
@@ -110,7 +114,7 @@ test("memorial can be hidden independently and restored after reload", async ({ 
 
 test("world switch removes events and its active list filter", async ({ page }) => {
   const list = page.locator("aside");
-  await page.getByRole("button", { name: "۱۷ شهریور ۱۴۰۵", exact: true }).click();
+  await page.getByRole("button", { name: dayName("۱۷ شهریور ۱۴۰۵") }).click();
   await expect(page.getByTestId("selected-events")).toContainText("سوادآموزی");
   await list.getByRole("button", { name: "جهانی", exact: true }).click();
   await page.getByRole("switch", { name: "جهانی", exact: true }).click();
@@ -125,7 +129,7 @@ test("world switch removes events and its active list filter", async ({ page }) 
 test("festival switch is on by default and removes the festivals and their filter", async ({ page }) => {
   const list = page.locator("aside");
   await expect(page.getByRole("switch", { name: "جشن‌ها", exact: true })).toHaveAttribute("aria-checked", "true");
-  await page.getByRole("button", { name: "۴ شهریور ۱۴۰۵", exact: true }).click();
+  await page.getByRole("button", { name: dayName("۴ شهریور ۱۴۰۵") }).click();
   await expect(page.getByTestId("selected-events")).toContainText("جشن شهریورگان");
   await list.getByRole("button", { name: "جشن‌ها", exact: true }).click();
   await expect(list).toContainText("جشن شهریورگان");
@@ -213,12 +217,12 @@ test("supported boundary months render and prevent out-of-range navigation", asy
 });
 
 test("calendar days support RTL arrow navigation", async ({ page }) => {
-  await page.getByRole("button", { name: "۱۵ شهریور ۱۴۰۵", exact: true }).focus();
+  await page.getByRole("button", { name: dayName("۱۵ شهریور ۱۴۰۵") }).focus();
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("button", { name: "۱۶ شهریور ۱۴۰۵", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: dayName("۱۶ شهریور ۱۴۰۵") })).toBeFocused();
   await expect(page.getByTestId("selected-date")).toContainText("۱۶ شهریور");
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("button", { name: "۲۳ شهریور ۱۴۰۵", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: dayName("۲۳ شهریور ۱۴۰۵") })).toBeFocused();
 });
 
 test("tool tabs support RTL keyboard navigation", async ({ page }) => {
@@ -623,7 +627,7 @@ test("non-Friday holidays are highlighted in red on the calendar grid", async ({
   await page.getByLabel("انتخاب ماه تقویم").selectOption("1");
   await page.getByLabel("انتخاب سال تقویم").selectOption("1405");
   // 1 Farvardin (Nowruz) is a holiday — not a Friday in 1405
-  const nowruzCell = page.getByRole("button", { name: "۱ فروردین ۱۴۰۵", exact: true });
+  const nowruzCell = page.getByRole("button", { name: dayName("۱ فروردین ۱۴۰۵") });
   await expect(nowruzCell).toBeVisible();
   // The holiday cell should have clay-colored text (red-ish), not the default ink color
   const textColor = await nowruzCell.evaluate((el) => getComputedStyle(el).color);
@@ -1116,8 +1120,8 @@ test("personal dates live in the tools box, are stored in the browser and mark t
   // The day is marked on the calendar, and the legend explains the mark.
   const calendar = page.getByRole("region", { name: "تقویم ماهانه" });
   await expect(calendar.getByText("تاریخ‌های من")).toBeVisible();
-  await expect(calendar.getByRole("button", { name: "۲۱ شهریور ۱۴۰۵" }).locator("span.absolute.left-1\\.5")).toHaveCount(1);
-  await expect(calendar.getByRole("button", { name: "۲۲ شهریور ۱۴۰۵" }).locator("span.absolute.left-1\\.5")).toHaveCount(0);
+  await expect(calendar.getByRole("button", { name: dayName("۲۱ شهریور ۱۴۰۵") }).locator("span.absolute.left-1\\.5")).toHaveCount(1);
+  await expect(calendar.getByRole("button", { name: dayName("۲۲ شهریور ۱۴۰۵") }).locator("span.absolute.left-1\\.5")).toHaveCount(0);
 
   // A hash opens the tool directly, so a link can point at it.
   await page.goto("/#dates");
@@ -1132,7 +1136,7 @@ test("the state's own occasions carry the mark and not the country's name", asyn
   await page.getByRole("region", { name: "تقویم ماهانه" }).getByRole("switch", { name: "دولتی", exact: true }).click();
   await page.getByRole("button", { name: "ماه بعد" }).click();
   for (let i = 0; i < 4; i += 1) await page.getByRole("button", { name: "ماه بعد" }).click();
-  await page.getByRole("button", { name: "۲۲ بهمن ۱۴۰۵", exact: true }).click();
+  await page.getByRole("button", { name: dayName("۲۲ بهمن ۱۴۰۵") }).click();
   const selected = page.getByTestId("selected-events");
   await expect(selected).toContainText("شورش ۵۷");
   await expect(selected).not.toContainText("ایران");
@@ -1238,4 +1242,20 @@ test("the day card's background is chosen from the settings menu and remembered"
   const file = await download;
   expect(file.suggestedFilename()).toMatch(/^taghvim-\d{4}-\d{2}-\d{2}\.(png|jpg)$/);
   expect(requests).toEqual([]);
+});
+
+test("a day cell speaks what the grid shows only by colour and dots", async ({ page }) => {
+  const grid = page.getByRole("group", { name: /روزهای ماه/ });
+  // 6 Sep 2026 is Sunday 15 Shahrivar; today comes first, the Gregorian date last
+  await expect(grid.getByRole("button", { name: dayName("۱۵ شهریور ۱۴۰۵") })).toHaveAccessibleName(/^امروز، یکشنبه ۱۵ شهریور ۱۴۰۵، .*۶ سپتامبر$/);
+  // A Friday is a day off, and says so
+  await expect(grid.getByRole("button", { name: dayName("۲۰ شهریور ۱۴۰۵") })).toHaveAccessibleName(/^جمعه ۲۰ شهریور ۱۴۰۵، تعطیل،/);
+  // A plain Thursday is not
+  await expect(grid.getByRole("button", { name: dayName("۱۹ شهریور ۱۴۰۵") })).not.toHaveAccessibleName(/تعطیل/);
+  // The skip link lands on the grid
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("link", { name: "رفتن به تقویم ماه" })).toBeFocused();
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#calendar")).toBeFocused();
 });

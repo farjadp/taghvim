@@ -16,7 +16,7 @@
 
 import { useState } from "react";
 import { ArrowLeft, ArrowLeftRight, Banknote, CalendarHeart, CalendarRange, Cake, Hourglass, Timer } from "lucide-react";
-import { type CalendarKind, dateNumbers, daysBetween, fa, formatDate, fromCalendar, toCalendar } from "@/lib/calendar";
+import { type CalendarKind, GREGORIAN_MONTHS_FA, dateNumbers, daysBetween, fa, formatDate, fromCalendar, toCalendar } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
 import { elapsedAge, parseNumericInput } from "@/lib/date-tools";
 import { type EventGroups } from "@/lib/events";
@@ -33,7 +33,6 @@ export const DEFAULT_TOOL: ToolTab = "bridges";
 export const TOOL_TABS: ToolTab[] = ["bridges", "countdown", "dates", "rates", "convert", "distance", "age"];
 type DateInput = { year: string; month: string; day: string };
 const KINDS: { value: CalendarKind; label: string }[] = [{ value: "persian", label: "خورشیدی" }, { value: "gregorian", label: "میلادی" }, { value: "islamic", label: "قمری محاسباتی" }];
-const GREGORIAN_MONTHS = ["ژانویه", "فوریه", "مارس", "آوریل", "مه", "ژوئن", "ژوئیه", "اوت", "سپتامبر", "اکتبر", "نوامبر", "دسامبر"];
 const ISLAMIC_MONTHS = ["محرم", "صفر", "ربیع‌الاول", "ربیع‌الثانی", "جمادی‌الاول", "جمادی‌الثانی", "رجب", "شعبان", "رمضان", "شوال", "ذی‌القعده", "ذی‌الحجه"];
 const INVALID_DATE = "تاریخ معتبر نیست. روز، ماه و سال را بررسی کنید؛ بازهٔ پشتیبانی‌شده ۱۲۰۰ تا ۱۶۰۰ خورشیدی است.";
 
@@ -49,7 +48,7 @@ function parseDate(value: DateInput, kind: CalendarKind = "persian") {
 
 function DateFields({ value, onChange, kind = "persian", prefix = "" }: { value: DateInput; onChange: (value: DateInput) => void; kind?: CalendarKind; prefix?: string }) {
   const months = useMonthNames();
-  const names = kind === "persian" ? months : kind === "gregorian" ? GREGORIAN_MONTHS : ISLAMIC_MONTHS;
+  const names = kind === "persian" ? months : kind === "gregorian" ? GREGORIAN_MONTHS_FA : ISLAMIC_MONTHS;
   return <div className="grid grid-cols-[.8fr_1.35fr_1fr] gap-3">
     <label className="block text-xs text-muted"><span className="mb-2 block">روز</span><input aria-label={`${prefix}روز`} inputMode="numeric" autoComplete="off" maxLength={2} value={value.day} onChange={(event) => onChange({ ...value, day: event.target.value })} className="field tabular-nums" /></label>
     <label className="block text-xs text-muted"><span className="mb-2 block">ماه</span><select aria-label={`${prefix}ماه`} value={value.month} onChange={(event) => onChange({ ...value, month: event.target.value })} className="field">{names.map((name, i) => <option key={name} value={i + 1}>{name}</option>)}</select></label>

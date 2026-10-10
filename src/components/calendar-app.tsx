@@ -1,8 +1,10 @@
 // ============================================================================
 // Source: src/components/calendar-app.tsx
-// Version: 0.9.27 — 2026-10-07
+// Version: 0.9.28 — 2026-10-09
 // Why: Client shell that owns app state: live Tehran clock, selected day,
 //      visible month, active tool tab and independent event/panel visibility.
+//      Two skip links: the main content, and the month grid itself, which sits
+//      after the hero and second calendars in reading order on every screen.
 // Env / Deps: lib/view guards taghvim-view persistence and legacy migration.
 // ============================================================================
 
@@ -121,6 +123,7 @@ export function CalendarApp({ initialNow, person, backgrounds, rates }: { initia
   return (
     <MonthNamesProvider avestan={preferences.avestan}>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-50 focus:rounded-lg focus:bg-forest-deep focus:px-4 focus:py-3 focus:text-memorial-ink">رفتن به محتوای اصلی</a>
+      <a href="#calendar" className="sr-only focus:not-sr-only focus:fixed focus:top-3 focus:right-3 focus:z-50 focus:rounded-lg focus:bg-forest-deep focus:px-4 focus:py-3 focus:text-memorial-ink">رفتن به تقویم ماه</a>
       <header className="border-b border-line bg-surface/80">
         <div className="mx-auto flex min-h-23 max-w-[1240px] flex-wrap items-center justify-between gap-4 px-5 py-4 sm:px-8">
           <a href="#" aria-label="تقویم، صفحهٔ اصلی" className="flex items-center gap-2.5 text-forest"><BrandMark /><span className="text-[1.6875rem] leading-none font-extrabold">تقویم<span className="mr-1 text-clay">.</span></span><span className="mr-4 hidden border-r border-line pr-5 text-xs font-normal text-muted xl:block">روزها را بهتر ببین</span></a>

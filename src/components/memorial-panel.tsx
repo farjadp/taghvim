@@ -1,11 +1,13 @@
 // ============================================================================
 // Source: src/components/memorial-panel.tsx
-// Version: 0.4.0 — 2026-09-07
+// Version: 0.4.1 — 2026-10-09
 // Why: The box that replaced prayer times in the default view: one randomly
 //      chosen person from the javidnaman list, with photo, age, place and a
 //      link to their page on the source site. A new name on every request.
 // Env / Deps: Person is picked on the server (app/page.tsx) so the HTML and the
 //      hydrated tree agree. Photo is a plain <img> hot-linked with no referrer.
+//      Its alt is empty on purpose: the name is printed right beside it, and
+//      «عکس <name>» made a screen reader say every name twice.
 // ============================================================================
 
 "use client";
@@ -27,12 +29,12 @@ export function MemorialPanel({ person }: { person: Person }) {
     <div className="mt-6 flex items-center gap-5 sm:gap-7">
       {/* Photo: 112px square like the source's "md" size; placeholder keeps the layout when absent */}
       {showPhoto
-        ? <img src={photoUrl(person.id, 288)} alt={`عکس ${person.name}`} width={112} height={112} loading="lazy" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="size-24 shrink-0 rounded-2xl border border-memorial-line object-cover sm:size-28" />
+        ? <img src={photoUrl(person.id, 288)} alt="" width={112} height={112} loading="lazy" referrerPolicy="no-referrer" onError={() => setBroken(true)} className="size-24 shrink-0 rounded-2xl border border-memorial-line object-cover sm:size-28" />
         : <div aria-hidden="true" className="flex size-24 shrink-0 items-center justify-center rounded-2xl border border-memorial-line text-memorial-muted sm:size-28"><Flame size={28} strokeWidth={1.4} /></div>}
       <div className="min-w-0">
         <p data-testid="memorial-name" className="text-2xl font-semibold leading-snug sm:text-3xl">{person.name}</p>
         {details && <p className="mt-2 flex items-center gap-1.5 text-sm text-memorial-muted"><MapPin size={14} />{details}</p>}
-        <a href={personUrl(person.id)} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-memorial-ink underline decoration-memorial-muted underline-offset-4 hover:decoration-memorial-ink">صفحهٔ او در جاویدنامان<ArrowUpLeft size={14} /></a>
+        <a href={personUrl(person.id)} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex items-center gap-1.5 text-xs font-medium text-memorial-ink underline decoration-memorial-muted underline-offset-4 hover:decoration-memorial-ink">صفحهٔ او در جاویدنامان<span className="sr-only">، در پنجرهٔ تازه</span><ArrowUpLeft size={14} /></a>
       </div>
     </div>
     <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-memorial-line pt-4"><p className="text-xs text-memorial-muted">هر بار که این صفحه باز می‌شود، یک نام دیگر.</p><span className="text-[0.625rem] text-memorial-muted">منبع: ایران اینترنشنال · به‌روزرسانی {updated}</span></div>

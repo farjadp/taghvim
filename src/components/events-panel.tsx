@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/events-panel.tsx
-// Version: 0.9.18 — 2026-10-08
+// Version: 0.9.19 — 2026-10-09
 // Why: Selected-day events and the month's event list with category chips.
 // Env / Deps: lib/events uses the grid's groups; only enabled category chips appear.
 // ============================================================================
@@ -38,7 +38,9 @@ export function EventsPanel({ year, month, selected, groups, onSelect }: { year:
       <div className="px-6 pt-6 pb-5">
         <div className="flex items-center justify-between"><h2 className="text-lg font-semibold">روزِ انتخاب‌شده</h2><Leaf size={18} className="text-forest" /></div>
         <p data-testid="selected-date" className="mt-3 text-sm font-medium text-forest">{formatDate(selected, "persian", true)}</p>
-        <div data-testid="selected-events" aria-live="polite" className="mt-3 text-xs leading-6 text-muted">{selectedEvents.length ? selectedEvents.map((event, i) => <p key={i} className={event.holiday ? "text-clay" : ""}><Occasions events={[event]} />{event.holiday && " · تعطیل"}</p>) : <p>در فهرست ما مناسبتی برای این روز ثبت نشده.</p>}</div>
+        {/* Not a live region: since 0.9.47 the focused day cell speaks its own occasions, and
+            announcing them here too made every arrow press say each one twice. */}
+        <div data-testid="selected-events" className="mt-3 text-xs leading-6 text-muted">{selectedEvents.length ? selectedEvents.map((event, i) => <p key={i} className={event.holiday ? "text-clay" : ""}><Occasions events={[event]} />{event.holiday && " · تعطیل"}</p>) : <p>در فهرست ما مناسبتی برای این روز ثبت نشده.</p>}</div>
       </div>
       <div className="flex items-center justify-between border-y border-line px-6 py-4"><h3 className="text-sm font-semibold">مناسبت‌های {MONTHS[month - 1]}</h3><span className="rounded-md bg-paper px-2 py-1 text-[0.625rem] text-muted">{fa(events.length)} مناسبت</span></div>
       <div className="flex flex-wrap gap-1 px-6 pt-4">{filters.map((item) => <button key={item.key} aria-pressed={activeFilter === item.key} onClick={() => setFilter(item.key)} className={`rounded-lg px-3 py-1.5 text-[0.6875rem] transition-colors ${activeFilter === item.key ? "bg-leaf font-medium text-forest" : "text-muted hover:bg-paper"}`}>{item.label}</button>)}</div>

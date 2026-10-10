@@ -1,8 +1,11 @@
 // ============================================================================
 // Source: src/components/calendar-panel.tsx
-// Version: 0.9.9 — 2026-10-08
+// Version: 0.10.0 — 2026-10-09
 // Why: Monthly Jalali grid, RTL keyboard navigation and interactive legend.
 //      Event groups and memorial visibility are controlled below the grid.
+//      Each cell's accessible name is a whole sentence from lib/day-label, so a
+//      screen reader hears the weekday, «تعطیل» and the occasions the grid shows
+//      only by colour and dots.
 // Env / Deps: Pure UI; lib/events filters grid events with the same groups as the list.
 // ============================================================================
 
@@ -14,6 +17,7 @@ import { useMonthNames } from "./month-names-context";
 import { eventsForDate, type EventGroups } from "@/lib/events";
 import { categoryOf, type CategoryId } from "@/lib/date-categories";
 import { categoryInk } from "@/lib/date-categories";
+import { dayLabel } from "@/lib/day-label";
 
 const VIEW_SWITCHES = [
   { key: "festival", label: "جشن‌ها" },
@@ -57,7 +61,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
   const end = fromCalendar({ year, month, day: monthLength(year, month) });
   const englishMonth = (date: Date) => new Intl.DateTimeFormat("en-US", { month: "short", timeZone: "Asia/Tehran" }).format(date);
   return (
-    <section id="calendar" aria-label="تقویم ماهانه" className="min-w-0 overflow-hidden rounded-[1.75rem] border border-line bg-surface">
+    <section id="calendar" tabIndex={-1} aria-label="تقویم ماهانه" className="min-w-0 focus:outline-none overflow-hidden rounded-[1.75rem] border border-line bg-surface">
       <div className="flex flex-wrap items-center justify-between gap-4 px-5 pt-6 pb-5 sm:px-7">
         <div className="flex items-center gap-3"><div className="flex gap-1"><button className="icon-button" aria-label="ماه قبل" disabled={year === 1200 && month === 1} onClick={() => onNavigate(-1)}><ChevronRight size={19} /></button><button className="icon-button" aria-label="ماه بعد" disabled={year === 1600 && month === 12} onClick={() => onNavigate(1)}><ChevronLeft size={19} /></button></div><div><h2 className="text-xl font-bold" aria-live="polite">{months[month - 1]} {fa(year)}</h2><p className="mt-1 text-[0.6875rem] text-muted" dir="ltr">{englishMonth(start)} – {englishMonth(end)} {toCalendar(end, "gregorian").year}</p></div></div>
         <button onClick={onToday} aria-label="برگشت به امروز" className="flex items-center gap-2 rounded-xl border border-line px-3 py-2 text-xs font-medium transition-colors hover:bg-leaf"><RotateCcw size={14} />امروز</button>
@@ -90,7 +94,7 @@ export function CalendarPanel({ year, month, today, selected, groups, memorial, 
             // Friday is always a holiday; other holidays come from the (group-filtered) events
             const holiday = isFriday || events.some((event) => event.holiday);
             const nonFridayHoliday = holiday && !isFriday;
-            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={`${fa(persian.day)} ${months[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-memorial-ink shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
+            return <button key={date.toISOString()} disabled={!supported} tabIndex={active || (!selectionInView && inMonth && persian.day === 1) ? 0 : -1} onClick={() => onSelect(date)} aria-label={supported ? dayLabel(date, groups, { today: isToday, mine: markedCategory(date) && categoryOf(markedCategory(date)!).label, months }) : `${fa(persian.day)} ${months[persian.month - 1]} ${fa(persian.year)}`} aria-pressed={active} aria-current={isToday ? "date" : undefined} className={`relative flex min-h-[66px] flex-col items-center justify-center gap-1 rounded-xl border sm:min-h-[77px] ${active ? "border-forest bg-forest-deep text-memorial-ink shadow-sm" : isToday ? "border-forest bg-leaf text-forest" : !inMonth ? "border-transparent text-muted hover:bg-paper" : holiday ? "border-clay/40 bg-holiday text-clay hover:bg-holiday-hover" : "border-transparent text-ink hover:bg-leaf"}`}>
               <span className={`text-lg leading-6 tabular-nums sm:text-[1.375rem] ${holiday && !active ? "font-bold" : "font-medium"}`}>{fa(persian.day)}</span>
               <span className={`flex items-center gap-1 text-[0.625rem] leading-none tabular-nums sm:text-[0.6875rem] ${active ? "text-memorial-ink/80" : "text-muted"}`}><span dir="ltr">{date.getUTCDate()}</span>{supported && <><span aria-hidden="true">·</span><span>{fa(hijriDay)}</span></>}</span>
               {events.length > 0 && <span className={`absolute bottom-1.5 size-1.5 rounded-full ${active ? "bg-memorial-ink/80" : holiday ? "bg-clay" : "bg-forest/60"}`} />}

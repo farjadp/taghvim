@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/calendar.ts
-// Version: 0.4.0 — 2026-09-10
+// Version: 0.5.0 — 2026-10-09
 // Why: Calendar core: Jalali/Gregorian/Hijri conversion, formatting, month grids.
 //      Every instant is read as a civil day in Asia/Tehran and returned at UTC noon.
 //      weekdayIndex() is the shared Saturday-first weekday, used by formatDate and bridges.
@@ -26,6 +26,12 @@ export const ISLAMIC_NOTICE = 'تاریخ قمری با تقویم محاسبا�
 const ISLAMIC_MONTHS = [
   'محرم', 'صفر', 'ربیع‌الاول', 'ربیع‌الثانی', 'جمادی‌الاول', 'جمادی‌الثانی',
   'رجب', 'شعبان', 'رمضان', 'شوال', 'ذی‌القعده', 'ذی‌الحجه',
+];
+// The Gregorian months in Persian, for text a Persian voice reads aloud and for the
+// converter's month list. Display keeps the Latin names (formatDate 'gregorian').
+export const GREGORIAN_MONTHS_FA: string[] = [
+  'ژانویه', 'فوریه', 'مارس', 'آوریل', 'مه', 'ژوئن',
+  'ژوئیه', 'اوت', 'سپتامبر', 'اکتبر', 'نوامبر', 'دسامبر',
 ];
 const GREGORIAN_MONTHS = [
   'January', 'February', 'March', 'April', 'May', 'June',
