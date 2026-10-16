@@ -7,7 +7,14 @@ out/
 playwright-report/
 test-results/
 .DS_Store
-.claude/
+# Claude Code: personal settings and work files stay local; the shared agent
+# team (agents, skills, hooks, templates, settings.json) is committed.
+.claude/*
+!.claude/agents/
+!.claude/skills/
+!.claude/hooks/
+!.claude/templates/
+!.claude/settings.json
 
 # Next.js regenerates this on every dev/build; it flipped between
 # .next/dev/types and .next/types and kept showing up as drift.
