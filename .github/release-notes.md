@@ -16,7 +16,7 @@ apksigcopier compare --unsigned taghvim-<v>-unsigned.apk taghvim-<v>.apk
 دستور دوم نشان می‌دهد APK امضاشده، جز امضا، بایت‌به‌بایت همان خروجی GitHub است. اثر انگشت SHA-256 گواهی امضا:
 
 ```
-2A:21:28:8E:2B:A9:A8:13:C2:19:84:83:D8:29:2D:9D:03:94:7D:19:C3:D8:71:7E:42:DA:8E:CF:6C:7B:68:6E
+AF:5B:08:88:E0:9F:6B:19:0F:A9:66:C7:37:81:29:D7:03:BD:3C:2B:CB:D4:F5:22:32:8B:AC:13:1B:11:23:7B
 ```
 
 جزئیات: [VERIFY.md](https://github.com/farjadp/taghvim/blob/main/VERIFY.md)
