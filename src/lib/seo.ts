@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/seo.ts
-// Version: 0.9.7 — 2026-09-08
+// Version: 0.9.48 — 2026-11-13
 // Why: Per-page metadata in one shape. Next inherits a parent's `openGraph`
 //      wholesale, so a page that set only `title` kept the home page's og:title
 //      — every secondary page shared it, and sharing /help showed the wrong
@@ -82,4 +82,13 @@ export function breadcrumbStructuredData(name: string, path: string): object {
       { '@type': 'ListItem', position: 2, name, item: `${SITE_ORIGIN}${path}` },
     ],
   };
+}
+
+// Serialises a JSON-LD payload for inlining in a <script>. JSON.stringify leaves
+// `<` alone, so a string holding `</script>` would close the tag and turn the
+// rest into markup. `\u003c` is the same character to a JSON parser and is
+// never a tag to the HTML one. The data is literals today; this keeps it safe
+// the day a title or a description comes from somewhere else.
+export function jsonLd(data: object): string {
+  return JSON.stringify(data).replace(/</g, '\\u003c');
 }

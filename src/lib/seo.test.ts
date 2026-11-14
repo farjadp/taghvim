@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/seo.test.ts
-// Version: 0.9.7 — 2026-09-08
+// Version: 0.9.48 — 2026-11-13
 // Why: The og tags and the canonical are read by machines and nobody notices
 //      when they are wrong. Every secondary page shared the home page's
 //      og:title until 0.9.7, which is the failure these lock down.
@@ -9,7 +9,7 @@
 
 import { describe, expect, it } from 'vitest';
 import { ROUTES, SITE_ORIGIN } from './routes';
-import { SITE_NAME, breadcrumbStructuredData, pageMetadata, siteStructuredData } from './seo';
+import { SITE_NAME, breadcrumbStructuredData, jsonLd, pageMetadata, siteStructuredData } from './seo';
 
 const sample = { title: 'راهنما | تقویم', description: 'چطور از تقویم استفاده کنی.', path: '/help' };
 
@@ -76,5 +76,19 @@ describe('structured data', () => {
     expect(crumb.itemListElement).toHaveLength(2);
     expect(crumb.itemListElement[0]).toMatchObject({ position: 1, name: SITE_NAME, item: `${SITE_ORIGIN}/` });
     expect(crumb.itemListElement[1]).toMatchObject({ position: 2, name: 'راهنما', item: `${SITE_ORIGIN}/help` });
+  });
+});
+
+describe('jsonLd', () => {
+  it('cannot be closed by a string carrying </script>', () => {
+    const data = { name: 'x</script><script>alert(1)</script>' };
+    const out = jsonLd(data);
+    expect(out).not.toContain('<');
+    expect(JSON.parse(out)).toEqual(data);
+  });
+
+  it('round-trips the site payload unchanged', () => {
+    const data = siteStructuredData('توضیح');
+    expect(JSON.parse(jsonLd(data))).toEqual(data);
   });
 });
