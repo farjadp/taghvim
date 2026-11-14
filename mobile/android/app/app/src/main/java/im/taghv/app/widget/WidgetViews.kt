@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/widget/WidgetViews.kt
-// Version: 0.3.0 — 2026-10-10
+// Version: 0.3.1 — 2026-11-13
 // Why: Lays a WidgetDay out as the designs Farjad picked on 10 Sep — small B
 //      (weekday, numeral, month) and wide B (a green block with the numeral and
 //      month, clay on a day off, then weekday, year and the first occasion) —
@@ -167,13 +167,15 @@ object WidgetViews {
 
     // The occasion, in clay when it is a holiday; with none, the Gregorian date,
     // isolated left-to-right so its digits keep their order inside RTL text.
+    // The isolates (LRI U+2066, PDI U+2069) are written as escapes: invisible
+    // raw ones fail lint's BidiSpoofing check and hide in review.
     private fun RemoteViews.occasionLine(context: Context, day: WidgetDay) {
         val occasion = day.occasion
         if (occasion != null) {
             setTextViewText(R.id.occasion, occasion)
             color(context, R.id.occasion, if (day.occasionIsHoliday) R.color.widget_clay else R.color.widget_muted)
         } else {
-            setTextViewText(R.id.occasion, "⁦${day.gregorian}⁩")
+            setTextViewText(R.id.occasion, "\u2066${day.gregorian}\u2069")
             color(context, R.id.occasion, R.color.widget_muted)
         }
         setViewVisibility(R.id.occasion, View.VISIBLE)
