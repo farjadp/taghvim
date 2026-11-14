@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: scripts/check-extension.mjs
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.48 — 2026-11-13
 // Why: The extension's whole pitch is "no permissions, no network, nothing
 //      leaves the machine". A manifest and a bundle can quietly stop being
 //      that, so every build is checked: the manifest asks for nothing, the
@@ -12,6 +12,8 @@
 // Env / Deps: Runs after `vite build` as part of `npm run build:extension`.
 //      Takes the dist folder as its one argument (default extension/dist).
 //      Exits 1 with a list of failures; prints OK otherwise.
+//      Since 0.9.48 the code scan covers every .js/.html/.css under dist, not
+//      only assets/*.js — boot.js was never read — and catches ws:// URLs.
 // ============================================================================
 
 import { existsSync, readFileSync, readdirSync } from 'node:fs';
@@ -30,8 +32,19 @@ const read = (file) => readFileSync(join(dist, file), 'utf8');
 const manifest = JSON.parse(read('manifest.json'));
 if (manifest.manifest_version !== 3) fail('manifest_version is not 3');
 if (manifest.chrome_url_overrides?.newtab !== 'newtab.html') fail('newtab override missing');
-if ((manifest.permissions ?? []).length) fail(`permissions requested: ${manifest.permissions.join(', ')}`);
-if ((manifest.host_permissions ?? []).length) fail(`host_permissions requested: ${manifest.host_permissions.join(', ')}`);
+// Must be arrays when present: a string or an object has no useful `.length`
+// check and the browser may still read it as a grant.
+for (const key of ['permissions', 'host_permissions']) {
+  if (!(key in manifest)) continue;
+  if (!Array.isArray(manifest[key])) fail(`${key} is not an array`);
+  else if (manifest[key].length) fail(`${key} requested: ${manifest[key].join(', ')}`);
+}
+// Each of these lets the extension reach beyond its own page — into sites, the
+// network, or other extensions — or run when no tab is open. None belongs in a
+// new tab that only draws a calendar.
+for (const key of ['content_scripts', 'optional_host_permissions', 'optional_permissions', 'web_accessible_resources', 'externally_connectable', 'background']) {
+  if (key in manifest) fail(`manifest declares ${key}`);
+}
 if (manifest.content_security_policy) fail('a custom CSP is set; the MV3 default is the point');
 for (const icon of Object.values(manifest.icons ?? {})) if (!existsSync(join(dist, icon))) fail(`icon missing: ${icon}`);
 if (!/^\d+(\.\d+){1,3}$/.test(manifest.version)) fail(`version is not dotted numeric: ${manifest.version}`);
@@ -72,18 +85,30 @@ if (css.length !== 1) fail(`expected one CSS bundle, found ${css.length}`);
 for (const name of assets) if (/\.(eot|ttf|woff)$/.test(name)) fail(`legacy font shipped: ${name}`);
 
 // --- code: no request of any kind ------------------------------------------
-const code = js.map((name) => read(join('assets', name))).join('\n');
-for (const token of ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'WebSocket(', 'EventSource(', 'importScripts(', 'eval(', 'new Function(']) {
-  if (code.includes(token)) fail(`bundle contains ${token}`);
-}
+// Every script, page and stylesheet in the package, at any depth: a file the
+// build adds later (boot.js was never scanned before 0.9.48) is still code.
+const walk = (dir) => readdirSync(join(dist, dir), { withFileTypes: true }).flatMap((entry) => {
+  const path = dir ? join(dir, entry.name) : entry.name;
+  return entry.isDirectory() ? walk(path) : [path];
+});
+const scanned = walk('').filter((name) => /\.(js|html|css)$/.test(name));
+// Matched with the opening parenthesis, so React's `fetchPriority` and
+// `prefetchDNS` names do not trip `fetch(`.
+const tokens = ['fetch(', 'XMLHttpRequest', 'sendBeacon', 'WebSocket(', 'EventSource(', 'importScripts(', 'eval(', 'new Function('];
 // taghv.im may carry a path now that the header links to /help#feedback, but
 // still only taghv.im: any other host in the bundle is a network request
 // waiting to happen and fails the build.
 // URL strings are allowed only as XML namespaces, React's error-page prefix,
 // and the one link a person can click. Anything else is a request waiting.
 const allowed = [/^http:\/\/www\.w3\.org\//, /^https:\/\/react\.dev\/errors\//, /^https:\/\/taghv\.im(\/[^\s]*)?$/];
-for (const [url] of code.matchAll(/https?:\/\/[^\s"'`)\\<>]+/g)) {
-  if (!allowed.some((pattern) => pattern.test(url))) fail(`unexpected URL in bundle: ${url}`);
+for (const name of scanned) {
+  // A stylesheet's comments are not code: Tailwind's licence banner names
+  // tailwindcss.com. Real references in CSS are url() and are checked below.
+  const code = name.endsWith('.css') ? read(name).replace(/\/\*[\s\S]*?\*\//g, '') : read(name);
+  for (const token of tokens) if (code.includes(token)) fail(`${name} contains ${token}`);
+  for (const [url] of code.matchAll(/(?:https?|wss?):\/\/[^\s"'`)\\<>]+/g)) {
+    if (!allowed.some((pattern) => pattern.test(url))) fail(`unexpected URL in ${name}: ${url}`);
+  }
 }
 
 // --- stylesheet: no external url(), and every local url() exists -----------
@@ -106,4 +131,4 @@ if (failures.length) {
   process.exit(1);
 }
 const bytes = readdirSync(join(dist, 'assets')).reduce((sum, name) => sum + readFileSync(join(dist, 'assets', name)).length, 0);
-console.log(`OK    extension (${target}): no permissions, no network, ${assets.length} assets, ${(bytes / 1024).toFixed(0)} KB`);
+console.log(`OK    extension (${target}): no permissions, no network, ${scanned.length} files scanned, ${assets.length} assets, ${(bytes / 1024).toFixed(0)} KB`);

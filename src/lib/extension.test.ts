@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/extension.test.ts
-// Version: 0.9.15 — 2026-09-09
+// Version: 0.9.48 — 2026-11-13
 // Why: The extension's manifest is a promise — no permissions, no remote
 //      code — and a promise nobody re-reads. These keep it honest, and keep
 //      its version in step with the package so a release cannot ship two
@@ -40,6 +40,15 @@ describe('extension manifest', () => {
     expect(manifest.permissions).toEqual([]);
     expect(manifest.host_permissions).toEqual([]);
     expect(manifest.optional_permissions).toBeUndefined();
+  });
+
+  // Each of these reaches past the new-tab page — into sites, the network,
+  // other extensions, or a background that runs with no tab open.
+  it('declares nothing that reaches beyond its own page', () => {
+    for (const key of ['content_scripts', 'optional_host_permissions', 'optional_permissions', 'web_accessible_resources', 'externally_connectable', 'background']) {
+      expect(manifest, key).not.toHaveProperty(key);
+      expect(firefox, key).not.toHaveProperty(key);
+    }
   });
 
   // The MV3 default CSP is what forbids inline and remote scripts; loosening
