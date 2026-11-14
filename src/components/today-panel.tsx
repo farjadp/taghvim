@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.39 — 2026-10-09
+// Version: 0.9.48 — 2026-11-13
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
@@ -100,7 +100,10 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
 
   return (
       <div className="relative isolate rounded-[1.75rem] bg-forest-deep px-7 py-7 text-white sm:px-9">
-        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem]"><HeroMotifs /></div>
+        {/* will-change gives the motif its own layer: Android WebView 133 left stale tiles under the
+            translucent SVG when the second clocks grew the hero after first paint, so the clock
+            appeared to spill out of the card. Reproduced and fixed on the API 36 emulator. */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.75rem] will-change-transform"><HeroMotifs /></div>
         <div className="relative z-10 flex flex-wrap items-start justify-between gap-5">
           <div>
             <div aria-hidden="true" className="mb-3 flex items-center gap-2 text-sm text-[#d9e3cf]"><span className="size-1.5 rounded-full bg-[#c8d4a8]" />امروز، {new Intl.DateTimeFormat("fa-IR", { weekday: "long", timeZone: "Asia/Tehran" }).format(now)}</div>
