@@ -1,13 +1,14 @@
 // ============================================================================
 // Source: src/lib/widget-sync.ts
-// Version: 0.2.0 — 2026-10-08
+// Version: 0.2.1 — 2026-11-13
 // Why: Hands the home-screen widgets the visitor's view — the four event
 //      groups and the older month names — so a widget shows what the calendar
-//      on screen shows. Only inside the Android app: there the native side
-//      injects `window.Capacitor` and registers the WidgetSync plugin
-//      (mobile/android/app/.../WidgetSyncPlugin.kt). Everywhere else — the
-//      site, the Chrome and Firefox extensions — it finds no native platform
-//      and does nothing. It reads the global rather than importing
+//      on screen shows. Only inside the Android and iPhone apps: there the
+//      native side injects `window.Capacitor` and registers the WidgetSync
+//      plugin (WidgetSyncPlugin.kt on Android, WidgetSyncPlugin.swift on iOS,
+//      which keeps the same JS name so this one file serves both). Everywhere
+//      else — the site, the Chrome and Firefox extensions — it finds no native
+//      platform and does nothing. It reads the global rather than importing
 //      @capacitor/core, so neither bundle grows and the extension's
 //      no-network check has nothing new to look at. The memorial switch and
 //      personal dates never cross.
