@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/vite.config.ts
-// Version: 0.9.27 — 2026-09-10
+// Version: 0.9.28 — 2026-11-13
 // Why: Builds the browser extension from the same source the site uses.
 //      `@/` resolves into ../src so panels and lib are imported, never copied.
 //      A small plugin emits what Vite would not otherwise produce: the
@@ -22,7 +22,10 @@ import { fileURLToPath } from "node:url";
 import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 import { defineConfig, type Plugin } from "vite";
-import { PREFERENCES_BOOT_SCRIPT } from "../src/lib/preferences";
+// With the extension: Vite loads this config through Node, which wants the file
+// name in full and warned on every build without it. tsconfig carries
+// allowImportingTsExtensions (noEmit is already on) so tsc accepts it.
+import { PREFERENCES_BOOT_SCRIPT } from "../src/lib/preferences.ts";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const repo = resolve(here, "..");
