@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/build.gradle
-// Version: 0.1.1 — 2026-10-01
+// Version: 0.1.2 — 2026-11-13
 // Why: The app module. Beyond Capacitor's template: Kotlin for the widgets;
 //      the shared im.taghv.core; java.time desugared, because minSdk is 24 and
 //      java.time arrived in 26 — the widget's Tehran midnight is java.time; and
@@ -32,7 +32,8 @@ android {
         }
     }
     compileOptions {
-        coreLibraryDesugaringEnabled true
+        // `=` assignment: the space form is deprecated and removed in Gradle 10.
+        coreLibraryDesugaringEnabled = true
     }
     sourceSets {
         main {
