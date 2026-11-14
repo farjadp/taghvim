@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.20 — 2026-10-09
+// Version: 0.11.21 — 2026-11-13
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.48',
+    at: '2026-11-13T21:51:39-05:00',
+    status: 'ready',
+    title: 'باز شدن درست صفحه‌ها',
+    changes: [
+      { kind: 'fixed', text: 'صفحه‌ای که از پایین صفحهٔ دیگر باز می‌شد، روی رایانه کمی پایین‌تر از سرش می‌ایستاد و پیوند به یک بخش، مثل «حریم خصوصی»، تا آن بخش می‌لغزید؛ حالا هر صفحه همان‌جا که باید باز می‌شود.' },
+    ],
+  },
   {
     version: '0.9.47',
     at: '2026-10-09T23:35:00-04:00',

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/app/layout.tsx
-// Version: 0.9.7 — 2026-09-08
+// Version: 0.9.48 — 2026-11-13
 // Why: Root layout: RTL Persian document, global styles, site metadata.
 // Env / Deps: Next.js Metadata API; globals.css (Vazirmatn is imported there).
 // ============================================================================
@@ -23,7 +23,12 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="fa" dir="rtl" suppressHydrationWarning>
+    <html lang="fa" dir="rtl" data-scroll-behavior="smooth" suppressHydrationWarning>
+      {/* data-scroll-behavior: globals.css makes <html> scroll smoothly for in-page
+          anchors. Next 16 no longer suspends that on a route change, so a new page
+          animated its own scroll — it settled 49px below the top on desktop and
+          slid ~1400px to /about#privacy. The attribute restores the suspension for
+          route changes only; in-page anchors still glide (measured, 13 Nov). */}
       {/* Applies stored theme/size/font before first paint; attributes are set client-side, hence suppressHydrationWarning */}
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREFERENCES_BOOT_SCRIPT }} />

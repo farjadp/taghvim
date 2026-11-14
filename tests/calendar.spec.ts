@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.47 — 2026-10-09
+// Version: 0.9.48 — 2026-11-13
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -563,6 +563,27 @@ test("changelog is reachable from the footer and lists releases with dates", asy
   await expect(releases.first()).toContainText("ساعت");
   // exact: a release is titled «آنچه در راه است», which also contains this text
   await expect(page.getByRole("heading", { name: "در راه", exact: true })).toBeVisible();
+});
+
+// 0.9.48: globals.css scrolls <html> smoothly, and Next 16 stopped suspending that on a
+// route change, so a page opened from the footer animated its own scroll — it settled
+// 49px below the top on desktop and slid ~1400px to /about#privacy. The new page must
+// land where it belongs at once and stay there.
+test("a page opened from the footer lands in place without animating the scroll", async ({ page }) => {
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  await page.getByRole("contentinfo").getByRole("link", { name: "حریم خصوصی" }).click();
+  await expect(page).toHaveURL(/\/about#privacy$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBeGreaterThan(0);
+  const first = await page.evaluate(() => window.scrollY);
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.scrollY)).toBe(first);
+
+  await page.evaluate(() => window.scrollTo({ top: document.documentElement.scrollHeight, behavior: "instant" }));
+  await page.getByRole("contentinfo").getByRole("link", { name: "راهنما", exact: true }).click();
+  await expect(page).toHaveURL(/\/help$/);
+  await expect.poll(() => page.evaluate(() => window.scrollY)).toBe(0);
+  await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
 });
 
 test("changelog passes accessibility checks in both themes", async ({ page }) => {
