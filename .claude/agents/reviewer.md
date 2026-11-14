@@ -36,6 +36,23 @@ Form your own view from the diff, the tests and the card before reading any buil
 - `scrollWidth - innerWidth` is 0 at 320, 360, 375 and 390px for layout changes.
 **Tests**
 - Tests would fail if the feature broke. None deleted, skipped or weakened.
+**Content rules**
+- `state` titles: no «ایران», the two men named by name only, no honorific or old epithet (the unit test walks the year; run it).
+- `/calendar.ics`: URL unchanged, `iran` only, UIDs stable, CRLF, no line over 75 octets.
+- Changelog: a visible change or a fix a visitor could hit has an entry described by what they saw; internal work has none.
+- No greeting, slogan or marketing line in the interface; footer still five links.
+
+## Full suites by area (run what the diff touches)
+| Area | Command |
+|---|---|
+| Unit, types, build | `npm test` · `npm run typecheck` · `npm run build` |
+| Browser | `npm run test:e2e` (projects `desktop`, `mobile`; dev server on 3100, in a worktree `--port 3101` with `E2E_PORT=3101`) |
+| Extension | `npm run build:extension` · `npm run build:extension:firefox` · `npx playwright test --project=firefox` |
+| Widget data | `npm run build:widget-data` then `git diff --exit-code mobile/shared/` |
+| Android core | `./gradlew test` in `mobile/android/core` with `JAVA_HOME` = Android Studio's `jbr`; the app module needs JDK 21 (`/opt/homebrew/opt/openjdk@21`) |
+| iOS core | `swift test` in `mobile/ios/TaghvimCore` |
+| Production, after a deploy | `npm run check:live` |
+Find day cells with `dayName("…")`, never an exact accessible name.
 
 ## Output
 `.claude/work/F-n-review.md` from `.claude/templates/review.md`, findings as BLOCKER / MAJOR / MINOR.

@@ -29,10 +29,13 @@ In this repo a push to `main` is a deploy, and a `v*` tag starts a public releas
 ## Release checklist: `.claude/work/F-n-release.md`
 - Surfaces affected and what Farjad must do for each:
   site (push to `main` → Railway) · extension and APK/AAB (tag `v<version>` → GitHub Actions draft release → his signing scripts) · stores (hand upload).
-- **At push time, flip every `ready` release to `live` in its own commit and send both in the same push.**
+- **At push time, flip every `ready` release to `live` in its own commit and send both in the same push.** Write the chain for Farjad as one `&&` sequence (release commit && flip commit && push), so the flip can never go out without the change it announces.
 - After deploy: run `npm run check:live`.
 - If event data changed: confirm `widget-data.json` was regenerated and the Kotlin/Swift parsers handle it.
 - Run `npm test` and `npm run typecheck` after your edits and report the result.
+
+## Commits
+Commit messages say why. No `Co-Authored-By` or other AI trailer, and no "Generated with" line: this repo is public and those trailers list bots as contributors (Farjad, 17 Sep).
 
 ## Final line
 `RELEASE READY: F-n — Farjad's actions: <list>`

@@ -38,6 +38,9 @@ You are a senior developer on Taghvim. You implement exactly one task at a time.
 - Do not edit `src/lib/changelog.ts` or `package.json`'s version — `release-prep` does that.
 - Do not remove the `nextjs-agent-rules` block from `AGENTS.md`; `next dev` re-adds it.
 
+## Commits
+If the task says to commit: small focused commits on the branch, messages that say why, and no `Co-Authored-By` or other AI trailer (Farjad, 17 Sep: this repo is public).
+
 ## Report (final message)
 ```
 TASK: F-n / Tn
