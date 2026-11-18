@@ -1,3 +1,12 @@
+// ============================================================================
+// Source: mobile/ios/app/App/App/AppDelegate.swift
+// Version: 0.2.0 — 2026-11-18
+// Why: Capacitor's app delegate, plus one privacy rule: the page's localStorage
+//      holds the personal dates, which can be people's names, and the app says
+//      that list stays on this device, so it must stay out of device backups.
+// Env / Deps: UIKit, Capacitor. Sets the backup-exclusion flag on Library/WebKit.
+// ============================================================================
+
 import UIKit
 import Capacitor
 
@@ -7,8 +16,29 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        excludeWebViewStorageFromBackup()
         return true
+    }
+
+    // WebKit excludes a site's storage folder for its first 24 hours, then
+    // clears that flag the next time the site is used, so localStorage becomes
+    // backup-eligible. The flag therefore goes on the parent, which WebKit does
+    // not touch. Set on every launch, before the web view exists, and the folder
+    // is created here because it does not exist yet on a first launch.
+    private func excludeWebViewStorageFromBackup() {
+        let fileManager = FileManager.default
+        do {
+            var webKitDirectory = try fileManager
+                .url(for: .libraryDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+                .appendingPathComponent("WebKit", isDirectory: true)
+            try fileManager.createDirectory(at: webKitDirectory, withIntermediateDirectories: true)
+            var values = URLResourceValues()
+            values.isExcludedFromBackup = true
+            try webKitDirectory.setResourceValues(values)
+        } catch {
+            // The calendar still works without the flag, so this must not stop launch.
+            NSLog("Taghvim: could not exclude web storage from backup: %@", error.localizedDescription)
+        }
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
