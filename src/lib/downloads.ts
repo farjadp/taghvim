@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.43 — 2026-10-07
+// Version: 0.9.49 — 2026-11-18
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -138,8 +138,9 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
 // release v0.9.39 is attested, and the signed one differs from it only by the
 // signature (scripts/sign-release-apk.mjs; VERIFY.md says how anyone can check).
 // 1.3 (versionCode 4, release v0.9.40) is the first signed with the key of 1 Oct.
+// 1.4 (versionCode 5, release v0.9.48) has the same key as 1.3, so it updates a 1.3 install, and carries the month widget.
 export const ANDROID_APK_URL: string | null =
-  'https://github.com/farjadp/taghvim/releases/download/v0.9.40/taghvim-1.3.apk';
+  'https://github.com/farjadp/taghvim/releases/download/v0.9.48/taghvim-1.4.apk';
 
 // The certificate every Taghvim APK is signed with (subject CN=Taghvim), so
 // anyone handed the file somewhere else can check it came from here. It is
@@ -176,13 +177,13 @@ export function appsPanel(apkUrl: string | null, appStoreUrl: string | null = nu
           name: 'اندروید',
           status: 'ready',
           points: [
-            'ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن',
+            'ویجت صفحهٔ خانه، در اندازهٔ کوچک و پهن، و ویجت ماه',
             'اندروید ۷ یا بالاتر، بدون مجوز اینترنت',
             'اندروید یک بار می‌پرسد اجازه می‌دهی مرورگر برنامه نصب کند؛ باید تأیید کنی.',
             // The key changed on 1 Oct 2026 (see ANDROID_CERT_SHA256). Android
             // refuses to install over an app signed with another key and says only
             // «App not installed»; this line is the explanation it does not give.
-            'اگر نسخهٔ ۱٫۰ تا ۱٫۲ را از اینجا نصب کرده‌ای، اول آن را حذف کن؛ ۱٫۳ با کلید تازه امضا شده و روی نسخهٔ قبلی نصب نمی‌شود.',
+            'اگر نسخهٔ ۱٫۰ تا ۱٫۲ را از اینجا نصب کرده‌ای، اول آن را حذف کن؛ نسخه‌های ۱٫۳ به بعد با کلید تازه امضا شده‌اند و روی نسخهٔ قبلی نصب نمی‌شوند.',
             // Reported 11 Sep: a reader's phone showed «App blocked to protect your
             // device — Play Protect hasn't seen an app from this developer before».
             // It is about the developer being unknown to Google, not the file; the

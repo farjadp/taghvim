@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.test.ts
-// Version: 0.2.0 — 2026-10-07
+// Version: 0.2.1 — 2026-11-18
 // Why: The apps panel must not offer a download that does not exist, and the
 //      day it does, it must carry the certificate that lets anyone check the
 //      file. Both states are built by appsPanel, so both are tested here
@@ -20,6 +20,7 @@ describe('apps panel', () => {
     expect(android.status).toBe('building');
     expect(android.action).toBeUndefined();
     expect(android.fingerprint).toBeUndefined();
+    expect(android.points.join(' ')).not.toContain('ویجت ماه');
     expect(panel.summary).toContain('در دست کدنویسی');
     expect(panel.timing).toContain('زمان انتشار هنوز معلوم نیست');
   });
@@ -30,6 +31,7 @@ describe('apps panel', () => {
     expect(android.status).toBe('ready');
     expect(android.action).toEqual({ label: 'دریافت فایل نصبی (APK)', href: URL, external: true });
     expect(android.fingerprint).toBe(ANDROID_CERT_SHA256);
+    expect(android.points.join(' ')).toContain('ویجت ماه');
     expect(android.points.join(' ')).toContain('بدون مجوز اینترنت');
     // The way past Play Protect's «unknown developer» block, named by the exact
     // labels the phone shows.

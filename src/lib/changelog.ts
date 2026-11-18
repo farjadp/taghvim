@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.21 — 2026-11-13
+// Version: 0.11.22 — 2026-11-18
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,16 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.49',
+    at: '2026-11-18T10:54:30-05:00',
+    status: 'ready',
+    title: 'اندروید ۱٫۴، با ویجت ماه',
+    changes: [
+      { kind: 'added', text: 'برنامهٔ اندروید ۱٫۴ روی صفحهٔ دریافت؛ روی نسخهٔ ۱٫۳ نصب می‌شود.' },
+      { kind: 'added', text: 'ویجت ماه برای اندروید: جدول ماه روی صفحهٔ خانه، و اگر یک ردیف بلندترش کنی، مناسبت‌های پیش‌رو زیر آن.' },
+    ],
+  },
   {
     version: '0.9.48',
     at: '2026-11-13T22:01:22-05:00',

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.48 — 2026-11-13
+// Version: 0.9.49 — 2026-11-18
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -1008,12 +1008,13 @@ test("the download page states each method's real status", async ({ page }) => {
   const android = page.locator("#app-android");
   const apk = android.locator('a[href*="/releases/"]');
   await expect(apk).toHaveCount(1);
-  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.40/taghvim-1.3.apk");
+  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.48/taghvim-1.4.apk");
   await expect(apk).toHaveAttribute("rel", /noopener/);
   await expect(android).toContainText("SHA-256");
   await expect(android).toContainText("AF:5B:08:88");
   // The key changed on 1 Oct; the card must say an older install has to go first.
   await expect(android).toContainText("۱٫۰ تا ۱٫۲");
+  await expect(android).toContainText("ویجت ماه");
   // Play Protect blocks an app from a developer Google does not know yet; the
   // card says where the way through is.
   await expect(android).toContainText("Install anyway");
