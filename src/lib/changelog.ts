@@ -40,7 +40,7 @@ export const RELEASES: Release[] = [
   {
     version: '0.9.49',
     at: '2026-11-18T10:59:45-05:00',
-    status: 'ready',
+    status: 'live',
     title: 'اندروید ۱٫۴، با ویجت ماه',
     changes: [
       { kind: 'added', text: 'برنامهٔ اندروید ۱٫۴ روی صفحهٔ دریافت؛ روی نسخهٔ ۱٫۳ نصب می‌شود.' },
