@@ -187,9 +187,10 @@ export function appsPanel(apkUrl: string | null, appStoreUrl: string | null = nu
             // Reported 11 Sep: a reader's phone showed «App blocked to protect your
             // device — Play Protect hasn't seen an app from this developer before».
             // It is about the developer being unknown to Google, not the file; the
-            // way through is under More details. Remove once the app and its key
-            // are registered with Google (developer verification / Play).
-            'چون برنامه هنوز در گوگل‌پلی نیست، ممکن است Play Protect بگوید سازنده‌اش را نمی‌شناسد. زیر «More details» گزینهٔ «Install anyway» را بزن.',
+            // way through is under More details. The app is public on Google Play
+            // (checked 18 Nov 2026), which does not prove a file installed from here
+            // is never flagged, so the line is conditional and names no cause.
+            'اگر Play Protect گفت سازنده‌اش را نمی‌شناسد، زیر «More details» گزینهٔ «Install anyway» را بزن.',
           ],
           action: { label: 'دریافت فایل نصبی (APK)', href: apkUrl, external: true },
           fingerprint: ANDROID_CERT_SHA256,

@@ -37,6 +37,8 @@ describe('apps panel', () => {
     // labels the phone shows.
     expect(android.points.join(' ')).toContain('«More details»');
     expect(android.points.join(' ')).toContain('«Install anyway»');
+    // The app is public on Google Play, so the card must not say otherwise.
+    expect(android.points.join(' ')).not.toContain('هنوز در گوگل‌پلی نیست');
     // The iPhone is untouched: still in development, still no date.
     expect(panel.platforms.find((p) => p.id === 'ios')!.status).toBe('building');
     expect(panel.timing).toContain('نسخهٔ آیفون');
