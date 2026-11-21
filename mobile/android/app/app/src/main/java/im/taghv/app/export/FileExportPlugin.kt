@@ -1,19 +1,21 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/export/FileExportPlugin.kt
-// Version: 0.2.0 — 2026-11-20
-// Why: The native half of src/lib/native-export.ts. In the app, the export of
-//      «تاریخ‌های من» was a blob: link clicked with `download`; Capacitor's
-//      WebView has no DownloadListener, so the click was dropped without a
-//      word. The page now calls FileExport.share({ fileName, mimeType,
-//      content }); this writes the text to cacheDir/exports/<name>, hands it
-//      out through the app's FileProvider with a read grant, and opens the
-//      system chooser on ACTION_SEND. Nothing leaves the phone except by the
-//      person's own pick in that sheet, and no permission is needed: the cache
-//      is the app's own, and the grant is per-intent.
+// Version: 0.3.0 — 2026-11-20
+// Why: The native half of src/lib/native-export.ts. Capacitor's WebView has
+//      no DownloadListener and no navigator.share, so a blob: download is
+//      dropped without a word. The page calls FileExport.share({ fileName,
+//      mimeType, content | base64, text? }) for two things: the .ics of
+//      «تاریخ‌های من» (UTF-8 content) and the hero's day card (PNG or JPEG as
+//      base64). ExportFiles.check decides what is accepted; this writes the
+//      bytes to cacheDir/exports/<name>, hands the file out through the app's
+//      FileProvider with a read grant, and opens the system chooser on
+//      ACTION_SEND, `text` riding along as EXTRA_TEXT. Nothing leaves the
+//      phone except by the person's own pick in that sheet, and no permission
+//      is needed: the cache is the app's own, and the grant is per-intent.
 //      Resolves { shared: true } once the chooser is up — the chooser does not
-//      report a cancel, and the page treats both answers the same. Rejects on a
-//      name, type or size it does not accept, a failed write, or no activity to
-//      show the sheet; the page then says «فایل ساخته نشد.».
+//      report a cancel, and the page treats both answers the same. Rejects with
+//      BAD_NAME / BAD_TYPE / BAD_CONTENT / TOO_LARGE on what check refuses,
+//      WRITE_FAILED, or NO_ACTIVITY.
 // Env / Deps: Capacitor 8 plugin API; androidx FileProvider with authority
 //      ${applicationId}.fileprovider (AndroidManifest.xml) and the `exports`
 //      cache-path in res/xml/file_paths.xml; registered in MainActivity.
@@ -38,18 +40,20 @@ import java.io.IOException
 class FileExportPlugin : Plugin() {
     @PluginMethod
     fun share(call: PluginCall) {
-        val name = ExportFiles.safeFileName(call.getString("fileName"))
-            ?: return call.reject("fileName must be a plain .ics name", "BAD_NAME")
-        if (!ExportFiles.isAllowedMimeType(call.getString("mimeType"))) {
-            return call.reject("only ${ExportFiles.MIME_TYPE} is exported", "BAD_TYPE")
+        val checked = ExportFiles.check(
+            call.getString("fileName"),
+            call.getString("mimeType"),
+            call.getString("content"),
+            call.getString("base64"),
+            call.getString("text"),
+        )
+        val ok = when (checked) {
+            is ExportFiles.Result.Rejected -> return call.reject(checked.message, checked.code)
+            is ExportFiles.Result.Ok -> checked
         }
-        val content = call.getString("content")
-            ?: return call.reject("content is missing", "NO_CONTENT")
-        val bytes = content.toByteArray(Charsets.UTF_8)
-        if (bytes.size > ExportFiles.MAX_BYTES) return call.reject("content too large", "TOO_LARGE")
 
         val file = try {
-            write(name, bytes)
+            write(ok.name, ok.bytes)
         } catch (e: IOException) {
             return call.reject("could not write the file", "WRITE_FAILED", e)
         } catch (e: IllegalArgumentException) {
@@ -64,14 +68,19 @@ class FileExportPlugin : Plugin() {
         }
 
         val send = Intent(Intent.ACTION_SEND).apply {
-            type = ExportFiles.MIME_TYPE
+            type = ok.kind.mime
             putExtra(Intent.EXTRA_STREAM, uri)
+            // The caption a chat app puts beside the picture (Telegram has no alt text).
+            ok.text?.let { putExtra(Intent.EXTRA_TEXT, it) }
             // ClipData carries the grant through the chooser to the app picked in it;
             // EXTRA_STREAM alone is not enough for the grant on every version.
-            clipData = ClipData.newUri(context.contentResolver, name, uri)
+            clipData = ClipData.newUri(context.contentResolver, ok.name, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        val chooser = Intent.createChooser(send, context.getString(R.string.export_chooser_title)).apply {
+        val title = context.getString(
+            if (ok.kind == ExportFiles.Kind.ICS) R.string.export_chooser_title else R.string.export_chooser_title_image,
+        )
+        val chooser = Intent.createChooser(send, title).apply {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
         // Plugin methods run on Capacitor's plugin thread, so runOnUiThread only

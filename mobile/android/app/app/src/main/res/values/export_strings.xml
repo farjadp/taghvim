@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Source: res/values/export_strings.xml — Version 0.1.0, 2026-11-20. The title of the share sheet FileExportPlugin opens for the .ics of «تاریخ‌های من». -->
+<!-- Source: res/values/export_strings.xml — Version 0.2.0, 2026-11-20. The titles of the share sheet FileExportPlugin opens: for the .ics of «تاریخ‌های من», and for the hero's day card. -->
 <resources>
     <string name="export_chooser_title">افزودن به تقویم</string>
+    <string name="export_chooser_title_image">فرستادن تصویر روز</string>
 </resources>
