@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/downloads.ts
-// Version: 0.9.49 — 2026-11-18
+// Version: 0.9.50 — 2026-11-20
 // Why: The ways to get the calendar onto a device, and the honest status of
 //      each. Kept as data so /download cannot claim something that is not
 //      built: a method with no `href` renders no button, and a store listing
@@ -139,8 +139,9 @@ export const DOWNLOAD_METHODS: readonly DownloadMethod[] = [
 // signature (scripts/sign-release-apk.mjs; VERIFY.md says how anyone can check).
 // 1.3 (versionCode 4, release v0.9.40) is the first signed with the key of 1 Oct.
 // 1.4 (versionCode 5, release v0.9.48) has the same key as 1.3, so it updates a 1.3 install, and carries the month widget.
+// 1.5 (versionCode 6, release v0.9.49) has the same key again, so it updates a 1.3 or 1.4 install; it keeps the app's data out of Google backup and device transfer.
 export const ANDROID_APK_URL: string | null =
-  'https://github.com/farjadp/taghvim/releases/download/v0.9.48/taghvim-1.4.apk';
+  'https://github.com/farjadp/taghvim/releases/download/v0.9.49/taghvim-1.5.apk';
 
 // The certificate every Taghvim APK is signed with (subject CN=Taghvim), so
 // anyone handed the file somewhere else can check it came from here. It is

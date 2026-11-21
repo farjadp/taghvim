@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.23 — 2026-11-18
+// Version: 0.11.24 — 2026-11-20
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,18 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.50',
+    at: '2026-11-20T19:20:23-05:00',
+    status: 'ready',
+    title: 'اندروید ۱٫۵: تاریخ‌های من دیگر در پشتیبان گوشی نمی‌رود',
+    changes: [
+      { kind: 'changed', text: 'برنامهٔ اندروید دیگر «تاریخ‌های من» و تنظیمات را در پشتیبان گوگلِ گوشی نمی‌گذارد.' },
+      { kind: 'changed', text: 'برای همین، با گوشی تازه هم جابه‌جا نمی‌شوند.' },
+      { kind: 'changed', text: 'پشتیبان‌هایی که پیش از این گرفته شده با این به‌روزرسانی پاک نمی‌شوند.' },
+      { kind: 'added', text: 'برنامهٔ اندروید ۱٫۵ روی صفحهٔ دریافت؛ روی نسخهٔ ۱٫۳ و ۱٫۴ نصب می‌شود.' },
+    ],
+  },
   {
     version: '0.9.49',
     at: '2026-11-18T10:59:45-05:00',
