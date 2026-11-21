@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/ExportCore/Sources/ExportCore/ExportFiles.swift
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.1.1 — 2026-11-20
 // Why: The pure half of the iPhone app's FileExportPlugin, a line-for-line
 //      twin of Android's ExportFiles.kt so the two apps accept exactly the same
 //      requests. The plugin is not a general file writer: it hands out three
@@ -12,8 +12,12 @@
 //      Names stay a bare ASCII basename whose extension matches the type,
 //      because the receiving app shows the name. Image bytes must start with
 //      their format's signature, so the page cannot hand out something else
-//      under an image type. Lengths are counted in UTF-16 units, as Kotlin and
-//      JavaScript count them, so a limit means the same number on both sides.
+//      under an image type. The name and the caption are counted in UTF-16
+//      units, as Kotlin and JavaScript count them, so those limits mean the
+//      same number on both sides; the .ics cap is in UTF-8 bytes, as Kotlin
+//      measures the encoded text, and the image cap in decoded bytes.
+//      No file-timestamp API is used (only resource keys for the file's kind),
+//      so PrivacyInfo.xcprivacy needs no file-timestamp reason.
 //      `clear` empties <tmp>/exports/ before each new export and once per
 //      launch, so the last export (people's names, or the day's card) does not
 //      linger.
@@ -106,7 +110,7 @@ public enum ExportFiles {
     public static func kindFor(_ mime: String?) -> Kind? {
         guard let mime = mime else { return nil }
         let bare = (mime.split(separator: ";", maxSplits: 1, omittingEmptySubsequences: false).first.map(String.init) ?? "")
-            .trimmingCharacters(in: .whitespaces)
+            .trimmingCharacters(in: .whitespacesAndNewlines) // Kotlin trim(): newlines too
             .lowercased()
         return Kind.allCases.first { $0.mime == bare }
     }
@@ -219,20 +223,36 @@ public enum ExportFiles {
     // else: no subfolder is entered, and a symlink is neither followed nor
     // removed, so this can never reach outside the folder. A missing folder,
     // or an exports/ that is itself a link, is left alone. Returns how many
-    // files were deleted. FileManager.attributesOfItem does not follow a
-    // link, so a link reports .typeSymbolicLink and is skipped.
+    // files were deleted. The kind is read with URL resource keys, not
+    // attributesOfItem (which also returns timestamps, an API Apple asks a
+    // reason for). isSymbolicLinkKey describes the entry itself and is checked
+    // first, so a link is skipped before its target's kind could matter.
     @discardableResult
     public static func clear(base: URL, fileManager: FileManager = .default) -> Int {
         let folder = base.appendingPathComponent(dir, isDirectory: true)
-        guard (try? fileManager.attributesOfItem(atPath: folder.path)[.type] as? FileAttributeType) == .typeDirectory,
+        guard kindOf(folder) == .directory,
               let entries = try? fileManager.contentsOfDirectory(atPath: folder.path) else { return 0 }
         var deleted = 0
         for entry in entries {
-            let path = folder.appendingPathComponent(entry).path
-            guard (try? fileManager.attributesOfItem(atPath: path)[.type] as? FileAttributeType) == .typeRegular else { continue }
-            if (try? fileManager.removeItem(atPath: path)) != nil { deleted += 1 }
+            let file = folder.appendingPathComponent(entry, isDirectory: false)
+            guard kindOf(file) == .regular else { continue }
+            if (try? fileManager.removeItem(at: file)) != nil { deleted += 1 }
         }
         return deleted
+    }
+
+    enum EntryKind { case regular, directory, link, other }
+
+    // What sits at `url`, without following a symlink at the last component.
+    // Nil when nothing is there.
+    static func kindOf(_ url: URL) -> EntryKind? {
+        // A fresh URL each time: URL caches resource values.
+        let fresh = URL(fileURLWithPath: url.path)
+        guard let values = try? fresh.resourceValues(forKeys: [.isSymbolicLinkKey, .isRegularFileKey, .isDirectoryKey]) else { return nil }
+        if values.isSymbolicLink == true { return .link }
+        if values.isRegularFile == true { return .regular }
+        if values.isDirectory == true { return .directory }
+        return .other
     }
 
     // One file at a time: the folder is emptied first, so an old export never

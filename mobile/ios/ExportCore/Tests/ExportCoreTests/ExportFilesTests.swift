@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/ExportCore/Tests/ExportCoreTests/ExportFilesTests.swift
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.1.1 — 2026-11-20
 // Why: Holds the iPhone FileExport's pure half to the same cases as Android's
 //      ExportFilesTest.kt, one test for one test: the names the page sends are
 //      accepted as is, anything that is not a plain basename is refused, only
@@ -73,6 +73,12 @@ final class ExportFilesTests: XCTestCase {
         let jpg = ok(check("taghvim-1405-08-30.jpg", "image/jpeg", nil, b64(jpegBytes)))
         XCTAssertEqual(jpg.kind, .jpeg)
         XCTAssertNil(jpg.text)
+    }
+
+    func testMimeIsTrimmedOfNewlinesAsKotlinTrimDoes() {
+        XCTAssertEqual(ExportFiles.kindFor("image/png\n"), .png)
+        XCTAssertEqual(ExportFiles.kindFor(" text/calendar\t;charset=utf-8"), .ics)
+        XCTAssertEqual(ok(check("a.png", "image/png\r\n", nil, b64(pngBytes))).kind, .png)
     }
 
     func testAnythingOutsideTheAllowlistIsBadType() {
