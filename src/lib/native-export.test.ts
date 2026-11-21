@@ -1,9 +1,9 @@
 // ============================================================================
 // Source: src/lib/native-export.test.ts
-// Version: 0.3.3 — 2026-11-20
+// Version: 0.3.4 — 2026-11-20
 // Why: The native export must be invisible on the site and in the extensions,
-//      send exactly the agreed payload inside the app, answer 'unavailable' where the plugin is missing (iPhone
-//      1.0, which has no FileExport), and surface any other native failure.
+//      send exactly the agreed payload inside the app, answer 'unavailable' where the plugin is missing (a
+//      defensive path for a native build without FileExport), and surface any other native failure.
 // Env / Deps: Vitest; a fake `Capacitor` host.
 // ============================================================================
 
@@ -37,7 +37,7 @@ describe('native export', () => {
     expect(registerPlugin).toHaveBeenCalledWith('FileExport');
   });
 
-  it("answers 'unavailable' where the native bridge defines no FileExport and no registerPlugin (iPhone app 1.0)", async () => {
+  it("answers 'unavailable' where the native bridge defines no FileExport and no registerPlugin (a native build without the plugin)", async () => {
     expect(await exportFileNatively(FILE, { Capacitor: { isNativePlatform: () => true, Plugins: {} } })).toBe('unavailable');
   });
 

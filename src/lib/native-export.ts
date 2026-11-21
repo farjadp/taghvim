@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/native-export.ts
-// Version: 0.4.0 — 2026-11-20
+// Version: 0.4.1 — 2026-11-20
 // Why: Hands a small text file (the .ics of «تاریخ‌های من») to the Android app's
 //      native share sheet. The app is a WebView, and a WebView drops a blob: URL
 //      clicked as `<a download>` without a word — so the export button did
@@ -10,10 +10,12 @@
 //      caller keeps its blob download byte for byte.
 //      iOS: from app 1.1 the iPhone/iPad app registers a Swift FileExport with
 //      this same name and contract (UIActivityViewController, a popover on iPad),
-//      so `Capacitor.Plugins.FileExport` exists there like on Android. An older
-//      iOS build (1.0) or a missing plugin still answers 'unavailable', and the
-//      native platform must then FAIL (see exportFallback) rather than fall into
-//      the blob link, which Capacitor iOS cancels without a word.
+//      so `Capacitor.Plugins.FileExport` exists there like on Android. A native
+//      build without the plugin answers 'unavailable', and the native platform
+//      must then FAIL (see exportFallback) rather than fall into the blob link,
+//      which Capacitor iOS cancels without a word. That is a defensive path:
+//      iPhone 1.0 (7 Oct) carries an older bundle that predates this file and
+//      keeps its old silent export until people update.
 //      A real native failure is NOT swallowed into the dead blob path: it
 //      throws, and the caller shows a short Persian error.
 //      Contract: FileExport.share({ fileName, mimeType, content?, base64?, text? })
@@ -50,8 +52,9 @@ export function assertNativeFile(file: NativeFile): void {
 }
 
 // What the caller does with an exportFileNatively answer. On a native platform that answers
-// 'unavailable' (an app build without FileExport, e.g. iPhone 1.0, or a missing plugin) the blob
-// link is dead in the WebView, so say so instead of trying it. Both apps now ship FileExport.
+// 'unavailable' (a native build without the plugin — a defensive path; iPhone 1.0's bundle predates
+// this code and never reaches it) the blob link is dead in the WebView, so say so instead of trying it.
+// Both apps now ship FileExport.
 export function exportFallback(result: 'shared' | 'unavailable', native: boolean): 'done' | 'blob' | 'fail' {
   if (result === 'shared') return 'done';
   return native ? 'fail' : 'blob';
