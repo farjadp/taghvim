@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/dates.test.ts
-// Version: 0.3.0 — 2026-09-10
+// Version: 0.3.1 — 2026-11-20
 // Why: Unit tests for the personal dates: storage guards, validation, the
 //      30 Esfand leap case, ordering, the three rhythms, the migration of rows
 //      written before categories existed, and the .ics export's line rules.
@@ -134,6 +134,13 @@ describe('the .ics export', () => {
     expect(text).toContain('DTSTART;VALUE=DATE:');
     // No RRULE: a yearly Gregorian rule drifts against the Solar Hijri year.
     expect(text).not.toContain('RRULE');
+  });
+
+  it('describes the file truthfully from every surface', () => {
+    // Unfold RFC 5545 continuation lines (CRLF + one space) before matching.
+    const text = file().replace(/\r\n /g, '');
+    expect(text).toContain('با «تاریخ‌های من» در تقویم taghv.im ساخته شده');
+    expect(text).not.toContain('از فهرست تاریخ‌های شخصی در taghv.im');
   });
 
   it('counts the years only where the year is known', () => {
