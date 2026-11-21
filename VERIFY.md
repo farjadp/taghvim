@@ -17,7 +17,7 @@ The output names the commit and the workflow. Works for every file in the releas
 ## ۲. APK امضاشده همان خروجی GitHub است؟ / Is the signed APK the CI build?
 
 ```
-apksigcopier compare --unsigned taghvim-1.5-unsigned.apk taghvim-1.5.apk
+apksigcopier compare --unsigned taghvim-1.6-unsigned.apk taghvim-1.6.apk
 ```
 
 ([apksigcopier](https://github.com/obfusk/apksigcopier), `pip install apksigcopier`.) اگر بی‌خطا تمام شود، APK امضاشده جز بلوک امضا بایت‌به‌بایت همان فایلی است که GitHub ساخته. Exit 0 means the signed APK is the attested unsigned build with a signature block added, and nothing else.
@@ -25,7 +25,7 @@ apksigcopier compare --unsigned taghvim-1.5-unsigned.apk taghvim-1.5.apk
 ## ۳. با کلید تقویم امضا شده؟ / Signed with Taghvim's key?
 
 ```
-apksigner verify --print-certs taghvim-1.5.apk
+apksigner verify --print-certs taghvim-1.6.apk
 ```
 
 باید `CN=Taghvim` و این اثر انگشت SHA-256 باشد / must show `CN=Taghvim` and:

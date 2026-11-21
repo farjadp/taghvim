@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: tests/calendar.spec.ts
-// Version: 0.9.50 — 2026-11-20
+// Version: 0.9.52 — 2026-11-20
 // Why: Browser tests: independent legend controls, migration, tools and navigation,
 //      midnight rollover, accessibility, overflow, responsive layout, and the
 //      crawler/install files served from the app router.
@@ -1008,7 +1008,7 @@ test("the download page states each method's real status", async ({ page }) => {
   const android = page.locator("#app-android");
   const apk = android.locator('a[href*="/releases/"]');
   await expect(apk).toHaveCount(1);
-  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.49/taghvim-1.5.apk");
+  await expect(apk).toHaveAttribute("href", "https://github.com/farjadp/taghvim/releases/download/v0.9.51/taghvim-1.6.apk");
   await expect(apk).toHaveAttribute("rel", /noopener/);
   await expect(android).toContainText("SHA-256");
   await expect(android).toContainText("AF:5B:08:88");

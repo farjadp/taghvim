@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.25 — 2026-11-20
+// Version: 0.11.26 — 2026-11-20
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,19 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.52',
+    at: '2026-11-20T21:06:00-05:00',
+    status: 'ready',
+    title: 'اندروید ۱٫۶: فرستادن فایل تقویم و تصویر روز',
+    changes: [
+      { kind: 'fixed', text: 'در برنامهٔ اندروید، دکمه‌ای در «تاریخ‌های من» بود که کاری نمی‌کرد. حالا «فرستادن فایل تقویم» است و برگهٔ هم‌رسانیِ گوشی را باز می‌کند.' },
+      { kind: 'fixed', text: 'از آنجا فایل را به تقویمی که ics می‌پذیرد، به ایمیل یا به Drive می‌فرستید.' },
+      { kind: 'fixed', text: 'دکمهٔ کارت روز حالا تصویر و متن را واقعاً با برگهٔ هم‌رسانی می‌فرستد و وقتی چیزی ذخیره نشده، دیگر «تصویر ذخیره شد.» نمی‌گوید.' },
+      { kind: 'fixed', text: 'یادداشت «تاریخ‌های من» در برنامه دیگر از مرورگر و افزونه حرف نمی‌زند.' },
+      { kind: 'added', text: 'برنامهٔ اندروید ۱٫۶ روی صفحهٔ دریافت؛ روی نسخهٔ ۱٫۳ تا ۱٫۵ نصب می‌شود.' },
+    ],
+  },
   {
     version: '0.9.51',
     at: '2026-11-20T20:42:54-05:00',
