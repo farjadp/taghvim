@@ -289,6 +289,9 @@ describe('wording per surface', () => {
     expect(DATES_NOTICE_APP).toContain('در taghv.im یا افزونه ثبت کرده‌ای');
     expect(DATES_NOTICE_APP).toContain('همین برنامه');
     expect(DATES_NOTICE_APP).not.toContain('پشتیبان'); // says nothing about backup either way
+    expect(DATES_NOTICE_EXTENSION.endsWith('خروجی را به تقویم خودت اضافه کن.')).toBe(true);
+    expect(DATES_NOTICE_APP).not.toContain('Google');
+    expect(DATES_NOTICE_APP).toContain('فایل ics می‌پذیرد');
     expect(DATES_NOTICE_APP).toContain('برنامه آن را به هیچ سروری نمی‌فرستد');
   });
 

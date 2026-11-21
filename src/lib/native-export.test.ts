@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/native-export.test.ts
-// Version: 0.3.0 — 2026-11-20
+// Version: 0.3.1 — 2026-11-20
 // Why: The native export must be invisible on the site and in the extensions,
 //      send exactly the agreed payload inside the app, answer 'unavailable' on iOS (no
 //      plugin defined: a known gap), and surface any other native failure.

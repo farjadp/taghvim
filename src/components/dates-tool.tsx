@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.6.2 — 2026-11-20
+// Version: 0.6.3 — 2026-11-20
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -15,7 +15,7 @@ import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Download, Info, Trash2 } from "lucide-react";
 import { fa, formatDate } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
-import { exportFileNatively } from "@/lib/native-export";
+import { exportFallback, exportFileNatively, isNativePlatform } from "@/lib/native-export";
 import { parseNumericInput } from "@/lib/date-tools";
 import {
   addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
@@ -107,7 +107,9 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE, 
     const content = buildDatesFile(dates, now);
     setError("");
     try {
-      if ((await exportFileNatively({ fileName: "taghvim-dates.ics", mimeType: "text/calendar", content })) === "shared") return;
+      const outcome = exportFallback(await exportFileNatively({ fileName: "taghvim-dates.ics", mimeType: "text/calendar", content }), isNativePlatform());
+      if (outcome === "done") return;
+      if (outcome === "fail") { setError("فرستادن فایل در این نسخهٔ برنامه ممکن نشد."); return; }
     } catch {
       setError("فایل ساخته نشد.");
       return;

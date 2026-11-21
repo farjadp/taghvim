@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/native-export.ts
-// Version: 0.3.0 — 2026-11-20
+// Version: 0.3.1 — 2026-11-20
 // Why: Hands a small text file (the .ics of «تاریخ‌های من») to the Android app's
 //      native share sheet. The app is a WebView, and a WebView drops a blob: URL
 //      clicked as `<a download>` without a word — so the export button did
@@ -44,9 +44,16 @@ export function assertNativeFile(file: NativeFile): void {
   const rule = ALLOWED[file.mimeType];
   const hasContent = typeof file.content === 'string';
   const hasBase64 = typeof file.base64 === 'string';
-  if (!rule || hasContent === hasBase64 || (rule.field === 'content') !== hasContent || !file.fileName.toLowerCase().endsWith(rule.extension)) {
+  if (!rule || hasContent === hasBase64 || (rule.field === 'content') !== hasContent || !file.fileName.endsWith(rule.extension)) {
     throw new Error('invalid native file');
   }
+}
+
+// What the caller does with an exportFileNatively answer. On a native platform that answers
+// 'unavailable' (the iPhone app, no Swift FileExport yet) the blob link is dead, so say so.
+export function exportFallback(result: 'shared' | 'unavailable', native: boolean): 'done' | 'blob' | 'fail' {
+  if (result === 'shared') return 'done';
+  return native ? 'fail' : 'blob';
 }
 
 export function isNativePlatform(host: unknown = globalThis): boolean {
