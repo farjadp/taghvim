@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/dates.test.ts
-// Version: 0.2.0 — 2026-09-10
+// Version: 0.3.0 — 2026-09-10
 // Why: Unit tests for the personal dates: storage guards, validation, the
 //      30 Esfand leap case, ordering, the three rhythms, the migration of rows
 //      written before categories existed, and the .ics export's line rules.
@@ -275,11 +275,14 @@ describe('wording per surface', () => {
       expect(text).not.toContain('مرورگر');
       expect(text).not.toContain('در همین افزونه');
       expect(text).not.toContain('حافظهٔ جدا');
+      // iOS may put the WebView's storage in the device's own backup, so «only on this device» is untrue there.
+      expect(text).not.toContain('همین دستگاه');
     }
     // It may name the other lists, as other lists.
     expect(DATES_NOTICE_APP).toContain('در taghv.im یا افزونه ثبت کرده‌ای');
     expect(DATES_NOTICE_APP).toContain('همین برنامه');
-    expect(DATES_NOTICE_APP).not.toContain('پشتیبان');
+    expect(DATES_NOTICE_APP).not.toContain('پشتیبان'); // says nothing about backup either way
+    expect(DATES_NOTICE_APP).toContain('برنامه آن را به هیچ سروری نمی‌فرستد');
   });
 
   it('picks the app copy for the app and the extension copy for chrome and firefox', () => {

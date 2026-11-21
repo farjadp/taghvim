@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/dates.ts
-// Version: 0.3.0 — 2026-11-20
+// Version: 0.4.0 — 2026-11-20
 // Why: The visitor's own dates — birthdays, instalments, appointments, the lot:
 //      stored in their browser,
 //      never sent anywhere, and exportable as an .ics so their own calendar
@@ -46,12 +46,15 @@ export const DATES_NOTICE = 'این فهرست فقط در حافظهٔ همین
 // «this browser and this device» alone would be true and still mislead.
 export const DATES_NOTICE_EXTENSION = 'این فهرست فقط در همین افزونه ذخیره می‌شود و با تاریخ‌هایی که در taghv.im ثبت کرده‌ای یکی نیست — افزونه حافظهٔ جدا دارد. به هیچ سروری فرستاده نمی‌شود و با پاک کردن دادهٔ افزونه از بین می‌رود. برای یادآوری واقعی، خروجی را به تقویم خودت اضافه کن.';
 
-// The Android and iPhone apps share one bundle, so this says nothing that is true of only one
-// of them (no word on backups). Its list is a THIRD list, apart from the site's and the extension's.
-export const DATES_NOTICE_APP = 'این فهرست فقط در همین برنامه و روی همین دستگاه ذخیره می‌شود و با تاریخ‌هایی که در taghv.im یا افزونه ثبت کرده‌ای یکی نیست. به هیچ سروری فرستاده نمی‌شود و با حذف برنامه یا پاک کردن داده‌اش از بین می‌رود. برای یادآوری واقعی، خروجی را به تقویم خودت اضافه کن.';
+// The Android and iPhone apps share one bundle, so every sentence must be true on both. On
+// Android nothing leaves the app (backup and transfer are excluded); on iOS the WebView's storage
+// may be inside the device's own iCloud/Finder backup. Hence «فقط در همین برنامه» (never «روی همین
+// دستگاه») and «برنامه به هیچ سروری نمی‌فرستد» (the app sends nothing; a device backup is not the app).
+// Its list is a THIRD list, apart from the site's and the extension's.
+export const DATES_NOTICE_APP = 'این فهرست فقط در همین برنامه ذخیره می‌شود و با تاریخ‌هایی که در taghv.im یا افزونه ثبت کرده‌ای یکی نیست. برنامه آن را به هیچ سروری نمی‌فرستد، و با حذف برنامه یا پاک کردن داده‌اش از بین می‌رود. برای یادآوری واقعی، خروجی را به تقویم خودت اضافه کن.';
 
 // The tab's one-line description under the strip, per surface.
-export const DATES_DESCRIPTION_APP = 'تولدها و سالگردها به تاریخ شمسی؛ فقط روی همین دستگاه می‌ماند.';
+export const DATES_DESCRIPTION_APP = 'تولدها و سالگردها به تاریخ شمسی؛ در خود برنامه نگه داشته می‌شود.';
 
 // `app` for the Capacitor shell, `chrome`/`firefox` for the extension. The site passes nothing
 // and keeps ToolsPanel's and DatesTool's own defaults. Chosen at build time by the caller.
@@ -325,7 +328,7 @@ export function buildDatesFile(dates: Anniversary[], now: Date, years = EXPORT_Y
         `DTSTAMP:${stamp(now)}T000000Z`,
         `DTSTART;VALUE=DATE:${stamp(occurrence)}`,
         `SUMMARY:${escapeText(entry.title + suffix)}`,
-        `DESCRIPTION:${escapeText('از فهرست تاریخ‌های شخصی در taghv.im ساخته شده. این فایل به‌روز نمی‌شود؛ اگر تاریخی اضافه کردی، دوباره خروجی بگیر.')}`,
+        `DESCRIPTION:${escapeText('با «تاریخ‌های من» در تقویم taghv.im ساخته شده. این فایل به‌روز نمی‌شود؛ اگر تاریخی اضافه کردی، دوباره خروجی بگیر.')}`,
         'TRANSP:TRANSPARENT',
         'END:VEVENT',
       );
