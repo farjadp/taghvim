@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/src/new-tab.tsx
-// Version: 0.9.40 — 2026-09-17
+// Version: 0.9.41 — 2026-11-20
 // Why: The new-tab shell: today, the month grid and the day's occasions on
 //      one screen. Every panel is the site's own component imported from
 //      ../../src; only this arrangement is the extension's. The clock,
@@ -17,12 +17,15 @@ import { DEFAULT_VIEW, readView, saveView, type ViewPreferences } from "@/lib/vi
 import { syncWidgets } from "@/lib/widget-sync";
 import { CalendarPanel } from "@/components/calendar-panel";
 import { DEFAULT_TOOL, ToolsPanel, type ToolTab } from "@/components/tools-panel";
-import { DATES_NOTICE_EXTENSION, datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
+import { datesCopyFor, datesOn, readDates, saveDates, type Anniversary } from "@/lib/dates";
 import { EventsPanel } from "@/components/events-panel";
 import { SettingsMenu } from "@/components/settings-menu";
 import { MonthNamesProvider } from "@/components/month-names-context";
 import { TodayHero } from "@/components/today-panel";
 import { DEFAULT_CARD_STYLE } from "@/lib/card-style";
+
+// The app is the same bundle as the extension; only its wording about where the list lives differs.
+const datesCopy = datesCopyFor(__APP_TARGET__ ? "app" : "chrome");
 
 export function NewTab() {
   const [now, setNow] = useState(() => new Date());
@@ -164,7 +167,7 @@ export function NewTab() {
       <div className="mx-auto w-full max-w-[1400px] px-5 pb-5">
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
           dates={dates} datesReady={datesReady} onDatesChange={commitDates}
-          bridgesHref="https://taghv.im/bridges" datesNotice={DATES_NOTICE_EXTENSION} />
+          bridgesHref="https://taghv.im/bridges" datesNotice={datesCopy.notice} datesDescription={datesCopy.description} />
       </div>
       {/* Which build this is. Farjad asked for it: the store rolls updates out over
           hours, so «am I on the new one» is otherwise unanswerable from the page. */}

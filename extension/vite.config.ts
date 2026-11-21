@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/vite.config.ts
-// Version: 0.9.28 — 2026-11-13
+// Version: 0.9.29 — 2026-11-20
 // Why: Builds the browser extension from the same source the site uses.
 //      `@/` resolves into ../src so panels and lib are imported, never copied.
 //      A small plugin emits what Vite would not otherwise produce: the
@@ -129,6 +129,8 @@ export default defineConfig({
   define: {
     __EXT_VERSION__: JSON.stringify(BUILD_VERSION),
     __EXT_BUILT__: JSON.stringify(BUILD_AT),
+    // Which surface this is, known at build time so the first paint already has the right wording.
+    __APP_TARGET__: JSON.stringify(TARGET === "app"),
   },
   resolve: { alias: { "@": resolve(repo, "src") } },
   build: {

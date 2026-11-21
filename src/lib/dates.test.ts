@@ -10,7 +10,7 @@
 import { describe, expect, it } from 'vitest';
 import { dayKey, fromCalendar, toCalendar } from './calendar';
 import {
-  addDate, buildDatesFile, DATES_KEY, DATES_NOTICE, datesOn, EXPORT_MONTHS, MAX_DATES,
+  addDate, buildDatesFile, DATES_DESCRIPTION_APP, DATES_KEY, DATES_NOTICE, DATES_NOTICE_APP, DATES_NOTICE_EXTENSION, datesCopyFor, datesOn, EXPORT_MONTHS, MAX_DATES,
   nextOccurrence, occurrenceIn, readDates, removeDate, saveDates, upcomingDates,
   type Anniversary,
 } from './dates';
@@ -266,5 +266,26 @@ describe('the export, per rhythm', () => {
   it('keeps the age sentence for a birthday and writes none for an instalment', () => {
     expect(buildDatesFile([entry()], now)).toContain('سالگی');
     expect(buildDatesFile([entry({ category: 'instalment', repeat: 'monthly', month: null, day: 20, year: null })], now)).not.toContain('سالگی');
+  });
+});
+
+describe('wording per surface', () => {
+  it('the app never claims the list lives in a browser or an extension', () => {
+    for (const text of [DATES_NOTICE_APP, DATES_DESCRIPTION_APP]) {
+      expect(text).not.toContain('مرورگر');
+      expect(text).not.toContain('در همین افزونه');
+      expect(text).not.toContain('حافظهٔ جدا');
+    }
+    // It may name the other lists, as other lists.
+    expect(DATES_NOTICE_APP).toContain('در taghv.im یا افزونه ثبت کرده‌ای');
+    expect(DATES_NOTICE_APP).toContain('همین برنامه');
+    expect(DATES_NOTICE_APP).not.toContain('پشتیبان');
+  });
+
+  it('picks the app copy for the app and the extension copy for chrome and firefox', () => {
+    expect(datesCopyFor('app')).toEqual({ notice: DATES_NOTICE_APP, description: DATES_DESCRIPTION_APP });
+    for (const target of ['chrome', 'firefox'] as const) {
+      expect(datesCopyFor(target)).toEqual({ notice: DATES_NOTICE_EXTENSION });
+    }
   });
 });

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/tools-panel.tsx
-// Version: 0.11.0 — 2026-10-09
+// Version: 0.11.1 — 2026-11-20
 // Why: Date tools: continuous holidays, countdown, conversion, distance, age.
 //      «تعطیلات پیوسته» is the first tab and the default one. «تاریخ‌های من» is
 //      third rather than last: on a phone the strip scrolls, and a tab nobody
@@ -164,11 +164,11 @@ function Age({ now }: { now: Date }) {
 }
 
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
-export function ToolsPanel({ now, tab: requested, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges", datesNotice, rates }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string; datesNotice?: string; rates?: React.ReactNode }) {
+export function ToolsPanel({ now, tab: requested, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges", datesNotice, datesDescription = "تولدها و سالگردها به تاریخ شمسی؛ فقط در مرورگر خودت می‌ماند.", rates }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string; datesNotice?: string; datesDescription?: string; rates?: React.ReactNode }) {
   const tabs = [
     { key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange, description: "بازه‌هایی که با یکی دو روز مرخصی به چند روز تعطیلی پشت‌سرهم می‌رسند." },
     { key: "countdown" as const, label: "روزشمار", icon: Timer, description: "چند روز تا مناسبت‌های بعدی، و تا نوروز و یلدا." },
-    { key: "dates" as const, label: "تاریخ‌های من", icon: CalendarHeart, description: "تولدها و سالگردها به تاریخ شمسی؛ فقط در مرورگر خودت می‌ماند." },
+    { key: "dates" as const, label: "تاریخ‌های من", icon: CalendarHeart, description: datesDescription },
     ...(rates ? [{ key: "rates" as const, label: "نرخ ارز", icon: Banknote, description: "دلار، یورو، سکه و طلا در بازار آزاد، چند بار در روز." }] : []),
     { key: "convert" as const, label: "تبدیل تاریخ‌ها", icon: ArrowLeftRight, description: "یک تاریخ را وارد کن، معادلش را در هر سه تقویم بگیر." },
     { key: "distance" as const, label: "فاصلهٔ دو تاریخ", icon: Hourglass, description: "چند روز میان دو تاریخ خورشیدی فاصله است." },
