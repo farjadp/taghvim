@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/app/App/App/FileExportPlugin.swift
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.1.1 — 2026-11-20
 // Why: The iPhone half of src/lib/native-export.ts, the twin of Android's
 //      FileExportPlugin.kt with the same JS name and contract. WKWebView drops
 //      a blob: link clicked with `download`, so the .ics of «تاریخ‌های من» and
@@ -9,7 +9,8 @@
 //      ExportCore's ExportFiles.check decides what is accepted, this writes the
 //      bytes to <tmp>/exports/<name> and presents UIActivityViewController with
 //      the file (and `text` as a caption). Nothing leaves the phone except by
-//      the person's own pick in that sheet, and no permission is needed.
+//      the person's own pick in that sheet, and no permission is needed —
+//      which is why the sheet never offers «Save Image» (see below).
 //      Resolves { shared: true } once the sheet is on screen — a cancel is not
 //      reported, as on Android. Rejects with BAD_NAME / BAD_TYPE / BAD_CONTENT
 //      / TOO_LARGE on what check refuses, WRITE_FAILED, or NO_ACTIVITY.
@@ -74,6 +75,11 @@ public class FileExportPlugin: CAPPlugin, CAPBridgedPlugin {
             var items: [Any] = [file]
             if let text = accepted.text { items.append(text) }
             let sheet = UIActivityViewController(activityItems: items, applicationActivities: nil)
+            // «Save Image» writes to the photo library, and iOS terminates an app
+            // that does so without NSPhotoLibraryAddUsageDescription in Info.plist.
+            // The app asks for no photo-library permission, so that activity is
+            // removed; «Save to Files» stays and covers the same need.
+            sheet.excludedActivityTypes = [.saveToCameraRoll]
 
             // Present from whatever is on top: presenting from a controller that
             // already shows something fails without an error.
