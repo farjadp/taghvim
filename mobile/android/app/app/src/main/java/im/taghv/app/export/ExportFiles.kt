@@ -1,0 +1,51 @@
+// ============================================================================
+// Source: mobile/android/app/app/src/main/java/im/taghv/app/export/ExportFiles.kt
+// Version: 0.1.0 — 2026-11-20
+// Why: The pure half of FileExportPlugin, kept free of Android types so the JVM
+//      tests can hold it: which file names the page may ask for, and where on
+//      disk such a file may land. The plugin is not a general file writer — it
+//      exists for the .ics of «تاریخ‌های من» — so a name must be a bare
+//      basename of [A-Za-z0-9._-] ending in .ics, the type must be
+//      text/calendar, and the file always lands in cacheDir/exports/, the one
+//      folder res/xml/file_paths.xml hands to the FileProvider for it.
+//      The name is kept rather than replaced by a fixed one because the
+//      receiving app shows it (FileProvider reports it as DISPLAY_NAME) and the
+//      site's download already calls the file taghvim-dates.ics.
+// Env / Deps: java.io only.
+// ============================================================================
+
+package im.taghv.app.export
+
+import java.io.File
+
+object ExportFiles {
+    // Must equal the cache-path's `path` in res/xml/file_paths.xml.
+    const val DIR = "exports"
+    const val MIME_TYPE = "text/calendar"
+    const val MAX_NAME = 64
+    // 60 dates × 10 written-out years is far below this; anything larger is not ours.
+    const val MAX_BYTES = 1_000_000
+
+    private val SAFE_NAME = Regex("^[A-Za-z0-9][A-Za-z0-9._-]*\\.ics$")
+
+    // The name the file will carry, or null when the page asked for something
+    // that is not a plain .ics basename. No path separators, no leading dot, no
+    // "..", no Persian or spaces: a name this narrow needs no escaping anywhere.
+    fun safeFileName(raw: String?): String? {
+        if (raw == null || raw.length > MAX_NAME) return null
+        if (!SAFE_NAME.matches(raw) || raw.contains("..")) return null
+        return raw
+    }
+
+    fun isAllowedMimeType(raw: String?): Boolean =
+        raw != null && raw.substringBefore(';').trim().equals(MIME_TYPE, ignoreCase = true)
+
+    // The file inside cacheDir/exports/, checked by canonical path so no name
+    // that slipped past safeFileName could ever point outside the folder.
+    fun target(cacheDir: File, name: String): File {
+        val dir = File(cacheDir, DIR).canonicalFile
+        val file = File(dir, name).canonicalFile
+        require(file.parentFile == dir) { "export path escapes $DIR/" }
+        return file
+    }
+}

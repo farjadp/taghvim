@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Source: res/values/export_strings.xml — Version 0.1.0, 2026-11-20. The title of the share sheet FileExportPlugin opens for the .ics of «تاریخ‌های من». -->
+<resources>
+    <string name="export_chooser_title">افزودن به تقویم</string>
+</resources>

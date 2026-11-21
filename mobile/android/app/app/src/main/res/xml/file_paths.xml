@@ -1,5 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  Source: mobile/android/app/app/src/main/res/xml/file_paths.xml
+  Version: 0.2.0 — 2026-11-20
+  Why: What the app's FileProvider (${applicationId}.fileprovider) may hand to
+       another app, and only through a per-intent read grant — the provider is
+       not exported. `exports` is the one folder FileExportPlugin writes the
+       .ics of «تاریخ‌های من» to (cacheDir/exports/). The first two entries are
+       Capacitor's template, kept as they were.
+  Env / Deps: Named by the FileProvider's meta-data in AndroidManifest.xml;
+       ExportFiles.DIR must equal the `exports` path.
+-->
 <paths xmlns:android="http://schemas.android.com/apk/res/android">
     <external-path name="my_images" path="." />
     <cache-path name="my_cache_images" path="." />
+    <cache-path name="exports" path="exports/" />
 </paths>
