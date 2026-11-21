@@ -1,15 +1,17 @@
 // ============================================================================
 // Source: mobile/ios/app/App/App/MainViewController.swift
-// Version: 0.2.0 — 2026-10-06
-// Why: Capacitor's view controller, plus the one local plugin: the app's own
-//      WidgetSyncPlugin is not an npm package, so it is registered here, where
-//      Capacitor 8 expects local plugins to be registered. It also puts a
-//      backdrop behind the status bar: with contentInset "always" the page
-//      starts below it, but scrolled content slid underneath with nothing
-//      behind the clock and battery icons. The backdrop takes the page's own
-//      background colour, so it follows the in-app theme, not only the system's,
-//      and so does the strip behind the home indicator.
-// Env / Deps: Capacitor 8, iOS 15+ (WKWebView.underPageBackgroundColor).
+// Version: 0.3.0 — 2026-11-20
+// Why: Capacitor's view controller, plus the app's two local plugins: its own
+//      WidgetSyncPlugin and FileExportPlugin are not npm packages, so they are
+//      registered here, where Capacitor 8 expects local plugins to be
+//      registered. It also puts a backdrop behind the status bar: with
+//      contentInset "always" the page starts below it, but scrolled content
+//      slid underneath with nothing behind the clock and battery icons. The
+//      backdrop takes the page's own background colour, so it follows the
+//      in-app theme, not only the system's, and so does the strip behind the
+//      home indicator.
+// Env / Deps: Capacitor 8, iOS 15+ (WKWebView.underPageBackgroundColor);
+//      WidgetSyncPlugin.swift, FileExportPlugin.swift.
 // ============================================================================
 
 import Capacitor
@@ -22,6 +24,7 @@ class MainViewController: CAPBridgeViewController {
 
     override open func capacitorDidLoad() {
         bridge?.registerPluginInstance(WidgetSyncPlugin())
+        bridge?.registerPluginInstance(FileExportPlugin())
         installStatusBarBackdrop()
     }
 

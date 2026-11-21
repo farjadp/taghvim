@@ -26,6 +26,8 @@
 		A516716438A7868EE44AC750 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = 29D9B9C4FF15FA400DB320D4 /* PrivacyInfo.xcprivacy */; };
 		AF83E3496B68AAFDA6E69222 /* widget-data.json in Resources */ = {isa = PBXBuildFile; fileRef = 6653622D21C113FB005D7F9B /* widget-data.json */; };
 		BDF0148A6439BEFC6CA719E3 /* WidgetViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = 298FEDA66893830017DA2BC7 /* WidgetViews.swift */; };
+		E5A1F0C2B7D84A9E6C3F1A02 /* FileExportPlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = E5A1F0C2B7D84A9E6C3F1A01 /* FileExportPlugin.swift */; };
+		E5A1F0C2B7D84A9E6C3F1A05 /* ExportCore in Frameworks */ = {isa = PBXBuildFile; productRef = E5A1F0C2B7D84A9E6C3F1A04 /* ExportCore */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,7 @@
 		BC6285BEBBF8EF177BC61265 /* MainViewController.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = MainViewController.swift; sourceTree = "<group>"; };
 		C995F6FBE47F206CCD3D424F /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; includeInIndex = 1; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E60D17085C67E5AF82462D79 /* App.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = App.entitlements; sourceTree = "<group>"; };
+		E5A1F0C2B7D84A9E6C3F1A01 /* FileExportPlugin.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = FileExportPlugin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,6 +87,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				4D22ABE92AF431CB00220026 /* CapApp-SPM in Frameworks */,
+				E5A1F0C2B7D84A9E6C3F1A05 /* ExportCore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -162,6 +166,7 @@
 				2FAD9762203C412B000D30F8 /* config.xml */,
 				50B271D01FEDC1A000F3C39B /* public */,
 				0D868101425F9AB51BF01EFF /* WidgetSyncPlugin.swift */,
+				E5A1F0C2B7D84A9E6C3F1A01 /* FileExportPlugin.swift */,
 				BC6285BEBBF8EF177BC61265 /* MainViewController.swift */,
 				E60D17085C67E5AF82462D79 /* App.entitlements */,
 				C995F6FBE47F206CCD3D424F /* PrivacyInfo.xcprivacy */,
@@ -218,6 +223,7 @@
 			name = App;
 			packageProductDependencies = (
 				4D22ABE82AF431CB00220026 /* CapApp-SPM */,
+				E5A1F0C2B7D84A9E6C3F1A04 /* ExportCore */,
 			);
 			productName = App;
 			productReference = 504EC3041FED79650016851F /* App.app */;
@@ -255,6 +261,7 @@
 			packageReferences = (
 				D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */,
 				4B9146AF61121F90056C1E5A /* XCLocalSwiftPackageReference "TaghvimCore" */,
+				E5A1F0C2B7D84A9E6C3F1A03 /* XCLocalSwiftPackageReference "ExportCore" */,
 			);
 			productRefGroup = 504EC3051FED79650016851F /* Products */;
 			projectDirPath = "";
@@ -300,6 +307,7 @@
 				504EC3081FED79650016851F /* AppDelegate.swift in Sources */,
 				9582B6832FE993A70072D4E8 /* SceneDelegate.swift in Sources */,
 				80B5FA28CBB8F41C5E396963 /* WidgetSyncPlugin.swift in Sources */,
+				E5A1F0C2B7D84A9E6C3F1A02 /* FileExportPlugin.swift in Sources */,
 				9C449E1AC963EE6A0CACF58A /* MainViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -460,7 +468,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = JN57DU6B4M;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -468,7 +476,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				OTHER_SWIFT_FLAGS = "$(inherited) \"-D\" \"COCOAPODS\" \"-DDEBUG\"";
 				PRODUCT_BUNDLE_IDENTIFIER = im.taghv.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -484,7 +492,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_ENTITLEMENTS = App/App.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = JN57DU6B4M;
 				INFOPLIST_FILE = App/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
@@ -492,7 +500,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = im.taghv.app;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "";
@@ -507,7 +515,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = TaghvimWidgets/TaghvimWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = JN57DU6B4M;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TaghvimWidgets/Info.plist;
@@ -517,7 +525,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = im.taghv.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -534,7 +542,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CODE_SIGN_ENTITLEMENTS = TaghvimWidgets/TaghvimWidgets.entitlements;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 2;
+				CURRENT_PROJECT_VERSION = 3;
 				DEVELOPMENT_TEAM = JN57DU6B4M;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = TaghvimWidgets/Info.plist;
@@ -544,7 +552,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				MARKETING_VERSION = 1.0;
+				MARKETING_VERSION = 1.1;
 				PRODUCT_BUNDLE_IDENTIFIER = im.taghv.app.widgets;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
@@ -595,6 +603,10 @@
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "CapApp-SPM";
 		};
+		E5A1F0C2B7D84A9E6C3F1A03 /* XCLocalSwiftPackageReference "ExportCore" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = ../../ExportCore;
+		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -607,6 +619,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = D4C12C0A2AAA248700AAC8A2 /* XCLocalSwiftPackageReference "CapApp-SPM" */;
 			productName = "CapApp-SPM";
+		};
+		E5A1F0C2B7D84A9E6C3F1A04 /* ExportCore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E5A1F0C2B7D84A9E6C3F1A03 /* XCLocalSwiftPackageReference "ExportCore" */;
+			productName = ExportCore;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
