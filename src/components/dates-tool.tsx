@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.6.1 — 2026-11-20
+// Version: 0.6.2 — 2026-11-20
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -59,7 +59,7 @@ function yearsLabel(item: UpcomingDate): string | null {
  * tool owned the list privately the grid did not hear about an addition until a reload — which
  * a separate page hid, and a tab beside the calendar does not.
  */
-export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }: {
+export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE, exportLabel = "افزودن به تقویم خودت" }: {
   now: Date;
   dates: Anniversary[];
   // False until the browser's list has been read; an empty state before that would tell
@@ -68,6 +68,8 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }
   onChange: (next: Anniversary[]) => void;
   // The extension keeps its own list on its own origin and has to say so.
   notice?: string;
+  // The app sends a file to the share sheet; the site and extensions add it to a calendar.
+  exportLabel?: string;
 }) {
   const months = useMonthNames();
   const [draft, setDraft] = useState(EMPTY);
@@ -191,7 +193,7 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }
           <p className="text-sm font-medium">تاریخ‌های تو</p>
           {dates.length > 0 && (
             <button type="button" onClick={download} className="flex items-center gap-1.5 text-xs font-medium text-forest hover:underline">
-              <Download size={14} />افزودن به تقویم خودت
+              <Download size={14} />{exportLabel}
             </button>
           )}
         </div>

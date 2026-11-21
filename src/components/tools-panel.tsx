@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/tools-panel.tsx
-// Version: 0.11.1 — 2026-11-20
+// Version: 0.11.2 — 2026-11-20
 // Why: Date tools: continuous holidays, countdown, conversion, distance, age.
 //      «تعطیلات پیوسته» is the first tab and the default one. «تاریخ‌های من» is
 //      third rather than last: on a phone the strip scrolls, and a tab nobody
@@ -164,7 +164,7 @@ function Age({ now }: { now: Date }) {
 }
 
 // Tab strip supports RTL arrow keys: ArrowLeft advances, ArrowRight goes back
-export function ToolsPanel({ now, tab: requested, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges", datesNotice, datesDescription = "تولدها و سالگردها به تاریخ شمسی؛ فقط در مرورگر خودت می‌ماند.", rates }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string; datesNotice?: string; datesDescription?: string; rates?: React.ReactNode }) {
+export function ToolsPanel({ now, tab: requested, onTabChange, groups, dates, datesReady, onDatesChange, bridgesHref = "/bridges", datesNotice, datesExportLabel, datesDescription = "تولدها و سالگردها به تاریخ شمسی؛ فقط در مرورگر خودت می‌ماند.", rates }: { now: Date; tab: ToolTab; onTabChange: (tab: ToolTab) => void; groups: EventGroups; dates: Anniversary[]; datesReady: boolean; onDatesChange: (next: Anniversary[]) => void; bridgesHref?: string; datesNotice?: string; datesExportLabel?: string; datesDescription?: string; rates?: React.ReactNode }) {
   const tabs = [
     { key: "bridges" as const, label: "تعطیلات پیوسته", icon: CalendarRange, description: "بازه‌هایی که با یکی دو روز مرخصی به چند روز تعطیلی پشت‌سرهم می‌رسند." },
     { key: "countdown" as const, label: "روزشمار", icon: Timer, description: "چند روز تا مناسبت‌های بعدی، و تا نوروز و یلدا." },
@@ -190,6 +190,6 @@ export function ToolsPanel({ now, tab: requested, onTabChange, groups, dates, da
       {/* One line saying what this tool answers, in the panel rather than in each tool, so
           all of them read alike and a new one cannot ship without one. */}
       <p data-testid="tool-description" className="mb-5 text-sm font-medium">{active.description}</p>
-      {tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} notice={datesNotice} /> : tab === "rates" ? rates : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
+      {tab === "bridges" ? <BridgesTool now={now} groups={groups} moreHref={bridgesHref} /> : tab === "countdown" ? <CountdownTool now={now} groups={groups} /> : tab === "dates" ? <DatesTool now={now} dates={dates} ready={datesReady} onChange={onDatesChange} notice={datesNotice} exportLabel={datesExportLabel} /> : tab === "rates" ? rates : tab === "convert" ? <Converter now={now} /> : tab === "distance" ? <Distance now={now} /> : <Age now={now} />}</div>
   </section>;
 }

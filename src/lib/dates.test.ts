@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/dates.test.ts
-// Version: 0.3.1 — 2026-11-20
+// Version: 0.3.2 — 2026-11-20
 // Why: Unit tests for the personal dates: storage guards, validation, the
 //      30 Esfand leap case, ordering, the three rhythms, the migration of rows
 //      written before categories existed, and the .ics export's line rules.
@@ -293,7 +293,7 @@ describe('wording per surface', () => {
   });
 
   it('picks the app copy for the app and the extension copy for chrome and firefox', () => {
-    expect(datesCopyFor('app')).toEqual({ notice: DATES_NOTICE_APP, description: DATES_DESCRIPTION_APP });
+    expect(datesCopyFor('app')).toEqual({ notice: DATES_NOTICE_APP, description: DATES_DESCRIPTION_APP, exportLabel: 'فرستادن فایل تقویم' });
     for (const target of ['chrome', 'firefox'] as const) {
       expect(datesCopyFor(target)).toEqual({ notice: DATES_NOTICE_EXTENSION });
     }

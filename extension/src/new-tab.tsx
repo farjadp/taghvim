@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: extension/src/new-tab.tsx
-// Version: 0.9.41 — 2026-11-20
+// Version: 0.9.42 — 2026-11-20
 // Why: The new-tab shell: today, the month grid and the day's occasions on
 //      one screen. Every panel is the site's own component imported from
 //      ../../src; only this arrangement is the extension's. The clock,
@@ -167,7 +167,7 @@ export function NewTab() {
       <div className="mx-auto w-full max-w-[1400px] px-5 pb-5">
         <ToolsPanel now={now} tab={tool} onTabChange={setTool} groups={preferences}
           dates={dates} datesReady={datesReady} onDatesChange={commitDates}
-          bridgesHref="https://taghv.im/bridges" datesNotice={datesCopy.notice} datesDescription={datesCopy.description} />
+          bridgesHref="https://taghv.im/bridges" datesNotice={datesCopy.notice} datesDescription={datesCopy.description} datesExportLabel={datesCopy.exportLabel} />
       </div>
       {/* Which build this is. Farjad asked for it: the store rolls updates out over
           hours, so «am I on the new one» is otherwise unanswerable from the page. */}
