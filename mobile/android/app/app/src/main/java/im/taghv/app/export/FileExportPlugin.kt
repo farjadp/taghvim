@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/export/FileExportPlugin.kt
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.2.0 — 2026-11-20
 // Why: The native half of src/lib/native-export.ts. In the app, the export of
 //      «تاریخ‌های من» was a blob: link clicked with `download`; Capacitor's
 //      WebView has no DownloadListener, so the click was dropped without a
@@ -74,17 +74,22 @@ class FileExportPlugin : Plugin() {
         val chooser = Intent.createChooser(send, context.getString(R.string.export_chooser_title)).apply {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        try {
-            host.runOnUiThread {
-                try {
-                    host.startActivity(chooser)
-                    call.resolve(JSObject().put("shared", true))
-                } catch (e: ActivityNotFoundException) {
-                    call.reject("no app can receive the file", "NO_ACTIVITY", e)
-                }
+        // Plugin methods run on Capacitor's plugin thread, so runOnUiThread only
+        // posts the runnable and returns; anything startActivity throws is thrown
+        // later, on the main thread, where no try around this call can see it.
+        // So the catch is inside: ActivityNotFoundException when nothing can show
+        // the sheet, and any other RuntimeException (a SecurityException, say),
+        // which would otherwise crash the app and leave the page's promise
+        // unsettled.
+        host.runOnUiThread {
+            try {
+                host.startActivity(chooser)
+                call.resolve(JSObject().put("shared", true))
+            } catch (e: ActivityNotFoundException) {
+                call.reject("no app can receive the file", "NO_ACTIVITY", e)
+            } catch (e: RuntimeException) {
+                call.reject("could not open the share sheet", "NO_ACTIVITY", e)
             }
-        } catch (e: RuntimeException) {
-            call.reject("could not open the share sheet", "NO_ACTIVITY", e)
         }
     }
 
@@ -95,7 +100,10 @@ class FileExportPlugin : Plugin() {
         val target = ExportFiles.target(context.cacheDir, name)
         val dir = target.parentFile ?: throw IOException("no export folder")
         if (!dir.isDirectory && !dir.mkdirs()) throw IOException("cannot create ${dir.name}")
-        dir.listFiles()?.forEach { it.delete() }
+        // Emptying on each new share can pull a file out from under a receiver
+        // still reading an earlier share (mail apps read the URI lazily, after
+        // the chooser returns). Accepted: one export at a time.
+        ExportFiles.clear(context.cacheDir)
         val temp = File(dir, ".$name.tmp")
         temp.writeBytes(bytes)
         if (!temp.renameTo(target)) {

@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/export/ExportFiles.kt
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.2.0 — 2026-11-20
 // Why: The pure half of FileExportPlugin, kept free of Android types so the JVM
 //      tests can hold it: which file names the page may ask for, and where on
 //      disk such a file may land. The plugin is not a general file writer — it
@@ -11,7 +11,10 @@
 //      The name is kept rather than replaced by a fixed one because the
 //      receiving app shows it (FileProvider reports it as DISPLAY_NAME) and the
 //      site's download already calls the file taghvim-dates.ics.
-// Env / Deps: java.io only.
+//      clear() empties that folder: before each new export, and once per
+//      process from MainActivity, so the last export — people's names — does
+//      not outlive the dates it was made from.
+// Env / Deps: java.io only (java.nio.file needs API 26; minSdk is 24).
 // ============================================================================
 
 package im.taghv.app.export
@@ -47,5 +50,26 @@ object ExportFiles {
         val file = File(dir, name).canonicalFile
         require(file.parentFile == dir) { "export path escapes $DIR/" }
         return file
+    }
+
+    // Deletes the regular files directly inside cacheDir/exports/ and nothing
+    // else: no subfolder is entered, and a symlink is neither followed nor
+    // removed, so this can never reach outside the folder. A missing folder,
+    // or an exports/ that is itself a link, is left alone. Returns how many
+    // files were deleted.
+    // A link is told apart by its canonical path: a symlink resolves somewhere
+    // other than <exports>/<its own name>, so it is skipped rather than followed.
+    fun clear(cacheDir: File): Int {
+        val dir = File(cacheDir, DIR)
+        if (!dir.isDirectory) return 0
+        val real = dir.canonicalFile
+        if (real != File(cacheDir.canonicalFile, DIR)) return 0
+        var deleted = 0
+        val entries = dir.listFiles() ?: return 0
+        for (entry in entries) {
+            if (!entry.isFile || entry.canonicalFile != File(real, entry.name)) continue
+            if (entry.delete()) deleted++
+        }
+        return deleted
     }
 }
