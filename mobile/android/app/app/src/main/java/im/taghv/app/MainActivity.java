@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/android/app/app/src/main/java/im/taghv/app/MainActivity.java
-// Version: 0.4.0 — 2026-11-20
+// Version: 0.4.1 — 2026-11-20
 // Why: Capacitor's activity, plus three things. WidgetSyncPlugin is registered,
 //      so the page can hand the widgets its groups and month names.
 //      FileExportPlugin is registered, so the .ics of «تاریخ‌های من» reaches
@@ -14,6 +14,8 @@
 //      deleted. Cold start only, never onResume/onPause: the app picked in the
 //      share sheet (a mail app, say) reads the file lazily after the chooser
 //      returns, and a rotation recreates this activity in the same process.
+//      That cleanup swallows every exception: it must never stop the calendar
+//      opening.
 // Env / Deps: Capacitor 8 BridgeActivity.
 // ============================================================================
 
@@ -40,7 +42,15 @@ public class MainActivity extends BridgeActivity {
             // On the main thread on purpose: the folder holds one small file at
             // most, so this is a listing and a delete, and doing it inline means it
             // cannot race a share the person starts right after launch.
-            ExportFiles.INSTANCE.clear(getCacheDir());
+            // Kotlin's clear() can throw IOException (canonicalFile) or
+            // SecurityException (listFiles/delete), and Java does not force a
+            // catch. A cleanup must never stop the calendar opening, and the
+            // next export empties the folder anyway, so any failure is dropped.
+            try {
+                ExportFiles.INSTANCE.clear(getCacheDir());
+            } catch (Exception ignored) {
+                // Intentionally empty; see above.
+            }
         }
         if (getBridge() != null && getBridge().getWebView() != null) {
             getBridge().getWebView().setBackgroundColor(getColor(R.color.splash_background));
