@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/dates.ts
-// Version: 0.4.3 — 2026-11-20
+// Version: 0.4.4 — 2026-11-20
 // Why: The visitor's own dates — birthdays, instalments, appointments, the lot:
 //      stored in their browser,
 //      never sent anywhere, and exportable as an .ics so their own calendar
@@ -48,7 +48,8 @@ export const DATES_NOTICE_EXTENSION = 'این فهرست فقط در همین ا
 
 // The Android and iPhone apps share one bundle, so every sentence must be true on both. On
 // Android nothing leaves the app (backup and transfer are excluded); on iOS the WebView's storage
-// may be inside the device's own iCloud/Finder backup. Hence «فقط در همین برنامه» (never «روی همین
+// (Library/WebKit) is flagged out of iCloud/Finder backups since app 1.1, but iOS 1.0 on the App
+// Store still has it inside the device's own backup, and the flag is simulator-verified only. Hence «فقط در همین برنامه» (never «روی همین
 // دستگاه») and «برنامه به هیچ سروری نمی‌فرستد» (the app sends nothing; a device backup is not the app).
 // Its list is a THIRD list, apart from the site's and the extension's.
 export const DATES_NOTICE_APP = 'این فهرست فقط در همین برنامه ذخیره می‌شود و با تاریخ‌هایی که در taghv.im یا افزونه ثبت کرده‌ای یکی نیست. برنامه آن را به هیچ سروری نمی‌فرستد و با حذف برنامه یا پاک کردن داده‌اش از بین می‌رود. برای یادآوری واقعی، فایل تقویم را بفرست و در تقویمی باز کن که فایل ics می‌پذیرد — مثلاً تقویم رایانه یا سامسونگ.';

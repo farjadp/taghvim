@@ -1,9 +1,9 @@
 // ============================================================================
 // Source: src/lib/native-export.test.ts
-// Version: 0.3.2 — 2026-11-20
+// Version: 0.3.3 — 2026-11-20
 // Why: The native export must be invisible on the site and in the extensions,
-//      send exactly the agreed payload inside the app, answer 'unavailable' on iOS (no
-//      plugin defined: a known gap), and surface any other native failure.
+//      send exactly the agreed payload inside the app, answer 'unavailable' where the plugin is missing (iPhone
+//      1.0, which has no FileExport), and surface any other native failure.
 // Env / Deps: Vitest; a fake `Capacitor` host.
 // ============================================================================
 
@@ -37,7 +37,7 @@ describe('native export', () => {
     expect(registerPlugin).toHaveBeenCalledWith('FileExport');
   });
 
-  it("answers 'unavailable' on iOS, where the native bridge defines no FileExport and no registerPlugin", async () => {
+  it("answers 'unavailable' where the native bridge defines no FileExport and no registerPlugin (iPhone app 1.0)", async () => {
     expect(await exportFileNatively(FILE, { Capacitor: { isNativePlatform: () => true, Plugins: {} } })).toBe('unavailable');
   });
 
@@ -76,7 +76,7 @@ describe('native export', () => {
     expect(share).not.toHaveBeenCalled();
   });
 
-  it('exportFallback: shared is done, unavailable is blob on the web and fail in the iPhone app', () => {
+  it('exportFallback: shared is done, unavailable is blob on the web and fail in an app build without the plugin', () => {
     expect(exportFallback('shared', true)).toBe('done');
     expect(exportFallback('shared', false)).toBe('done');
     expect(exportFallback('unavailable', false)).toBe('blob');

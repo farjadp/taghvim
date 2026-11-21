@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.6.4 — 2026-11-20
+// Version: 0.6.5 — 2026-11-20
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -101,9 +101,10 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE, 
   // Built in the browser from the browser's own list; there is no server that could serve it.
   // Inside the Android app a blob link is silently dropped, so the native share sheet goes
   // first; on the site and the extensions it answers «unavailable» and the blob download
-  // below runs as before. The iPhone app also answers «unavailable» but its WebView cancels the
-  // blob: navigation too, so there it skips the dead blob link and shows «فرستادن فایل در این
-  // نسخهٔ برنامه ممکن نشد.» until a Swift FileExport exists.
+  // below runs as before. The iPhone/iPad app carries a Swift FileExport since 1.1, so it takes the
+  // same native path. An app build without the plugin (iPhone 1.0) answers «unavailable», and since its
+  // WebView cancels the blob: navigation too, it skips the dead blob link and shows «فرستادن فایل در این
+  // نسخهٔ برنامه ممکن نشد.»
   async function download() {
     const content = buildDatesFile(dates, now);
     setError("");
