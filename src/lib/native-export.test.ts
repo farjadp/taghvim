@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/native-export.test.ts
-// Version: 0.3.1 — 2026-11-20
+// Version: 0.3.2 — 2026-11-20
 // Why: The native export must be invisible on the site and in the extensions,
 //      send exactly the agreed payload inside the app, answer 'unavailable' on iOS (no
 //      plugin defined: a known gap), and surface any other native failure.
@@ -8,7 +8,7 @@
 // ============================================================================
 
 import { describe, expect, it, vi } from 'vitest';
-import { exportFileNatively, isNativePlatform } from './native-export';
+import { assertNativeFile, exportFallback, exportFileNatively, isNativePlatform } from './native-export';
 
 const FILE = { fileName: 'taghvim-dates.ics', mimeType: 'text/calendar', content: 'BEGIN:VCALENDAR\r\n' };
 
@@ -74,6 +74,20 @@ describe('native export', () => {
     ] as unknown as Parameters<typeof exportFileNatively>[0][];
     for (const file of bad) await expect(exportFileNatively(file, host)).rejects.toThrow('invalid native file');
     expect(share).not.toHaveBeenCalled();
+  });
+
+  it('exportFallback: shared is done, unavailable is blob on the web and fail in the iPhone app', () => {
+    expect(exportFallback('shared', true)).toBe('done');
+    expect(exportFallback('shared', false)).toBe('done');
+    expect(exportFallback('unavailable', false)).toBe('blob');
+    expect(exportFallback('unavailable', true)).toBe('fail');
+  });
+
+  it('assertNativeFile rejects upper-case extensions and accepts lower-case', () => {
+    expect(() => assertNativeFile({ fileName: 'taghvim-dates.ICS', mimeType: 'text/calendar', content: 'x' })).toThrow('invalid native file');
+    expect(() => assertNativeFile({ fileName: 'X.PNG', mimeType: 'image/png', base64: 'AA==' })).toThrow('invalid native file');
+    expect(() => assertNativeFile({ fileName: 'taghvim-dates.ics', mimeType: 'text/calendar', content: 'x' })).not.toThrow();
+    expect(() => assertNativeFile({ fileName: 'x.png', mimeType: 'image/png', base64: 'AA==' })).not.toThrow();
   });
 
   it('reports whether it is running natively', () => {
