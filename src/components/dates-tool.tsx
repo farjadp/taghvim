@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.6.0 — 2026-11-20
+// Version: 0.6.1 — 2026-11-20
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -98,8 +98,9 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }
 
   // Built in the browser from the browser's own list; there is no server that could serve it.
   // Inside the Android app a blob link is silently dropped, so the native share sheet goes
-  // first; on the site, the extensions and the iPhone app it answers «unavailable» and the
-  // blob download below runs exactly as before.
+  // first; on the site and the extensions it answers «unavailable» and the blob download
+  // below runs as before. The iPhone app also answers «unavailable» but its WebView cancels the
+  // blob: navigation too, so the export is a known gap there until a Swift FileExport exists.
   async function download() {
     const content = buildDatesFile(dates, now);
     setError("");

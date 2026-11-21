@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/android-manifest.test.ts
-// Version: 0.1.0 — 2026-11-20
+// Version: 0.2.0 — 2026-11-20
 // Why: The Android app's zero-request promise is enforced by the system only
 //      while the manifest keeps it: no INTERNET, no network-state probes, no
 //      exact alarms, and no backup or device-transfer path for the WebView's
@@ -37,15 +37,19 @@ const DOMAINS = [
 
 // Names of every <uses-permission> / <uses-permission-sdk-23> element.
 const permissions = [
-  ...manifest.matchAll(/<uses-permission(?:-sdk-\d+)?\b[^>]*?android:name\s*=\s*"([^"]+)"/g),
+  ...manifest.matchAll(/<uses-permission(?:-sdk-\d+)?\b[^>]*?android:name\s*=\s*["']([^"']+)["']/g),
 ].map((m) => m[1]);
 
 // The domains excluded with path "." inside one block (<device-transfer> or <cloud-backup>).
+function bodyOf(block: string): string {
+  return rules.match(new RegExp(`<${block}\\b[^>]*>([\\s\\S]*?)</${block}>`))?.[1] ?? '';
+}
+
 function excluded(block: string): string[] {
-  const body = rules.match(new RegExp(`<${block}\\b[^>]*>([\\s\\S]*?)</${block}>`))?.[1] ?? '';
+  const body = bodyOf(block);
   return [...body.matchAll(/<exclude\b([^>]*)>/g)]
-    .filter((m) => /path\s*=\s*"\."/.test(m[1]))
-    .map((m) => m[1].match(/domain\s*=\s*"([^"]+)"/)?.[1] ?? '');
+    .filter((m) => /path\s*=\s*["']\.["']/.test(m[1]))
+    .map((m) => m[1].match(/domain\s*=\s*["']([^"']+)["']/)?.[1] ?? '');
 }
 
 describe('AndroidManifest.xml', () => {
@@ -61,8 +65,8 @@ describe('AndroidManifest.xml', () => {
   });
 
   it('turns backup off and points at the extraction rules', () => {
-    expect(manifest).toMatch(/android:allowBackup\s*=\s*"false"/);
-    expect(manifest).toMatch(/android:dataExtractionRules\s*=\s*"@xml\/data_extraction_rules"/);
+    expect(manifest).toMatch(/android:allowBackup\s*=\s*["']false["']/);
+    expect(manifest).toMatch(/android:dataExtractionRules\s*=\s*["']@xml\/data_extraction_rules["']/);
   });
 });
 
@@ -71,6 +75,11 @@ describe('data_extraction_rules.xml', () => {
     it(`<${block}> excludes all nine domains`, () => {
       const got = excluded(block);
       for (const domain of DOMAINS) expect(got, `${block} misses ${domain}`).toContain(domain);
+    });
+
+    it(`<${block}> includes nothing`, () => {
+      // An <include> would re-admit a path the excludes closed.
+      expect(bodyOf(block)).not.toMatch(/<include\b/);
     });
   }
 });
