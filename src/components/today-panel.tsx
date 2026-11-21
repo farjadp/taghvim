@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/today-panel.tsx
-// Version: 0.9.48 — 2026-11-13
+// Version: 0.9.49 — 2026-11-20
 // Why: Hero: today in Persian with the live Tehran clock and any second
 //      clocks, plus a side card holding the same day in the Gregorian and
 //      Hijri calendars and its zodiac sign. Exported in two halves, TodayHero
@@ -28,6 +28,7 @@ import { type EventGroups } from "@/lib/events";
 import { todaySentence } from "@/lib/day-label";
 import { type Background, type CardStyle } from "@/lib/card-style";
 import { shareDayCard } from "./day-card";
+import { CARD_FAILED_NOTE, cardNote as noteFor } from "@/lib/card-share";
 import { WorldClocks } from "./world-clocks";
 import { ZodiacIcon } from "./zodiac-icon";
 import { HeroMotifs } from "./hero-motifs";
@@ -90,9 +91,9 @@ export function TodayHero({ now, initialNow, groups, cardStyle, backgrounds }: {
     setBusy(true);
     try {
       const result = await shareDayCard(now, groups, cardStyle, backgrounds, months);
-      setCardNote(result === "saved" ? "تصویر ذخیره شد." : result === "shared" ? "تصویر فرستاده شد." : "");
+      setCardNote(noteFor(result));
     } catch {
-      setCardNote("ساختن تصویر ممکن نشد.");
+      setCardNote(CARD_FAILED_NOTE);
     } finally {
       setBusy(false);
     }

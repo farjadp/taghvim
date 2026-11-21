@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/day-card.tsx
-// Version: 0.3.0 — 2026-10-09
+// Version: 0.4.0 — 2026-11-20
 // Why: Draws one day as an image the visitor can save and send. Canvas, in
 //      their own browser — nothing is uploaded and no server renders anything.
 // Env / Deps: lib/day-card decides the content; this file only draws it.
@@ -9,7 +9,9 @@
 //      themed UI. Keep PALETTE equal to the tokens it names, the same rule
 //      scripts/build-og already follows. The share carries the day as text too
 //      (lib/day-label shareText): Telegram has no alt text, so a blind recipient
-//      of the image alone gets nothing.
+//      of the image alone gets nothing. Delivery order and what may be claimed
+//      afterwards live in lib/card-share; in the Android app the native share sheet
+//      carries it (lib/native-export), because a WebView has no navigator.share.
 // ============================================================================
 
 "use client";
@@ -17,6 +19,8 @@
 import { CARD_SOURCE, cardFilename, cardOccasions, dayCard, type DayCard } from "@/lib/day-card";
 import { type EventGroups } from "@/lib/events";
 import { shareText } from "@/lib/day-label";
+import { deliverCard, type CardShareResult } from "@/lib/card-share";
+import { exportFileNatively, isNativePlatform } from "@/lib/native-export";
 import { DEFAULT_PALETTE, resolveCardStyle, type Background, type CardColours, type CardStyle } from "@/lib/card-style";
 
 // One card, chosen by Farjad on 9 Sep from three in a sandbox: the green square. Square is
@@ -181,7 +185,7 @@ export function loadBackground(src: string): Promise<HTMLImageElement | undefine
  * which is what someone on a phone actually wants, since «send it to Telegram» is the point —
  * and a download everywhere else.
  */
-export async function shareDayCard(now: Date, groups: EventGroups, style: CardStyle, backgrounds: Background[], months?: string[]): Promise<"shared" | "saved" | "cancelled"> {
+export async function shareDayCard(now: Date, groups: EventGroups, style: CardStyle, backgrounds: Background[], months?: string[]): Promise<CardShareResult> {
   const { colours, photo } = resolveCardStyle(style, backgrounds);
   const [, image] = await Promise.all([loadCardFont(), photo ? loadBackground(photo.src) : undefined]);
   const canvas = document.createElement("canvas");
@@ -192,22 +196,34 @@ export async function shareDayCard(now: Date, groups: EventGroups, style: CardSt
   if (!blob) throw new Error("card render failed");
   const name = cardFilename(now, format.extension);
   const file = new File([blob], name, { type: format.type });
-  const payload = { files: [file], text: shareText(now, groups, { months }) };
-  if (navigator.canShare?.(payload)) {
-    try {
-      await navigator.share(payload);
-      return "shared";
-    } catch (thrown) {
-      // Dismissing the sheet is not a failure and must not be reported as one.
-      if (thrown instanceof DOMException && thrown.name === "AbortError") return "cancelled";
-      // Anything else falls through to a download rather than leaving them with nothing.
-    }
-  }
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-  link.href = url;
-  link.download = name;
-  link.click();
-  URL.revokeObjectURL(url);
-  return "saved";
+  const text = shareText(now, groups, { months });
+  const payload = { files: [file], text };
+  return deliverCard({
+    canWebShare: Boolean(navigator.canShare?.(payload)),
+    webShare: () => navigator.share(payload),
+    // Only read when the app's native side exists; on the site this answers «unavailable» at once.
+    native: async () => (isNativePlatform() ? exportFileNatively({ fileName: name, mimeType: format.type, base64: await blobToBase64(blob), text }) : "unavailable"),
+    isNative: isNativePlatform(),
+    download: () => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = name;
+      link.click();
+      URL.revokeObjectURL(url);
+    },
+  });
+}
+
+// Standard base64 of the bytes, no `data:` prefix. FileReader is local; nothing is fetched.
+function blobToBase64(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => {
+      const url = String(reader.result);
+      resolve(url.slice(url.indexOf(",") + 1));
+    };
+    reader.onerror = () => reject(reader.error ?? new Error("read failed"));
+    reader.readAsDataURL(blob);
+  });
 }
