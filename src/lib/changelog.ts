@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/lib/changelog.ts
-// Version: 0.11.24 — 2026-11-20
+// Version: 0.11.25 — 2026-11-20
 // Why: The release history and the shortlist of what is being considered next,
 //      as data. Rendered by /changelog; nothing else reads it.
 //      WRITTEN FOR VISITORS, NOT FOR US. Work that changes nothing a visitor can
@@ -37,6 +37,15 @@ export const CHANGE_LABELS: Record<ChangeKind, string> = {
 
 // Newest first. Add a release here in the same commit that ships it.
 export const RELEASES: Release[] = [
+  {
+    version: '0.9.51',
+    at: '2026-11-20T20:42:54-05:00',
+    status: 'ready',
+    title: 'متن رویدادهای فایل تقویم درست‌تر شد',
+    changes: [
+      { kind: 'fixed', text: 'در فایل تقویمی که از «تاریخ‌های من» می‌گیری، توضیح هر رویداد حالا درست می‌گوید از کجا ساخته شده.' },
+    ],
+  },
   {
     version: '0.9.50',
     at: '2026-11-20T19:20:23-05:00',
