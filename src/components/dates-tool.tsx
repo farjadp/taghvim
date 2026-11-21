@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: src/components/dates-tool.tsx
-// Version: 0.5.0 — 2026-09-10
+// Version: 0.6.0 — 2026-11-20
 // Why: The visitor's own dates: add under one of fourteen categories and one of
 //      three rhythms, list by nearness, remove, and export as an .ics.
 // Env / Deps: lib/dates owns the arithmetic, lib/date-tools parses the fields so
@@ -15,6 +15,7 @@ import { useState } from "react";
 import { ArrowLeft, CalendarPlus, Download, Info, Trash2 } from "lucide-react";
 import { fa, formatDate } from "@/lib/calendar";
 import { useMonthNames } from "./month-names-context";
+import { exportFileNatively } from "@/lib/native-export";
 import { parseNumericInput } from "@/lib/date-tools";
 import {
   addDate, buildDatesFile, DATES_NOTICE, MAX_TITLE, removeDate,
@@ -96,8 +97,19 @@ export function DatesTool({ now, dates, ready, onChange, notice = DATES_NOTICE }
   }
 
   // Built in the browser from the browser's own list; there is no server that could serve it.
-  function download() {
-    const blob = new Blob([buildDatesFile(dates, now)], { type: "text/calendar;charset=utf-8" });
+  // Inside the Android app a blob link is silently dropped, so the native share sheet goes
+  // first; on the site, the extensions and the iPhone app it answers «unavailable» and the
+  // blob download below runs exactly as before.
+  async function download() {
+    const content = buildDatesFile(dates, now);
+    setError("");
+    try {
+      if ((await exportFileNatively({ fileName: "taghvim-dates.ics", mimeType: "text/calendar", content })) === "shared") return;
+    } catch {
+      setError("فایل ساخته نشد.");
+      return;
+    }
+    const blob = new Blob([content], { type: "text/calendar;charset=utf-8" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement("a");
     link.href = url;
