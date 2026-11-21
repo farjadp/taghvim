@@ -1,6 +1,6 @@
 // ============================================================================
 // Source: mobile/ios/app/App/App/AppDelegate.swift
-// Version: 0.2.0 — 2026-11-18
+// Version: 0.2.1 — 2026-11-20
 // Why: Capacitor's app delegate, plus one privacy rule: the page's localStorage
 //      holds the personal dates, which can be people's names, and the app says
 //      that list stays on this device, so it must stay out of device backups.
@@ -20,9 +20,9 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
 
-    // WebKit excludes a site's storage folder for its first 24 hours, then
-    // clears that flag the next time the site is used, so localStorage becomes
-    // backup-eligible. The flag therefore goes on the parent, which WebKit does
+    // Observed on the iOS 26.5 simulator: WebKit flags a site's folder at
+    // first and cleared the flag on a later use once the folder was older than
+    // 24 hours, so localStorage became backup-eligible. The flag therefore goes on the parent, which WebKit does
     // not touch. Set on every launch, before the web view exists, and the folder
     // is created here because it does not exist yet on a first launch.
     private func excludeWebViewStorageFromBackup() {
